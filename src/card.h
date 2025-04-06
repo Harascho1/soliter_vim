@@ -32,11 +32,18 @@ typedef enum _VALUE {
     value_king
 } VALUE;
 
+typedef struct _POSITION {
+    int row;
+    int col;
+} POSITION;
+
 typedef struct _CARD {
     VALUE value;
     SUIT suit;
     int visible;
     int selected; //0 if not selected, 1 if selected
+    SDL_FPoint *frame;
+    POSITION *pos;
 } CARD;
 
 typedef struct _HAND {
@@ -52,6 +59,6 @@ typedef struct _DECK {
 DECK* create_deck();
 void destroy_deck(DECK *deck);
 
-int render_card(SDL_Renderer *renderer, CARD *card, SDL_Point *point);
+int render_card(SDL_Renderer *renderer, CARD *card, SDL_FPoint *point);
 
 #endif //CARD_H

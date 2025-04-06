@@ -31,6 +31,13 @@ typedef struct _FIELD {
     int card_height;
 } FIELD;
 
+typedef struct _CURSOR {
+    SDL_FRect *cursor;
+    POSITION *pos;
+    int mode;
+} CURSOR;
+
+
 typedef struct _GAME{
     SDL_Window      *window;
     SDL_Renderer    *renderer;
@@ -40,6 +47,7 @@ typedef struct _GAME{
     SDL_Texture     *background_texture;
     DECK            *deck;
     FIELD           field;
+    CURSOR          *cursor;
 } GAME;
 
 typedef struct _RESOULUTION {

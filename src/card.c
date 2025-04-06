@@ -29,6 +29,9 @@ DECK* create_deck() {
         for (int value = value_ace; value <= value_king; value++) {
             deck->cards[i].suit = suit;
             deck->cards[i].value = value;
+            deck->cards[i].visible = not_visible;
+            deck->cards[i].frame = SDL_malloc(sizeof(SDL_FPoint));
+            deck->cards[i].pos = SDL_malloc(sizeof(POSITION));
             i++;
         }
     }    
@@ -43,6 +46,14 @@ void destroy_deck(DECK *deck) {
 }
 
 char* find_path(CARD *card) {
+    char *path;
+    path = SDL_malloc(sizeof(char) * 50);
+
+    if (card->visible == not_visible) {
+        sprintf(path, "../assets/cards/back_red_basic_white.png");
+        return path;
+    }
+
     char suit[10];
     switch (card->suit) {
         case suit_clubs:
@@ -82,21 +93,25 @@ char* find_path(CARD *card) {
             break;
     }
 
-    char *path;
-    path = SDL_malloc(sizeof(char) * 50);
+    if (card->selected == 1) {
+        sprintf(path, "../assets/cards/%s_%s.png", value, suit);
+        return path;
+
+    }
+
     sprintf(path, "../assets/cards/%s_%s_white.png", value, suit);
 
     return path;
 }
 
 int
-render_card(SDL_Renderer *renderer, CARD *card, SDL_Point *point) {
+render_card(SDL_Renderer *renderer, CARD *card, SDL_FPoint *point) {
     if (renderer == NULL || card == NULL) {
         SDL_Log("renderer or card are NULL in render_card fun...\n");
         return 0;
     }
 
-    const char* path;
+    char* path;
     path = find_path(card);
     if (path == NULL) {
         SDL_Log("path is NULL in render_card fun...\n");
@@ -123,6 +138,7 @@ render_card(SDL_Renderer *renderer, CARD *card, SDL_Point *point) {
     }
 
     SDL_DestroyTexture(texture);
+    SDL_free(path);
     return status;
 }
 

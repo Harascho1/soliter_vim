@@ -16,6 +16,30 @@ const char *game_over_items[] = {
 
 Uint32 g_change_scene_event_type = (Uint32) - 1;
 
+int
+load_game_field(DECK *deck) {
+    int count = 0;
+    int x_coord = padding_of_card / 2;
+    for (int i = 0; i < number_of_cards_in_row; i++) {
+        int y_coord = 2 * padding_of_card + card_height;
+        for (int j = 0; j < i + 1; j++) {
+            if (i == j) {
+                deck->cards[count].visible = visible;
+            }
+            deck->cards[count].frame->x = x_coord;
+            deck->cards[count].frame->y = y_coord;
+            deck->cards[count].pos->col = i + 1;
+            deck->cards[count].pos->row = j + 1;
+
+
+            y_coord += padding_of_card;
+            count++;
+        }
+        x_coord += padding_of_card + card_width;
+    }
+    return 1;
+}
+
 int game_init(GAME* game, const char *title, const RESOLUTION *res) {
     int status = 0;
 
@@ -30,6 +54,21 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
     float card_width_height_ratio = 7/5.0f;
     card_width = (width - number_of_cards_in_row * padding_of_card) / number_of_cards_in_row; 
     card_height = card_width * card_width_height_ratio;
+
+    SDL_FRect *rectovic = SDL_malloc(sizeof(SDL_FRect));
+    rectovic->x = (float)padding_of_card / 2.0f - padding_of_card / 4.0f;
+    rectovic->y = (float)padding_of_card * 2 + card_height - padding_of_card / 4;
+    rectovic->w = (float)card_width + padding_of_card / 2.0f;
+    rectovic->h = (float)card_height + padding_of_card / 2.0f;
+
+    game->cursor = SDL_malloc(sizeof(CURSOR));
+    game->cursor->cursor = rectovic;
+    if (game->cursor->cursor == NULL) {
+        SDL_Log("nece da mi radi rectovic\n");
+    }
+    game->cursor->pos = SDL_malloc(sizeof(POSITION));
+    game->cursor->pos->col = 1; 
+    game->cursor->pos->row = 1;
 
     game->renderer = SDL_CreateRenderer(game->window, NULL);
     if (game->renderer == NULL) {
@@ -91,6 +130,9 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         return status;
     }
     g_change_scene_event_type = event_type;
+
+
+    load_game_field(game->deck);
 
     return 1;
 }
