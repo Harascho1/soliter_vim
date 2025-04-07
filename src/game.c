@@ -195,6 +195,7 @@ void game_quit(GAME* game) {
 void
 restart_game(GAME *game) {
     destroy_cursor(game->cursor);
+    SDL_Log("RADI\n");
     destroy_deck(game->deck);
     game->deck = create_deck();
     game->cursor = create_cursor(1, 1);

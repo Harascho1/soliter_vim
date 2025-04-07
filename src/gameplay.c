@@ -4,6 +4,12 @@
 CARD* is_there_a_card(GAME *game, int *row, int *col);
 int change_cursor_frame(GAME *game);
 
+static char* modes[3] = {
+    "mode : normal",
+    "mode : select",
+    "mode : fly"
+};
+
 CARD*
 draw_next_card(DECK *deck) {
     int i;
@@ -211,10 +217,31 @@ interact(GAME *game) {
 
 int
 gamaplay_event_handler(GAME *game, const SDL_Event *event) {
+    int tmp;
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch (event->key.key) {
             case SDLK_ESCAPE:
                 push_user_event(g_change_scene_event_type, game_state_game_over);
+                break;
+            case SDLK_X:
+                game->cursor->mode = CURSOR_NORMAL_MODE;
+                break;
+            case SDLK_C:
+                game->cursor->mode += CURSOR_FLY_MODE;
+                break;
+            case SDLK_2:
+                tmp = 2;
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
+                    break;
+                }
+                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
+                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
+                    break;
+                } else if (is_there_a_card(game, NULL, &(tmp))) {
+                    game->cursor->pos->col = 2;
+                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
+                    change_cursor_frame(game);
+                }
                 break;
             case SDLK_D:
             case SDLK_RIGHT:
@@ -442,6 +469,29 @@ gameplay_render(GAME* game) {
                 return 0;
             }
     }
+
+    // * RENDERING TEXT THAT SHOWS WHAT IN WHAT MODE ARE U
+    int mode = game->cursor->mode % 4;
+    SDL_Log("mode: %d\n", mode);
+    int text_width, text_height;
+    status = get_text_size(
+        game->font,
+        modes[mode],
+        standard_font_size,
+        &text_width,
+        &text_height
+    );
+    if (status == 0) {
+        SDL_Log("get_text_size error...\n");
+    }
+    status = render_text(
+        game->font,
+        game->renderer,
+        modes[mode],
+        standard_font_size,
+        &(SDL_Point){padding_of_card, height - text_height - padding_of_card},
+        &(SDL_Color){255,255,255,255}
+    );
 
 
     // * RENDERING GAME FIELD

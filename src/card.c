@@ -119,15 +119,20 @@ DECK* create_deck() {
     return deck;
 }
 
+void destroy_card(CARD *card) {
+    if (card != NULL) {
+        SDL_free(card->frame);
+        SDL_free(card->pos);
+    }
+}
+
 void destroy_deck(DECK *deck) {
     if (deck != NULL) {
         for (int i = 0; i < 52; i++) {
-            SDL_free(deck->cards[i].pos);
-            SDL_free(deck->cards[i].frame);
+            destroy_card(&deck->cards[i]);
         }
         for (int i = 0; i < 4; i++) {
-            SDL_free(deck->sorted_cards[i]->pos);
-            SDL_free(deck->sorted_cards[i]->frame);
+            destroy_card(deck->sorted_cards[i]);
             SDL_free(deck->sorted_cards[i]);
         }
         SDL_free(deck);

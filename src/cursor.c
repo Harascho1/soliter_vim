@@ -27,3 +27,16 @@ destroy_cursor(CURSOR *cursor) {
         SDL_free(cursor);
     }
 }
+
+int
+have_a_flag(CURSOR *cursor, int flag) {
+    if (cursor->mode & flag) {
+        return 1;
+    }
+    return 0;
+}
+
+int
+delete_hover_flag(CURSOR *cursor, int flag) {
+    cursor->mode = cursor->mode & ~flag;
+}

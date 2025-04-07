@@ -64,7 +64,6 @@ typedef struct _DECK {
     CARD *deck_card;
     CARD *previous_cards[2];
 
-
     //TODO OVO MOZDA MOZE BOLJE DA SE OSMISLI
     CARD *sorted_cards[4];
 
