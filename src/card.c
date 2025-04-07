@@ -5,10 +5,36 @@ int card_width = 0;
 int card_height = 0;
 
 void
-deselect_all_card(DECK *deck) {
+deselect_all_cards(DECK *deck) {
     for (int i = 0; i < 52; i++) {
         deck->cards[i].selected = 0;
     }
+}
+
+CARD*
+find_card(DECK *deck, int col, int row) {
+    for (int i = 0; i < 52; i++) {
+        if (deck->cards[i].pos->col == col &&
+            deck->cards[i].pos->row == row) {
+            return &deck->cards[i];
+        }
+    }
+    return NULL;
+}
+
+int
+select_card_below(CARD *card, DECK *deck) {
+    if (card == NULL) return 0;
+    if (card->visible == not_visible) {
+        return 1;
+    }
+    CARD *tmp_card = find_card(deck, card->pos->col, card->pos->row + 1);
+    if (tmp_card == NULL) {
+        return 1;
+    }
+    SDL_Log("moj brat\n");
+    tmp_card->selected = 1;
+    return select_card_below(tmp_card, deck);
 }
 
 void shuffle_deck(DECK *deck) {
@@ -24,37 +50,98 @@ void shuffle_deck(DECK *deck) {
     }
 }
 
+int
+sort_a_card(CARD *card, DECK *deck) {
+    SDL_Log("SI USO\n");
+    for (int suit = 0; suit <= suit_spades; suit++) {
+        if (card->suit == deck->sorted_cards[suit]->suit) {
+            SDL_Log("Alo momak\n");
+            if (deck->sorted_cards[suit]->value + 1 != card->value) {
+                return 0;
+            }
+            SDL_Log("Alo momak\n");
+            int card_value = card->value;
+            card->pos->col = deck->sorted_cards[suit]->pos->col;
+            card->pos->row = deck->sorted_cards[suit]->pos->row;
+            card->frame->x = deck->sorted_cards[suit]->frame->x;
+            card->frame->y = deck->sorted_cards[suit]->frame->y;
+            SDL_Log(
+                "(%d, %d)",
+                card->pos->col,
+                card->pos->row
+            );
+            deck->sorted_cards[suit]->value = card_value;
+            return 1;
+        }
+    }
+    SDL_Log("SI IZASO\n");
+    return 0;
+}
+
+int
+can_card_be_placed(CARD *card_below, CARD *card_above) {
+    if (card_below->value + 1 != card_above->value) {
+        return 0;
+    }
+    if ((card_below->suit == suit_clubs || card_below->suit == suit_spades) &&
+        (card_above->suit == suit_diamonds || card_above->suit == suit_hearts)) {
+        return 1;
+    } else if ((card_below->suit == suit_diamonds || card_below->suit == suit_hearts) &&
+        (card_above->suit == suit_clubs || card_above->suit == suit_spades)) {
+        return 1;
+    }
+    return 0;
+}
+
 DECK* create_deck() {
     DECK *deck = NULL;
     deck = SDL_malloc(sizeof(DECK));
     if (deck == NULL) {
         return deck;
     }
-    deck->count = 52;
+    deck->count = 28;
     int i = 0;
     for (int suit = suit_clubs; suit <= suit_spades; suit++) {
         for (int value = value_ace; value <= value_king; value++) {
             deck->cards[i].suit = suit;
             deck->cards[i].value = value;
             deck->cards[i].visible = not_visible;
+            deck->cards[i].selected = 0;
+            deck->cards[i].on_field = 0;
             deck->cards[i].frame = SDL_malloc(sizeof(SDL_FPoint));
             deck->cards[i].pos = SDL_malloc(sizeof(POSITION));
             i++;
         }
-    }    
+    }
+    deck->new_card = NULL;
+    deck->deck_card = &deck->cards[28];
     shuffle_deck(deck);
     return deck;
 }
 
 void destroy_deck(DECK *deck) {
     if (deck != NULL) {
+        for (int i = 0; i < 52; i++) {
+            SDL_free(deck->cards[i].pos);
+            SDL_free(deck->cards[i].frame);
+        }
+        for (int i = 0; i < 4; i++) {
+            SDL_free(deck->sorted_cards[i]->pos);
+            SDL_free(deck->sorted_cards[i]->frame);
+            SDL_free(deck->sorted_cards[i]);
+        }
         SDL_free(deck);
     }
 }
 
 char* find_path(CARD *card) {
     char *path;
-    path = SDL_malloc(sizeof(char) * 50);
+    path = SDL_malloc(sizeof(char) * 100);
+
+    if (card->value == 0) {
+        sprintf(path, "../assets/cards/blank_front_with_num_boarders_white.png");
+        return path;
+    }
 
     if (card->visible == not_visible) {
         sprintf(path, "../assets/cards/back_red_basic_white.png");

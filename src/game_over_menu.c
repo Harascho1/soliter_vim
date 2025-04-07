@@ -5,16 +5,19 @@ game_over_menu_event_handler(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch (event->key.key) {
             case SDLK_UP:
+            case SDLK_W:
                 if (game->game_over_menu->selected_item != 0) {
                     game->game_over_menu->selected_item--;
                 }
                 break;
             case SDLK_DOWN:
+            case SDLK_S:
                 if (game->game_over_menu->selected_item != game_over_item_type_max - 1) {
                     game->game_over_menu->selected_item++;
                 }
                 break;
             case SDLK_RETURN:
+            case SDLK_SPACE:
                 switch (game->game_over_menu->selected_item) {
                     case game_over_item_type_restart:
                         restart_game(game);

@@ -23,14 +23,16 @@ int
 load_game_field(DECK *deck) {
     int count = 0;
     int x_coord = padding_of_card / 2;
+    
     for (int i = 0; i < number_of_cards_in_row; i++) {
         int y_coord = 2 * padding_of_card + card_height;
         invisible_card[i].frame = SDL_malloc(sizeof(SDL_FPoint));
         invisible_card[i].pos = SDL_malloc(sizeof(POSITION));
         invisible_card[i].pos->row = 1;
-        invisible_card[i].pos->col = 1;
+        invisible_card[i].pos->col = i + 1;
         invisible_card[i].frame->x = x_coord;
         invisible_card[i].frame->y = y_coord;
+        invisible_card[i].value = 14;
         for (int j = 0; j < i + 1; j++) {
             if (i == j) {
                 deck->cards[count].visible = visible;
@@ -39,12 +41,38 @@ load_game_field(DECK *deck) {
             deck->cards[count].frame->y = y_coord;
             deck->cards[count].pos->col = i + 1;
             deck->cards[count].pos->row = j + 1;
+            deck->cards[count].on_field = 1;
 
             y_coord += padding_of_card;
             count++;
         }
         x_coord += padding_of_card + card_width;
     }
+    for (; count < 52; count++) {
+        deck->cards[count].frame->x = padding_of_card / 2;
+        deck->cards[count].frame->y = padding_of_card / 2;
+        deck->cards[count].pos->col = 1;
+        deck->cards[count].pos->row = 0;
+
+    }
+
+    int padding_width = 3 * (card_width + padding_of_card) + padding_of_card /2;
+    for (int suit = suit_clubs; suit <= suit_spades; suit++) {
+        deck->sorted_cards[suit] = SDL_malloc(sizeof(CARD));
+        deck->sorted_cards[suit]->frame = SDL_malloc(sizeof(SDL_FPoint));
+        deck->sorted_cards[suit]->frame->x = padding_width;
+        deck->sorted_cards[suit]->frame->y = padding_of_card / 2;
+
+        deck->sorted_cards[suit]->pos = SDL_malloc(sizeof(POSITION));
+        deck->sorted_cards[suit]->pos->col = suit + 3;
+        deck->sorted_cards[suit]->pos->row = 0;
+        padding_width += padding_of_card + card_width;
+
+        deck->sorted_cards[suit]->suit = suit;
+        deck->sorted_cards[suit]->value = 0;
+        deck->sorted_cards[suit]->visible = 1;
+    }
+
     return 1;
 }
 

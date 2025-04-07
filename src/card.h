@@ -6,6 +6,11 @@ enum {
     visible
 };
 
+enum {
+    not_selected = 0,
+    selected
+};
+
 extern int card_width;
 extern int card_height;
 
@@ -44,6 +49,7 @@ typedef struct _CARD {
     int selected; //0 if not selected, 1 if selected
     SDL_FPoint *frame;
     POSITION *pos;
+    int on_field;
 } CARD;
 
 typedef struct _HAND {
@@ -54,6 +60,14 @@ typedef struct _HAND {
 typedef struct _DECK {
     CARD cards[52];
     int count;
+    CARD *new_card;
+    CARD *deck_card;
+    CARD *previous_cards[2];
+
+
+    //TODO OVO MOZDA MOZE BOLJE DA SE OSMISLI
+    CARD *sorted_cards[4];
+
 } DECK;
 
 extern CARD invisible_card[7];
@@ -63,5 +77,9 @@ void destroy_deck(DECK *deck);
 
 int render_card(SDL_Renderer *renderer, CARD *card, SDL_FPoint *point);
 void deselect_all_cards(DECK *deck);
+CARD* find_card(DECK *deck, int col, int row);
+int can_card_be_placed(CARD *card_below, CARD *card_above);
+int sort_a_card(CARD *card, DECK* deck);
+int select_card_below(CARD *card, DECK *deck);
 
 #endif //CARD_H

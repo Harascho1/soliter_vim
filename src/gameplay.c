@@ -1,8 +1,41 @@
 #include "game.h"
 #include "texture.h"
 
-int change_cursor_frame(GAME *game);
 CARD* is_there_a_card(GAME *game, int *row, int *col);
+int change_cursor_frame(GAME *game);
+
+CARD*
+draw_next_card(DECK *deck) {
+    int i;
+    if (deck->count == 52) {
+        deck->count = 28;
+    }
+    while (deck->count < 52) {
+        if (deck->cards[deck->count].on_field == 0) {
+            i = deck->count;
+            //TODO treba da mu se vrate sva ostala na fabricko
+            if (deck->new_card != NULL) {
+                deck->new_card->visible = not_visible;
+                deck->new_card->pos->col = 1;
+                deck->new_card->pos->row = 0;
+                deck->new_card->frame->x = padding_of_card / 2;
+                deck->new_card->frame->y = padding_of_card / 2;
+
+            }
+
+            deck->cards[i].pos->col = 2;
+            deck->cards[i].pos->row = 0;
+            deck->cards[i].frame->x = padding_of_card / 2 + padding_of_card + card_width;
+            deck->cards[i].frame->y = padding_of_card / 2;
+            deck->cards[i].visible = visible;
+            break;
+        }
+        deck->count++;
+    }
+    deck->count++;
+    deck->deck_card = &deck->cards[deck->count];
+    return &deck->cards[i];
+}
 
 int
 reveal_card_below(GAME *game) {
@@ -25,7 +58,7 @@ reveal_card_below(GAME *game) {
             if (card == NULL) {
                 SDL_Log("card je NULL\n");
             }
-            card->visible = !card->visible;
+            card->visible = visible;
             return 1;
         } 
     }
@@ -50,51 +83,64 @@ same_card_selected(CARD *card1, CARD *card2) {
 }
 
 int
-select_a_card(GAME *game) {
-    if (game->cursor->mode == 1) {
-        
-        for (int i = 0; i < 52; i++) {
-            if (game->deck->cards[i].visible == 0) {
-                continue;
-            }
-            if (game->deck->cards[i].pos->col == game->cursor->pos->col
-            && game->deck->cards[i].pos->row == game->cursor->pos->row) {
-                CARD *card = selected_card(game->deck);
-                if ((game_update = same_card_selected(&game->deck->cards[i], card)) == 1) {
-                    //TODO
-                    card->selected = 0;
-                    SDL_Log("Ista karta je selektovana");
-                    game_update = 0;
-                    game->cursor->mode = 0;
-                    return 1;
-                }       
+place_a_card(GAME *game) {
+    for (int i = 0; i < 52; i++) {
+        if (game->deck->cards[i].pos->col == game->cursor->pos->col &&
+            game->deck->cards[i].pos->row == game->cursor->pos->row) {
 
-                if (card == NULL) {
-                    SDL_Log("Ni jedna karta nije selektovana\n");
-                    return 0;
-                }
+            if (game->deck->cards[i].visible == not_visible) {
+                deselect_all_cards(game->deck);
                 game->cursor->mode = 0;
-                int old_col = card->pos->col;
-                card->pos->col = game->cursor->pos->col;
-                card->pos->row = game->deck->cards[i].pos->row + 1;
-                card->frame->x = game->deck->cards[i].frame->x;
-                card->frame->y = game->deck->cards[i].frame->y + padding_of_card;
-
-                card->selected = 0;
-                game->cursor->pos->row = card->pos->row;
-                
-                game_update = 1;
-                change_cursor_frame(game);
-                return 1;
+                return 0;
             }
 
+            CARD *card = selected_card(game->deck);
+            if (card == NULL) {
+                SDL_Log("Ni jedna karta nije selektovana\n");
+                return 0;
+            }
+
+            if ((game_update = same_card_selected(&game->deck->cards[i], card)) == 1) {
+                //TODO
+                game_update = sort_a_card(card, game->deck);
+                SDL_Log("SKR SKR\n");
+                deselect_all_cards(game->deck);
+                SDL_Log("Ista karta je selektovana");
+                game->cursor->mode = 0;
+                return 1;
+            }       
+            
+            if (can_card_be_placed(card, &game->deck->cards[i]) == 0) {
+                game->cursor->mode = 0;
+                deselect_all_cards(game->deck);
+                return 0;
+            }
+
+            game->cursor->mode = 0;
+            int old_col = card->pos->col;
+            card->pos->col = game->cursor->pos->col;
+            card->pos->row = game->deck->cards[i].pos->row + 1;
+            card->frame->x = game->deck->cards[i].frame->x;
+            card->frame->y = game->deck->cards[i].frame->y + padding_of_card;
+
+            deselect_all_cards(game->deck);
+            //game->cursor->pos->row = card->pos->row;
+            
+            game_update = 1;
+            change_cursor_frame(game);
+            return 1;
         }
-        SDL_Log("PLS NE\n");
-        game->cursor->mode = 0;
-        return 0;
 
     }
+    SDL_Log("PLS NE\n");
+    game->cursor->mode = 0;
+    return 0;
 
+}
+
+
+int
+select_a_card(GAME *game) {
     for (int i = 0; i < 52; i++) {
         if (game->deck->cards[i].visible == not_visible) {
             continue;
@@ -103,6 +149,7 @@ select_a_card(GAME *game) {
         && game->deck->cards[i].pos->row == game->cursor->pos->row) {
 
             game->deck->cards[i].selected = !game->deck->cards[i].selected;
+            select_card_below(&game->deck->cards[i], game->deck);
             game->cursor->mode = 1;
             return 1;
         }
@@ -133,25 +180,33 @@ is_there_a_card(GAME *game, int *changed_row, int *changed_col) {
 
 int
 change_cursor_frame(GAME *game) {
-    int i = 0;
-    for (i = 0; i < 52; i++) {
-        if (game->deck->cards[i].pos->col == game->cursor->pos->col
-        && game->deck->cards[i].pos->row == game->cursor->pos->row) {
-            break;
-        }
-    }
-    if (i == 52) {
+    CARD *card = find_card(
+        game->deck,
+        game->cursor->pos->col,
+        game->cursor->pos->row
+    );
+    if (card == NULL) {
         return 0;
     }
-    game->cursor->cursor->x = game->deck->cards[i].frame->x - padding_of_card / 4; 
-    game->cursor->cursor->y = game->deck->cards[i].frame->y - padding_of_card / 4; 
+    game->cursor->cursor->x = card->frame->x - padding_of_card / 4; 
+    game->cursor->cursor->y = card->frame->y - padding_of_card / 4; 
     return 1;
 }
 
 int
 go_to_invisible_card(GAME *game, int col) {
-    game->cursor->cursor->x = invisible_card[col-1].frame->x;
-    game->cursor->cursor->y = invisible_card[col-1].frame->y;
+    game->cursor->pos->col = col;
+    game->cursor->cursor->x = invisible_card[col - 1].frame->x - padding_of_card / 4;
+    game->cursor->cursor->y = invisible_card[col - 1].frame->y - padding_of_card / 4;
+}
+
+int
+interact(GAME *game) {
+    if (game->cursor->mode == 0) {
+        select_a_card(game);
+    } else if (game->cursor->mode == 1) {
+        place_a_card(game);
+    }
 }
 
 int
@@ -168,6 +223,10 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 }
                 int new_col = game->cursor->pos->col + 1;
                 if (is_there_a_card(game, NULL, &(new_col)) == 0) {
+                    if (game->cursor->pos->row == 1) {
+                        go_to_invisible_card(game, new_col); 
+                        break;
+                    } 
                     break;
                 }
                 game->cursor->pos->col++;
@@ -180,10 +239,11 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 }
                 new_col = game->cursor->pos->col - 1;
                 if (is_there_a_card(game, NULL, &new_col) == 0) {
-                    if (new_col == 1 && game->cursor->pos->row == 1) {
+                    if (game->cursor->pos->row == 1) {
                         go_to_invisible_card(game, new_col);
                         break;
                     }
+                    break;
                 }
                 game->cursor->pos->col--;
                 change_cursor_frame(game);
@@ -199,8 +259,15 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 break;                
             case SDLK_W:
             case SDLK_UP:
+                //SDL_Log(
+                //    "(%d, %d)",
+                //    game->cursor->pos->row,
+                //    game->cursor->pos->col
+                //);
                 if (game->cursor->pos->row == 1) {
-                    break;
+                    if (game->cursor->pos->col != 1) {
+                        break;
+                    }
                 }
                 new_row = game->cursor->pos->row - 1;
                 if (is_there_a_card(game, &new_row, NULL) == 0) {
@@ -209,8 +276,12 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 game->cursor->pos->row--;
                 change_cursor_frame(game);
                 break;                
+            case SDLK_N:
+                game->deck->new_card = draw_next_card(game->deck);
+                break;
             case SDLK_RETURN:
-                select_a_card(game);
+            case SDLK_SPACE:
+                interact(game);
                 break;
             default:
                 break;
@@ -229,7 +300,6 @@ gameplay_update(GAME* game) {
         if (status != 0) {
             game_update = 0;
         }
-
     }
 
     return 1;
@@ -306,12 +376,12 @@ gameplay_render(GAME* game) {
         return 0;
     }
 
-    const char *path = "../assets/cards/blank_front_with_num_boarders_white.png";
-    SDL_Texture *texture = create_texture_from_image(game->renderer, path);
-    if (texture == NULL) {
-        SDL_Log("create_texture_from_image failed...\n");
-        return 0;
-    }
+    //const char *path = "../assets/cards/blank_front_with_num_boarders_white.png";
+    //SDL_Texture *texture = create_texture_from_image(game->renderer, path);
+    //if (texture == NULL) {
+    //    SDL_Log("create_texture_from_image failed...\n");
+    //    return 0;
+    //}
 
     status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
     if (status == 0) {
@@ -324,38 +394,83 @@ gameplay_render(GAME* game) {
     int width, height;
     status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
 
-    int y_blank_coord = padding_of_card / 2;
-    int x_blank_coord = width - padding_of_card / 2 - card_width;
+    // *RENDERING SORTED_CARDS
     for (int i = 0; i < 4; i++) {
-        status = SDL_RenderTexture(game->renderer, texture, NULL, &(SDL_FRect){x_blank_coord, y_blank_coord, card_width, card_height});
-        x_blank_coord -= padding_of_card + card_width;
+        status = render_card(
+            game->renderer,
+            game->deck->sorted_cards[i],
+            game->deck->sorted_cards[i]->frame
+        );
     }
 
+    //TODO popravi ovo ovo je samo za test za kursor
+    // *RENDERING DECK AND ONE MORE CARD ON LEFT RIGHT CORNER
     status = render_card(
         game->renderer,
-        &game->deck->cards[51],
-        &(SDL_FPoint){padding_of_card / 2, padding_of_card / 2}
+        game->deck->deck_card,
+        game->deck->deck_card->frame
     );
     if (status == 0) {
         SDL_Log("render card error...\n");
     }
+    if (game->cursor->pos->col == 1 &&
+        game->cursor->pos->row == 0) {
 
-    status = render_cursor(game);
-    if (status == 0) {
-        SDL_Log("render_cursor error...\n");
-        return 0;
+            status = render_cursor(game);
+            if (status == 0) {
+                SDL_Log("render_cursor error...\n");
+                return 0;
+            }
     }
 
+    if (game->deck->new_card != NULL) {
+        status = render_card(
+            game->renderer,
+            game->deck->new_card,
+            game->deck->new_card->frame
+        );
+        if (status == 0) {
+            SDL_Log("render card error...\n");
+        }
+    }
+    if (game->cursor->pos->col == 2 &&
+        game->cursor->pos->row == 0) {
+
+            status = render_cursor(game);
+            if (status == 0) {
+                SDL_Log("render_cursor error...\n");
+                return 0;
+            }
+    }
+
+
+    // * RENDERING GAME FIELD
     for (int i = 1; i <= number_of_cards_in_row; i++) {
         int j = 1;
         CARD *card;
-        while ((card = is_there_a_card(game, &j, &i)) != NULL) {
+        while ((card = find_card(game->deck, i, j)) != NULL) {
             render_card(
                 game->renderer,
                 card,
                 card->frame
             );
+            if (game->cursor->pos->col == i &&
+                game->cursor->pos->row == j) {
+                    status = render_cursor(game);
+                    if (status == 0) {
+                        SDL_Log("render_cursor error...\n");
+                        return 0;
+                    }
+            }
             j++;
+        }
+        if (game->cursor->pos->col == i &&
+            game->cursor->pos->row == j) {
+                status = render_cursor(game);
+                if (status == 0) {
+                    SDL_Log("render_cursor error...\n");
+                    return 0;
+                }
         }
     }
 

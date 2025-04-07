@@ -6,18 +6,21 @@ main_menu_event_handler(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch (event->key.key) {
             case SDLK_UP:
+            case SDLK_W:
                 game->main_menu->selected_item--;
                 if (game->main_menu->selected_item < 0) {
                     game->main_menu->selected_item = game->main_menu->count - 1;
                 }
                 break;
             case SDLK_DOWN:
+            case SDLK_S:
                 game->main_menu->selected_item++;
                 if (game->main_menu->selected_item >= game->main_menu->count) {
                     game->main_menu->selected_item = 0;
                 }
                 break;
             case SDLK_RETURN:
+            case SDLK_SPACE:
                 switch (game->main_menu->items[game->main_menu->selected_item].type) {
                     case menu_item_type_play:
                         push_user_event(g_change_scene_event_type, game_state_gameplay);
