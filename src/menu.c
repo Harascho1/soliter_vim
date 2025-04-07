@@ -1,6 +1,6 @@
 #include "menu.h"
 
-MENU* menu_init(const char *text[], int count) {
+MENU* create_menu(const char *text[], int count) {
     MENU *menu = (MENU *)malloc(sizeof(MENU));
 
     menu->items = (MENU_ITEM *)malloc(sizeof(MENU_ITEM) * count);

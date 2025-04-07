@@ -4,6 +4,13 @@
 int card_width = 0;
 int card_height = 0;
 
+void
+deselect_all_card(DECK *deck) {
+    for (int i = 0; i < 52; i++) {
+        deck->cards[i].selected = 0;
+    }
+}
+
 void shuffle_deck(DECK *deck) {
     if (deck == NULL) {
         SDL_Log("Deck is NULL and therefore cannot be shuffled");

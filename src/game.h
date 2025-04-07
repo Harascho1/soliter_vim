@@ -5,6 +5,7 @@
 #include "font.h"
 #include "card.h"
 #include "texture.h"
+#include "cursor.h"
 
 extern Uint32 g_change_scene_event_type;
 
@@ -31,12 +32,7 @@ typedef struct _FIELD {
     int card_height;
 } FIELD;
 
-typedef struct _CURSOR {
-    SDL_FRect *cursor;
-    POSITION *pos;
-    int mode;
-} CURSOR;
-
+typedef struct _CURSOR CURSOR;
 
 typedef struct _GAME{
     SDL_Window      *window;
@@ -69,8 +65,12 @@ extern SCENE main_menu_scene;
 extern SCENE gameplay_scene;
 extern SCENE game_over_menu_scene;
 
+extern int game_update;
+
 int game_init(GAME* game, const char *title, const RESOLUTION *res);
 void game_quit(GAME* game);
+int load_game_field(DECK *game);
+void restart_game(GAME *game);
 
 int push_user_event(Uint32 type, Sint32 code);
 

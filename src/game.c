@@ -16,12 +16,21 @@ const char *game_over_items[] = {
 
 Uint32 g_change_scene_event_type = (Uint32) - 1;
 
+int game_update = 0;
+CARD invisible_card[7];
+
 int
 load_game_field(DECK *deck) {
     int count = 0;
     int x_coord = padding_of_card / 2;
     for (int i = 0; i < number_of_cards_in_row; i++) {
         int y_coord = 2 * padding_of_card + card_height;
+        invisible_card[i].frame = SDL_malloc(sizeof(SDL_FPoint));
+        invisible_card[i].pos = SDL_malloc(sizeof(POSITION));
+        invisible_card[i].pos->row = 1;
+        invisible_card[i].pos->col = 1;
+        invisible_card[i].frame->x = x_coord;
+        invisible_card[i].frame->y = y_coord;
         for (int j = 0; j < i + 1; j++) {
             if (i == j) {
                 deck->cards[count].visible = visible;
@@ -30,7 +39,6 @@ load_game_field(DECK *deck) {
             deck->cards[count].frame->y = y_coord;
             deck->cards[count].pos->col = i + 1;
             deck->cards[count].pos->row = j + 1;
-
 
             y_coord += padding_of_card;
             count++;
@@ -55,20 +63,12 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
     card_width = (width - number_of_cards_in_row * padding_of_card) / number_of_cards_in_row; 
     card_height = card_width * card_width_height_ratio;
 
-    SDL_FRect *rectovic = SDL_malloc(sizeof(SDL_FRect));
-    rectovic->x = (float)padding_of_card / 2.0f - padding_of_card / 4.0f;
-    rectovic->y = (float)padding_of_card * 2 + card_height - padding_of_card / 4;
-    rectovic->w = (float)card_width + padding_of_card / 2.0f;
-    rectovic->h = (float)card_height + padding_of_card / 2.0f;
-
-    game->cursor = SDL_malloc(sizeof(CURSOR));
-    game->cursor->cursor = rectovic;
-    if (game->cursor->cursor == NULL) {
-        SDL_Log("nece da mi radi rectovic\n");
+    game->cursor = create_cursor(1, 1);
+    if (game->cursor == NULL) {
+        SDL_Log("create cursor error\n");
+        game_quit(game);
+        return status;
     }
-    game->cursor->pos = SDL_malloc(sizeof(POSITION));
-    game->cursor->pos->col = 1; 
-    game->cursor->pos->row = 1;
 
     game->renderer = SDL_CreateRenderer(game->window, NULL);
     if (game->renderer == NULL) {
@@ -77,7 +77,7 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         return status;
     }
 
-    game->main_menu = menu_init(
+    game->main_menu = create_menu(
         main_menu_items,
         sizeof(main_menu_items) / sizeof(main_menu_items[0])
     );
@@ -87,7 +87,7 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         return status;
     }
 
-    game->game_over_menu = menu_init(
+    game->game_over_menu = create_menu(
         game_over_items,
         sizeof(game_over_items) / sizeof(game_over_items[0])
     );
@@ -97,7 +97,7 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         return status;
     }
 
-    game->font = font_init(
+    game->font = create_font(
         "../assets/font.ttf"
     );
     if (game->font == NULL) {
@@ -151,8 +151,26 @@ void game_quit(GAME* game) {
         destroy_menu(game->game_over_menu);
     }
     if (game->font != NULL) {
-        font_destroy(game->font);
+        destroy_font(game->font);
     }
+    if (game->deck != NULL) {
+        destroy_deck(game->deck);
+    }
+    if (game->cursor != NULL) {
+        destroy_cursor(game->cursor);
+    }
+    if (game->background_texture != NULL) {
+        SDL_DestroyTexture(game->background_texture);
+    }
+}
+
+void
+restart_game(GAME *game) {
+    destroy_cursor(game->cursor);
+    destroy_deck(game->deck);
+    game->deck = create_deck();
+    game->cursor = create_cursor(1, 1);
+    load_game_field(game->deck);
 }
 
 int push_user_event(Uint32 type, Sint32 code) {
@@ -160,6 +178,5 @@ int push_user_event(Uint32 type, Sint32 code) {
     memset(&event, 0, sizeof(event));
     event.type = type;
     event.user.code = code;
-    SDL_Log("Code je %d\n", code);
     return SDL_PushEvent(&event);
 }

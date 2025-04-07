@@ -56,9 +56,12 @@ typedef struct _DECK {
     int count;
 } DECK;
 
+extern CARD invisible_card[7];
+
 DECK* create_deck();
 void destroy_deck(DECK *deck);
 
 int render_card(SDL_Renderer *renderer, CARD *card, SDL_FPoint *point);
+void deselect_all_cards(DECK *deck);
 
 #endif //CARD_H

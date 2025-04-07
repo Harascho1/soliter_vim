@@ -1,6 +1,7 @@
 #include "font.h"
 
-FONT* font_init(const char *path) {
+FONT*
+create_font(const char *path) {
     FONT *font = (FONT *)malloc(sizeof(FONT));
     if (font == NULL) {
         return NULL;
@@ -18,7 +19,7 @@ FONT* font_init(const char *path) {
 }
 
 void
-font_destroy(FONT *font) {
+destroy_font(FONT *font) {
     if (font == NULL) {
         return;
     }

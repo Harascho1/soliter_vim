@@ -20,7 +20,6 @@ main_menu_event_handler(GAME *game, const SDL_Event *event) {
             case SDLK_RETURN:
                 switch (game->main_menu->items[game->main_menu->selected_item].type) {
                     case menu_item_type_play:
-                        printf("Starting game...\n");
                         push_user_event(g_change_scene_event_type, game_state_gameplay);
                         break;
                     case menu_item_type_settings:
@@ -33,7 +32,6 @@ main_menu_event_handler(GAME *game, const SDL_Event *event) {
                         SDL_Event quit_event;
                         quit_event.type = SDL_EVENT_QUIT;
                         SDL_PushEvent(&quit_event);
-                        printf("Exiting game...\n");
                         break;
                     default:
                         break;

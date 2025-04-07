@@ -33,7 +33,7 @@ typedef struct _MENU {
     int count;
 } MENU;
 
-MENU* menu_init(const char *text[], int count);
+MENU* create_menu(const char *text[], int count);
 void destroy_menu(MENU *menu);
 
 
