@@ -33,20 +33,22 @@ find_card(DECK *deck, int col, int row) {
 
 int
 select_card_below(CARD *card, DECK *deck) {
-    if (card == NULL) return 0;
+    if (card == NULL) {
+        return 0;
+    }
     if (card->visible == not_visible) {
-        return 1;
+        return 0;
     }
     CARD *tmp_card = find_card(deck, card->pos->col, card->pos->row + 1);
     if (tmp_card == NULL) {
         return 1;
     }
-    SDL_Log("moj brat\n");
     tmp_card->selected = 1;
-    return select_card_below(tmp_card, deck);
+    return 1 + select_card_below(tmp_card, deck);
 }
 
-void shuffle_deck(DECK *deck) {
+void
+shuffle_deck(DECK *deck) {
     if (deck == NULL) {
         SDL_Log("Deck is NULL and therefore cannot be shuffled");
         return;
@@ -66,17 +68,17 @@ sort_a_card(CARD *card, DECK *deck) {
             if (deck->sorted_cards[suit]->value + 1 != card->value) {
                 return 0;
             }
-            SDL_Log("Alo momak\n");
+            //SDL_Log("Alo momak\n");
             int card_value = card->value;
             card->pos->col = deck->sorted_cards[suit]->pos->col;
             card->pos->row = deck->sorted_cards[suit]->pos->row;
             card->frame->x = deck->sorted_cards[suit]->frame->x;
             card->frame->y = deck->sorted_cards[suit]->frame->y;
-            SDL_Log(
-                "(%d, %d)",
-                card->pos->col,
-                card->pos->row
-            );
+            //SDL_Log(
+            //    "(%d, %d)",
+            //    card->pos->col,
+            //    card->pos->row
+            //);
             deck->sorted_cards[suit]->value = card_value;
             return 1;
         }

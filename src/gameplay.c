@@ -33,7 +33,6 @@ draw_next_card(DECK *deck) {
                     deck->count_previos_cards = 0;
                 }
             }
-
             deck->cards[i].pos->col = 2;
             deck->cards[i].pos->row = 0;
             deck->cards[i].frame->x = padding_of_card / 2 + padding_of_card + card_width;
@@ -66,7 +65,7 @@ reveal_card_below(GAME *game) {
             return 1;
         }
         if (last_card_visible == 0) {
-            SDL_Log("sad cemo da okrenemo kartu\n");
+            //SDL_Log("sad cemo da okrenemo kartu\n");
             card = is_there_a_card(game, &j, &i);
             if (card == NULL) {
                 SDL_Log("card je NULL\n");
@@ -201,7 +200,8 @@ select_a_card(GAME *game) {
         return 1;
     }
     card->selected = !card->selected;
-    select_card_below(card, game->deck);
+    int selected_cards = select_card_below(card, game->deck);
+    SDL_Log("selected_cards: %d\n",selected_cards);
     game->cursor->mode = 1;
     return 1;
 }
