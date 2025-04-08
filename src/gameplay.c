@@ -4,7 +4,7 @@
 CARD* is_there_a_card(GAME *game, int *row, int *col);
 int change_cursor_frame(GAME *game);
 
-static char* modes[3] = {
+static const char* modes[3] = {
     "mode : normal",
     "mode : select",
     "mode : fly"
@@ -222,7 +222,10 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 game->cursor->mode = CURSOR_NORMAL_MODE;
                 break;
             case SDLK_C:
-                game->cursor->mode += CURSOR_FLY_MODE;
+                //TODO omoguci da se koristi fly mode
+                SDL_Log("Trenutno je core mehanika u izgradnji");
+                break;
+                game->cursor->mode = CURSOR_FLY_MODE;
                 break;
             case SDLK_1:
                 tmp = 1;
