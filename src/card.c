@@ -4,6 +4,11 @@
 int card_width = 0;
 int card_height = 0;
 
+int
+same_card_selected(CARD *card1, CARD *card2) {
+    return card1 == card2;
+}
+
 void
 deselect_all_cards(DECK *deck) {
     for (int i = 0; i < 52; i++) {
@@ -13,6 +18,10 @@ deselect_all_cards(DECK *deck) {
 
 CARD*
 find_card(DECK *deck, int col, int row) {
+    if (col == 1 && row == 0) {
+        return deck->deck_card;
+    }
+
     for (int i = 0; i < 52; i++) {
         if (deck->cards[i].pos->col == col &&
             deck->cards[i].pos->row == row) {
@@ -52,10 +61,8 @@ void shuffle_deck(DECK *deck) {
 
 int
 sort_a_card(CARD *card, DECK *deck) {
-    SDL_Log("SI USO\n");
     for (int suit = 0; suit <= suit_spades; suit++) {
         if (card->suit == deck->sorted_cards[suit]->suit) {
-            SDL_Log("Alo momak\n");
             if (deck->sorted_cards[suit]->value + 1 != card->value) {
                 return 0;
             }
@@ -93,7 +100,8 @@ can_card_be_placed(CARD *card_below, CARD *card_above) {
     return 0;
 }
 
-DECK* create_deck() {
+DECK* 
+create_deck() {
     DECK *deck = NULL;
     deck = SDL_malloc(sizeof(DECK));
     if (deck == NULL) {
@@ -149,6 +157,10 @@ char* find_path(CARD *card) {
     }
 
     if (card->visible == not_visible) {
+        if (card->selected == selected) {
+            sprintf(path, "../assets/cards/back_red_basic.png");
+            return path;
+        }
         sprintf(path, "../assets/cards/back_red_basic_white.png");
         return path;
     }

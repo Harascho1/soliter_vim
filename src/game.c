@@ -199,6 +199,7 @@ restart_game(GAME *game) {
     destroy_deck(game->deck);
     game->deck = create_deck();
     game->cursor = create_cursor(1, 1);
+    game_update = 0;
     load_game_field(game->deck);
 }
 

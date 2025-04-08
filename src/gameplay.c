@@ -21,12 +21,17 @@ draw_next_card(DECK *deck) {
             i = deck->count;
             //TODO treba da mu se vrate sva ostala na fabricko
             if (deck->new_card != NULL) {
-                deck->new_card->visible = not_visible;
-                deck->new_card->pos->col = 1;
-                deck->new_card->pos->row = 0;
-                deck->new_card->frame->x = padding_of_card / 2;
-                deck->new_card->frame->y = padding_of_card / 2;
+                if (deck->previous_cards[deck->count_previos_cards] != NULL) {
+                    deck->previous_cards[deck->count_previos_cards]->pos->col = 1;
+                    deck->previous_cards[deck->count_previos_cards]->frame->x = padding_of_card / 2;
+                    deck->previous_cards[deck->count_previos_cards]->visible = not_visible;
 
+                }
+                deck->previous_cards[deck->count_previos_cards++] = deck->new_card;
+                deck->previous_cards[deck->count_previos_cards - 1]->visible = not_visible;
+                if (deck->count_previos_cards == 2) {
+                    deck->count_previos_cards = 0;
+                }
             }
 
             deck->cards[i].pos->col = 2;
@@ -40,12 +45,14 @@ draw_next_card(DECK *deck) {
     }
     deck->count++;
     deck->deck_card = &deck->cards[deck->count];
+    //SDL_Log("broj karte za deck_card: %d", deck->count);
     return &deck->cards[i];
 }
 
 int
 reveal_card_below(GAME *game) {
-    SDL_Log("uso je u update\n");
+    SDL_Log("Otkriva kartu ispod\n");
+    //TODO dodati da moze da vidi ako je postavio pre toga new card da otkrije kartu ispod nje ako je ima
 
     for (int i = 1; i <= number_of_cards_in_row; i++) {
         int j = 1;
@@ -68,9 +75,24 @@ reveal_card_below(GAME *game) {
             return 1;
         } 
     }
-    SDL_Log("uso je u update\n");
 
-    return 0;
+    SDL_Log(
+        "count_previous_card: %d\n",
+        game->deck->count_previos_cards
+    );
+    CARD *tmp = game->deck->previous_cards[game->deck->count_previos_cards - 1];
+    if (tmp == NULL) {
+        SDL_Log("Ne postoji karta u previous_cards");
+        return 1;
+    }
+    if (tmp->visible == not_visible) {
+        tmp->visible = visible;
+        game->deck->count_previos_cards++;
+        return 1;
+    }
+    SDL_Log("Ovde je greska\n");
+
+    return 1;
 }
 
 CARD*
@@ -81,11 +103,6 @@ selected_card(DECK *deck) {
         }
     }
     return NULL;
-}
-
-int
-same_card_selected(CARD *card1, CARD *card2) {
-    return card1 == card2;
 }
 
 int
@@ -109,10 +126,24 @@ place_a_card(GAME *game) {
     }
 
     if ((game_update = same_card_selected(card, s_card)) == 1) {
+        SDL_Log("game_update: %d\n", game_update);
+        //TODO dodaj da vuce kartu ako je selektovao deck card
+        if (same_card_selected(card, game->deck->deck_card)) {
+            game->deck->new_card = draw_next_card(game->deck);
+            if (game->deck->new_card == NULL) {
+                SDL_Log("error u same_card_selected\n");
+            }
+            deselect_all_cards(game->deck);
+            game->cursor->mode = 0;
+            return 1;
+
+        }
         game_update = sort_a_card(s_card, game->deck);
-        deselect_all_cards(game->deck);
-        game->cursor->mode = 0;
-        return 1;
+        if (game_update != 0) {
+            deselect_all_cards(game->deck);
+            game->cursor->mode = 0;
+            return 1;
+        }
     }       
             
     if (can_card_be_placed(s_card, card) == 0) {
@@ -128,6 +159,10 @@ place_a_card(GAME *game) {
     s_card->frame->x = card->frame->x;
     s_card->frame->y = card->frame->y + padding_of_card;
 
+    if (same_card_selected(s_card, game->deck->new_card)) {
+        game->deck->new_card = NULL;
+    }
+
     deselect_all_cards(game->deck);
     //game->cursor->pos->row = card->pos->row;
             
@@ -142,21 +177,33 @@ place_a_card(GAME *game) {
 
 int
 select_a_card(GAME *game) {
-    for (int i = 0; i < 52; i++) {
-        if (game->deck->cards[i].visible == not_visible) {
-            continue;
-        }
-        if (game->deck->cards[i].pos->col == game->cursor->pos->col
-        && game->deck->cards[i].pos->row == game->cursor->pos->row) {
-
-            game->deck->cards[i].selected = !game->deck->cards[i].selected;
-            select_card_below(&game->deck->cards[i], game->deck);
-            game->cursor->mode = 1;
-            return 1;
-        }
+    CARD *card = find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
+    if (card == NULL) {
+        SDL_Log("Selected card not found\n");
+        exit(0);
     }
-    game->cursor->mode = 0;
-    return 0;
+    //SDL_Log(
+    //    "card addr: %ld & deck_card: %ld",
+    //    card,
+    //    game->deck->deck_card
+    //);
+    if (same_card_selected(card, game->deck->deck_card)) {
+        card->selected = !card->selected;
+        game->cursor->mode = 1;
+        return 1;
+    }
+    if (same_card_selected(card, game->deck->new_card)) {
+        card->selected = !card->selected;
+        game->cursor->mode = 1;
+        return 1;
+    }
+    if (card->visible == not_visible) {
+        return 1;
+    }
+    card->selected = !card->selected;
+    select_card_below(card, game->deck);
+    game->cursor->mode = 1;
+    return 1;
 }
 
 CARD*
@@ -498,13 +545,6 @@ gameplay_render(GAME* game) {
         SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
         return 0;
     }
-
-    //const char *path = "../assets/cards/blank_front_with_num_boarders_white.png";
-    //SDL_Texture *texture = create_texture_from_image(game->renderer, path);
-    //if (texture == NULL) {
-    //    SDL_Log("create_texture_from_image failed...\n");
-    //    return 0;
-    //}
 
     status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
     if (status == 0) {

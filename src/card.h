@@ -63,6 +63,7 @@ typedef struct _DECK {
     CARD *new_card;
     CARD *deck_card;
     CARD *previous_cards[2];
+    int count_previos_cards;
 
     //TODO OVO MOZDA MOZE BOLJE DA SE OSMISLI
     CARD *sorted_cards[4];
@@ -80,5 +81,6 @@ CARD* find_card(DECK *deck, int col, int row);
 int can_card_be_placed(CARD *card_below, CARD *card_above);
 int sort_a_card(CARD *card, DECK* deck);
 int select_card_below(CARD *card, DECK *deck);
+int same_card_selected(CARD *card1, CARD *card2);
 
 #endif //CARD_H
