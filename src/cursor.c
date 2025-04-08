@@ -28,6 +28,13 @@ destroy_cursor(CURSOR *cursor) {
     }
 }
 
+//TODO
+int
+set_a_flag(CURSOR *cursor, int flag) {
+    int mode = cursor->mode;
+
+}
+
 int
 have_a_flag(CURSOR *cursor, int flag) {
     if (cursor->mode & flag) {

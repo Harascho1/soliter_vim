@@ -1,6 +1,8 @@
 #include "game.h"
 #include "texture.h"
 
+static const char *title = "SoVIMter";
+
 int
 main_menu_event_handler(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
@@ -54,8 +56,6 @@ int
 main_menu_update(GAME* game) {
     return 1;
 }
-
-const char *title = "Soliter";
 
 int
 main_menu_render(GAME* game) {

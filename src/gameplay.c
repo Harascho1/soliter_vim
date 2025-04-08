@@ -90,55 +90,50 @@ same_card_selected(CARD *card1, CARD *card2) {
 
 int
 place_a_card(GAME *game) {
-    for (int i = 0; i < 52; i++) {
-        if (game->deck->cards[i].pos->col == game->cursor->pos->col &&
-            game->deck->cards[i].pos->row == game->cursor->pos->row) {
-
-            if (game->deck->cards[i].visible == not_visible) {
-                deselect_all_cards(game->deck);
-                game->cursor->mode = 0;
-                return 0;
-            }
-
-            CARD *card = selected_card(game->deck);
-            if (card == NULL) {
-                SDL_Log("Ni jedna karta nije selektovana\n");
-                return 0;
-            }
-
-            if ((game_update = same_card_selected(&game->deck->cards[i], card)) == 1) {
-                //TODO
-                game_update = sort_a_card(card, game->deck);
-                SDL_Log("SKR SKR\n");
-                deselect_all_cards(game->deck);
-                SDL_Log("Ista karta je selektovana");
-                game->cursor->mode = 0;
-                return 1;
-            }       
-            
-            if (can_card_be_placed(card, &game->deck->cards[i]) == 0) {
-                game->cursor->mode = 0;
-                deselect_all_cards(game->deck);
-                return 0;
-            }
-
-            game->cursor->mode = 0;
-            int old_col = card->pos->col;
-            card->pos->col = game->cursor->pos->col;
-            card->pos->row = game->deck->cards[i].pos->row + 1;
-            card->frame->x = game->deck->cards[i].frame->x;
-            card->frame->y = game->deck->cards[i].frame->y + padding_of_card;
-
-            deselect_all_cards(game->deck);
-            //game->cursor->pos->row = card->pos->row;
-            
-            game_update = 1;
-            change_cursor_frame(game);
-            return 1;
-        }
-
+    CARD *card = find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
+    if (card == NULL) {
+        game->cursor->mode = 0;
+        return 0;
     }
-    SDL_Log("PLS NE\n");
+
+    if (card == not_visible) {
+        deselect_all_cards(game->deck);
+        game->cursor->mode = 0;
+        return 0;
+    }
+
+    CARD *s_card= selected_card(game->deck);
+    if (s_card == NULL) {
+        SDL_Log("Ni jedna karta nije selektovana\n");
+        return 0;
+    }
+
+    if ((game_update = same_card_selected(card, s_card)) == 1) {
+        game_update = sort_a_card(s_card, game->deck);
+        deselect_all_cards(game->deck);
+        game->cursor->mode = 0;
+        return 1;
+    }       
+            
+    if (can_card_be_placed(s_card, card) == 0) {
+        game->cursor->mode = 0;
+        deselect_all_cards(game->deck);
+        return 0;
+    }
+
+    game->cursor->mode = 0;
+    int old_col = s_card->pos->col;
+    s_card->pos->col = game->cursor->pos->col;
+    s_card->pos->row = card->pos->row + 1;
+    s_card->frame->x = card->frame->x;
+    s_card->frame->y = card->frame->y + padding_of_card;
+
+    deselect_all_cards(game->deck);
+    //game->cursor->pos->row = card->pos->row;
+            
+    game_update = 1;
+    change_cursor_frame(game);
+    return 1;
     game->cursor->mode = 0;
     return 0;
 
@@ -229,6 +224,20 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
             case SDLK_C:
                 game->cursor->mode += CURSOR_FLY_MODE;
                 break;
+            case SDLK_1:
+                tmp = 1;
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
+                    break;
+                }
+                if (have_a_flag(game->cursor, CURSOR_HOVER_1) == 0) {
+                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_1;
+                    break;
+                } else if (is_there_a_card(game, NULL, &(tmp))) {
+                    game->cursor->pos->col = tmp;
+                    delete_hover_flag(game->cursor, CURSOR_HOVER_1);
+                    change_cursor_frame(game);
+                }
+                break;
             case SDLK_2:
                 tmp = 2;
                 if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
@@ -238,13 +247,86 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                     game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
                     break;
                 } else if (is_there_a_card(game, NULL, &(tmp))) {
-                    game->cursor->pos->col = 2;
+                    game->cursor->pos->col = tmp;
+                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
+                    change_cursor_frame(game);
+                }
+                break;
+            case SDLK_3:
+                tmp = 3;
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
+                    break;
+                }
+                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
+                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
+                    break;
+                } else if (is_there_a_card(game, NULL, &(tmp))) {
+                    game->cursor->pos->col = tmp;
+                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
+                    change_cursor_frame(game);
+                }
+                break;
+            case SDLK_4:
+                tmp = 4;
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
+                    break;
+                }
+                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
+                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
+                    break;
+                } else if (is_there_a_card(game, NULL, &(tmp))) {
+                    game->cursor->pos->col = tmp;
+                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
+                    change_cursor_frame(game);
+                }
+                break;
+            case SDLK_5:
+                tmp = 5;
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
+                    break;
+                }
+                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
+                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
+                    break;
+                } else if (is_there_a_card(game, NULL, &(tmp))) {
+                    game->cursor->pos->col = tmp;
+                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
+                    change_cursor_frame(game);
+                }
+                break;
+            case SDLK_6:
+                tmp = 6;
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
+                    break;
+                }
+                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
+                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
+                    break;
+                } else if (is_there_a_card(game, NULL, &(tmp))) {
+                    game->cursor->pos->col = tmp;
+                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
+                    change_cursor_frame(game);
+                }
+                break;
+            case SDLK_7:
+                tmp = 7;
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
+                    break;
+                }
+                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
+                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
+                    break;
+                } else if (is_there_a_card(game, NULL, &(tmp))) {
+                    game->cursor->pos->col = tmp;
                     delete_hover_flag(game->cursor, CURSOR_HOVER_2);
                     change_cursor_frame(game);
                 }
                 break;
             case SDLK_D:
             case SDLK_RIGHT:
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
+                    break;
+                }
                 if (game->cursor->pos->col == 7) {
                     break;
                 }
@@ -261,6 +343,9 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 break;                
             case SDLK_A:
             case SDLK_LEFT:
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
+                    break;
+                }
                 if (game->cursor->pos->col == 1) {
                     break;
                 }
@@ -277,6 +362,9 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 break;                
             case SDLK_S:
             case SDLK_DOWN:
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
+                    break;
+                }
                 int new_row = game->cursor->pos->row + 1;
                 if (is_there_a_card(game, &new_row, NULL) == 0) {
                     break;
@@ -286,6 +374,9 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 break;                
             case SDLK_W:
             case SDLK_UP:
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
+                    break;
+                }
                 //SDL_Log(
                 //    "(%d, %d)",
                 //    game->cursor->pos->row,
@@ -308,6 +399,9 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_RETURN:
             case SDLK_SPACE:
+                if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
+                    break;
+                }
                 interact(game);
                 break;
             default:
@@ -319,15 +413,14 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
 
 int
 gameplay_update(GAME* game) {
-    //TODO - ako je karta okkrenuta poledjini a karte ispod nje nema onda treba da se otkije ta karta
     int status;
-
     if (game_update == 1) {
         status = reveal_card_below(game);
         if (status != 0) {
             game_update = 0;
         }
     }
+    // TODO - auto sort da update sam sortira karte koje su na polju
 
     return 1;
 }
@@ -472,7 +565,7 @@ gameplay_render(GAME* game) {
 
     // * RENDERING TEXT THAT SHOWS WHAT IN WHAT MODE ARE U
     int mode = game->cursor->mode % 4;
-    SDL_Log("mode: %d\n", mode);
+    //SDL_Log("mode: %d\n", mode);
     int text_width, text_height;
     status = get_text_size(
         game->font,
