@@ -70,7 +70,7 @@ extern int game_update;
 int game_init(GAME* game, const char *title, const RESOLUTION *res);
 void game_quit(GAME* game);
 int load_game_field(DECK *game);
-void restart_game(GAME *game);
+void run_a_game(GAME *game);
 
 int push_user_event(Uint32 type, Sint32 code);
 

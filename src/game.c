@@ -91,13 +91,6 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
     card_width = (width - number_of_cards_in_row * padding_of_card) / number_of_cards_in_row; 
     card_height = card_width * card_width_height_ratio;
 
-    game->cursor = create_cursor(1, 1);
-    if (game->cursor == NULL) {
-        SDL_Log("create cursor error\n");
-        game_quit(game);
-        return status;
-    }
-
     game->renderer = SDL_CreateRenderer(game->window, NULL);
     if (game->renderer == NULL) {
         SDL_Log("SDL_CreateRenderer failed: %s\n", SDL_GetError());
@@ -134,13 +127,6 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         return status;
     }
 
-    game->deck = create_deck();
-    if (game->deck == NULL) {
-        SDL_Log("create_deck failed\n");
-        game_quit;
-        return status;
-    }
-
     game->background_texture = create_texture_from_image(
         game->renderer,
         "../assets/background.png"
@@ -159,8 +145,8 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
     }
     g_change_scene_event_type = event_type;
 
-
-    load_game_field(game->deck);
+    game->deck = NULL;
+    game->cursor = NULL;
 
     return 1;
 }
@@ -193,12 +179,27 @@ void game_quit(GAME* game) {
 }
 
 void
-restart_game(GAME *game) {
+run_a_game(GAME *game) {
+    if (game == NULL) {
+        SDL_Log("game is NULL\n");
+    }
+
     destroy_cursor(game->cursor);
-    SDL_Log("RADI\n");
     destroy_deck(game->deck);
+
+    SDL_Log("ajde sad\n");
+
     game->deck = create_deck();
+    if (game->deck == NULL) {
+        SDL_Log("create_deck error\n");
+        game_quit(game);
+    }
+
     game->cursor = create_cursor(1, 1);
+    if (game->cursor == NULL) {
+        SDL_Log("create_cursor error\n");
+        game_quit(game);
+    }
     game_update = 0;
     load_game_field(game->deck);
 }

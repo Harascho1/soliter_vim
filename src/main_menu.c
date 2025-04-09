@@ -25,6 +25,7 @@ main_menu_event_handler(GAME *game, const SDL_Event *event) {
             case SDLK_SPACE:
                 switch (game->main_menu->items[game->main_menu->selected_item].type) {
                     case menu_item_type_play:
+                        run_a_game(game);
                         push_user_event(g_change_scene_event_type, game_state_gameplay);
                         break;
                     case menu_item_type_settings:

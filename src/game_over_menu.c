@@ -20,7 +20,7 @@ game_over_menu_event_handler(GAME *game, const SDL_Event *event) {
             case SDLK_SPACE:
                 switch (game->game_over_menu->selected_item) {
                     case game_over_item_type_restart:
-                        restart_game(game);
+                        run_a_game(game);
                         push_user_event(g_change_scene_event_type, game_state_gameplay);
                         break;
                     case game_over_item_credits:
