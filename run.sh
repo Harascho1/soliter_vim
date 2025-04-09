@@ -1,5 +1,3 @@
 cd build
-cmake ..
-make
-./soliter
+./soVIMter
 cd ..

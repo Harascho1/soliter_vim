@@ -26,6 +26,12 @@ file(GLOB_RECURSE soliter_src
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${soliter_src})
 
+set_target_properties(${PROJECT_NAME}
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY            "${CMAKE_SOURCE_DIR}/build"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG      "${CMAKE_SOURCE_DIR}/build"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE    "${CMAKE_SOURCE_DIR}/build")
+
 target_link_libraries(${PROJECT_NAME} PUBLIC SDL3_ttf::SDL3_ttf SDL3_image::SDL3_image SDL3::SDL3)
 
 include_directories(${CMAKE_SOURCE_DIR}/sdl/SDL/include)
