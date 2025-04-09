@@ -10,6 +10,7 @@ static const char* modes[3] = {
     "mode : fly"
 };
 
+//TODO OVO JE PROBLEM ZA KASNIJE
 CARD*
 draw_next_card(DECK *deck) {
     int i;
@@ -94,14 +95,27 @@ reveal_card_below(GAME *game) {
     return 1;
 }
 
-CARD*
-selected_card(DECK *deck) {
+int
+selected_card(DECK *deck, CARD **selected_cards) {
+    
+    int count = 0;
     for (int i = 0; i < 52; i++) {
-        if (deck->cards[i].selected == 1) {
-            return &deck->cards[i];
+        if (deck->cards[i].selected == selected) {
+            selected_cards[count++] = &deck->cards[i];
         }
     }
-    return NULL;
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = i + 1; j < count ; j++) {
+            if (selected_cards[j] > selected_cards[i]) {
+                CARD *tmp;
+                tmp = selected_cards[j];
+                selected_cards[j] = selected_cards[i];
+                selected_cards[i] = tmp;
+            }
+        }
+    }
+
+    return count;
 }
 
 int
@@ -118,14 +132,15 @@ place_a_card(GAME *game) {
         return 0;
     }
 
-    CARD *s_card= selected_card(game->deck);
-    if (s_card == NULL) {
+    CARD *s_card[14];
+    int num_of_selected_cards;
+    num_of_selected_cards = selected_card(game->deck, s_card);
+    if (num_of_selected_cards == 0) {
         SDL_Log("Ni jedna karta nije selektovana\n");
         return 0;
     }
 
-    if ((game_update = same_card_selected(card, s_card)) == 1) {
-        SDL_Log("game_update: %d\n", game_update);
+    if (same_card_selected(card, *s_card) == 1 && num_of_selected_cards == 1) {
         //TODO dodaj da vuce kartu ako je selektovao deck card
         if (same_card_selected(card, game->deck->deck_card)) {
             game->deck->new_card = draw_next_card(game->deck);
@@ -137,28 +152,43 @@ place_a_card(GAME *game) {
             return 1;
 
         }
-        game_update = sort_a_card(s_card, game->deck);
+        game_update = sort_a_card(*s_card, game->deck);
         if (game_update != 0) {
             deselect_all_cards(game->deck);
             game->cursor->mode = 0;
             return 1;
         }
+        SDL_Log("Karta ne moze da se sortira\n");
     }       
-            
-    if (can_card_be_placed(s_card, card) == 0) {
+    
+    if (can_card_be_placed(*s_card, card) == 0) {
+        SDL_Log("Karta ne moze da se postavi\n");
         game->cursor->mode = 0;
         deselect_all_cards(game->deck);
         return 0;
     }
 
-    game->cursor->mode = 0;
-    int old_col = s_card->pos->col;
-    s_card->pos->col = game->cursor->pos->col;
-    s_card->pos->row = card->pos->row + 1;
-    s_card->frame->x = card->frame->x;
-    s_card->frame->y = card->frame->y + padding_of_card;
+    int col_of_cursor = game->cursor->pos->col;
+    int row_of_cursor = game->cursor->pos->row;
+    int x_card_pos = card->frame->x;
+    int y_card_pos = card->frame->y;
 
-    if (same_card_selected(s_card, game->deck->new_card)) {
+    for (int i = 0; i < num_of_selected_cards; i++) {
+        s_card[i]->pos->col = col_of_cursor;
+        s_card[i]->pos->row = row_of_cursor + 1;
+
+        s_card[i]->frame->x = x_card_pos;
+        s_card[i]->frame->y = y_card_pos + padding_of_card;
+
+        s_card[i]->on_field = 1;
+
+        row_of_cursor++;
+        y_card_pos += padding_of_card;
+    }
+
+    game->cursor->mode = 0;
+
+    if (same_card_selected(*s_card, game->deck->new_card)) {
         game->deck->new_card = NULL;
     }
 
@@ -201,7 +231,6 @@ select_a_card(GAME *game) {
     }
     card->selected = !card->selected;
     int selected_cards = select_card_below(card, game->deck);
-    SDL_Log("selected_cards: %d\n",selected_cards);
     game->cursor->mode = 1;
     return 1;
 }

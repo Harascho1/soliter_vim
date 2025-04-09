@@ -6,6 +6,11 @@ int card_height = 0;
 
 int
 same_card_selected(CARD *card1, CARD *card2) {
+    //SDL_Log(
+    //    "card1 addr: %ld & card2: %ld",
+    //    card1,
+    //    card2
+    //);
     return card1 == card2;
 }
 

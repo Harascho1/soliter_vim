@@ -53,6 +53,7 @@ load_game_field(DECK *deck) {
         deck->cards[count].frame->y = padding_of_card / 2;
         deck->cards[count].pos->col = 1;
         deck->cards[count].pos->row = 0;
+        deck->cards[count].on_field = 0;
 
     }
 
@@ -186,8 +187,6 @@ run_a_game(GAME *game) {
 
     destroy_cursor(game->cursor);
     destroy_deck(game->deck);
-
-    SDL_Log("ajde sad\n");
 
     game->deck = create_deck();
     if (game->deck == NULL) {
