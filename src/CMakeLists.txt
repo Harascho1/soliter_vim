@@ -3,27 +3,46 @@ cmake_minimum_required(VERSION 3.20)
 set(ASSETS_PATH ${PROJECT_SOURCE_DIR}/assets)
 
 set(HEADER_FILES
-    ${CMAKE_SOURCE_DIR}/menu.h
-    ${CMAKE_SOURCE_DIR}/cursor.h
-    ${CMAKE_SOURCE_DIR}/font.h
-    ${CMAKE_SOURCE_DIR}/game.h
-    ${CMAKE_SOURCE_DIR}/texture.h
-    ${CMAKE_SOURCE_DIR}/card.h
+    ${CMAKE_SOURCE_DIR}/src/menu.h
+    ${CMAKE_SOURCE_DIR}/src/cursor.h
+    ${CMAKE_SOURCE_DIR}/src/font.h
+    ${CMAKE_SOURCE_DIR}/src/game.h
+    ${CMAKE_SOURCE_DIR}/src/texture.h
+    ${CMAKE_SOURCE_DIR}/src/card.h
 )
 
 file(GLOB_RECURSE soliter_src 
-    ${CMAKE_SOURCE_DIR}/font.c
-    ${CMAKE_SOURCE_DIR}/cursor.c
-    ${CMAKE_SOURCE_DIR}/texture.c
-    ${CMAKE_SOURCE_DIR}/main_menu.c
-    ${CMAKE_SOURCE_DIR}/gameplay.c
-    ${CMAKE_SOURCE_DIR}/game_over_menu.c
-    ${CMAKE_SOURCE_DIR}/menu.c
-    ${CMAKE_SOURCE_DIR}/game.c
-    ${CMAKE_SOURCE_DIR}/card.c
-    ${CMAKE_SOURCE_DIR}/main.c
+    ${CMAKE_SOURCE_DIR}/src/font.c
+    ${CMAKE_SOURCE_DIR}/src/cursor.c
+    ${CMAKE_SOURCE_DIR}/src/texture.c
+    ${CMAKE_SOURCE_DIR}/src/main_menu.c
+    ${CMAKE_SOURCE_DIR}/src/gameplay.c
+    ${CMAKE_SOURCE_DIR}/src/game_over_menu.c
+    ${CMAKE_SOURCE_DIR}/src/menu.c
+    ${CMAKE_SOURCE_DIR}/src/game.c
+    ${CMAKE_SOURCE_DIR}/src/card.c
+    ${CMAKE_SOURCE_DIR}/src/main.c
 )
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${soliter_src})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC SDL3_ttf SDL3_image SDL3)
+target_link_libraries(${PROJECT_NAME} PUBLIC SDL3_ttf::SDL3_ttf SDL3_image::SDL3_image SDL3::SDL3)
+
+include_directories(${CMAKE_SOURCE_DIR}/sdl/SDL/include)
+include_directories(${CMAKE_SOURCE_DIR}/sdl/SDL_ttf/include)
+include_directories(${CMAKE_SOURCE_DIR}/sdl/SDL_image/include)
+
+target_precompile_headers(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/pch/pch.h)
+
+if (LINUX) 
+    SET(SDL_IMAGE_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_image/libSDL3_image.so.0")
+    SET(SDL_TTF_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_ttf/libSDL3_ttf.so.0")
+    SET(SDL_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL/libSDL3.so.0")
+endif()
+
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/build"
+    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_IMAGE_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/build"
+    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_TTF_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/build"
+    COMMENT "Copying shared libraries")
