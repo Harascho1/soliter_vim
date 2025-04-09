@@ -69,6 +69,12 @@ jobs:
           libxinerama-dev \
           libxi-dev
 
+    # jedno od resenja posto ovako trebam da dodaje submodule
+    - name: Install FreeType and HarfBuzz dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get install -y libfreetype6-dev libharfbuzz-dev
+
     - name: Initialize and update submodules
       run: git submodule update --init --depth 1 --recursive  # Povlači submodule ako nisu već
 
