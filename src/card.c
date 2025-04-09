@@ -95,6 +95,7 @@ sort_a_card(CARD *card, DECK *deck) {
 int
 can_card_be_placed(CARD *card_below, CARD *card_above) {
     if (card_below->value + 1 != card_above->value) {
+        SDL_Log("Karta nije za jedan manja od ove iznad\n");
         return 0;
     }
     if ((card_below->suit == suit_clubs || card_below->suit == suit_spades) &&

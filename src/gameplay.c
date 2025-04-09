@@ -51,7 +51,7 @@ draw_next_card(DECK *deck) {
 
 int
 reveal_card_below(GAME *game) {
-    SDL_Log("Otkriva kartu ispod\n");
+    //SDL_Log("Otkriva kartu ispod\n");
     //TODO dodati da moze da vidi ako je postavio pre toga new card da otkrije kartu ispod nje ako je ima
 
     for (int i = 1; i <= number_of_cards_in_row; i++) {
@@ -80,6 +80,9 @@ reveal_card_below(GAME *game) {
         "count_previous_card: %d\n",
         game->deck->count_previos_cards
     );
+    if (game->deck->count_previos_cards > 0) {
+        return 1;
+    }
     CARD *tmp = game->deck->previous_cards[game->deck->count_previos_cards - 1];
     if (tmp == NULL) {
         SDL_Log("Ne postoji karta u previous_cards");
@@ -106,7 +109,7 @@ selected_card(DECK *deck, CARD **selected_cards) {
     }
     for (int i = 0; i < count - 1; i++) {
         for (int j = i + 1; j < count ; j++) {
-            if (selected_cards[j] > selected_cards[i]) {
+            if (selected_cards[j]->value > selected_cards[i]->value) {
                 CARD *tmp;
                 tmp = selected_cards[j];
                 selected_cards[j] = selected_cards[i];
@@ -114,7 +117,12 @@ selected_card(DECK *deck, CARD **selected_cards) {
             }
         }
     }
-
+    //for (int i = 0; i < count; i++) {
+    //    SDL_Log(
+    //        "karta je: %d\n",
+    //        selected_cards[i]->value
+    //    );
+    //}
     return count;
 }
 
@@ -162,6 +170,11 @@ place_a_card(GAME *game) {
     }       
     
     if (can_card_be_placed(*s_card, card) == 0) {
+        SDL_Log(
+            "card1 addr: %ld & card2: %ld",
+            s_card,
+            card
+        );
         SDL_Log("Karta ne moze da se postavi\n");
         game->cursor->mode = 0;
         deselect_all_cards(game->deck);
@@ -299,8 +312,8 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_C:
                 //TODO omoguci da se koristi fly mode
-                SDL_Log("Trenutno je core mehanika u izgradnji");
-                break;
+                //SDL_Log("Trenutno je core mehanika u izgradnji");
+                //break;
                 game->cursor->mode = CURSOR_FLY_MODE;
                 break;
             case SDLK_1:
