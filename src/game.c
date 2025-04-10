@@ -18,6 +18,7 @@ Uint32 g_change_scene_event_type = (Uint32) - 1;
 
 int game_update = 0;
 CARD invisible_card[7];
+int padding_of_card = 20;
 
 int
 load_game_field(DECK *deck) {
@@ -89,6 +90,7 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
     int width = res->width, height = res->height;
 
     float card_width_height_ratio = 7/5.0f;
+    padding_of_card = width / 30;
     card_width = (width - number_of_cards_in_row * padding_of_card) / number_of_cards_in_row; 
     card_height = card_width * card_width_height_ratio;
 

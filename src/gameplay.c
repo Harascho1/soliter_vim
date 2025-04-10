@@ -13,9 +13,9 @@ static const char* modes[3] = {
 CARD*
 top_deck_card(DECK *deck) {
     if (deck->count >= 52) {
-        SDL_Log("deck->count je veci ili jednak sa 52\n");
-        deck->count = 28;
-        pop_all(deck->new_cards);
+        //SDL_Log("deck->count je veci ili jednak sa 52\n");
+        //deck->count = 28;
+        //pop_all(deck->new_cards);
         return NULL;
     }
     while (deck->count < 52) {
@@ -32,11 +32,17 @@ next_deck_card(DECK *deck) {
     if (deck->count >= 52) {
         SDL_Log("deck->count je veci ili jednak sa 52\n");
         deck->count = 28;
+        return NULL;
+    }
+    if (deck->count == 28) {
+        SDL_Log("pop_all\n");
+        pop_all(deck->new_cards);
     }
     while (deck->count < 52) {
         if (deck->cards[deck->count].on_field == 0) {
             return &deck->cards[deck->count];
         }
+        
         deck->count++;
     }
     return NULL;
@@ -294,6 +300,10 @@ select_a_card(GAME *game) {
     CARD *card;
     card = find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
     if (card == NULL) {
+        if (game->cursor->pos->row == 0 && game->cursor->pos->col == 1) {
+            draw_next_card(game->deck);
+            return 1;
+        }
         SDL_Log("Selected card not found\n");
         exit(0);
     }

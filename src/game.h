@@ -24,8 +24,9 @@ enum {
 
 enum {
     number_of_cards_in_row = 7,
-    padding_of_card = 20
 };
+
+extern int padding_of_card;
 
 typedef struct _FIELD {
     int card_width;

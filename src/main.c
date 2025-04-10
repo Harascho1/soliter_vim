@@ -64,7 +64,7 @@ int main() {
     }
 
     GAME game;
-    status = game_init(&game, "Soliter", &(RESOLUTION){600, 400});
+    status = game_init(&game, "Soliter", &(RESOLUTION){900, 900});
     if (status == 0) {
         SDL_Log("game_init failed: %s\n", SDL_GetError());
         cleanup();
