@@ -28,8 +28,10 @@ draw_next_card(DECK *deck) {
                     deck->previous_cards[deck->count_previos_cards]->visible = not_visible;
 
                 }
+                SDL_Log("OKEJ\n");
                 deck->previous_cards[deck->count_previos_cards++] = deck->new_card;
                 deck->previous_cards[deck->count_previos_cards - 1]->visible = not_visible;
+                deck->previous_cards[deck->count_previos_cards - 1]->pos->col = 3;
                 if (deck->count_previos_cards == 2) {
                     deck->count_previos_cards = 0;
                 }
@@ -202,6 +204,14 @@ place_a_card(GAME *game) {
     game->cursor->mode = 0;
 
     if (same_card_selected(*s_card, game->deck->new_card)) {
+        //TODO Dodaj funckiju za ovo
+        if (game->deck->count_previos_cards >= 0) {
+            game->deck->new_card = game->deck->previous_cards[game->deck->count_previos_cards];
+            game->deck->new_card->pos->col = 2;
+            game->deck->new_card->visible = visible;
+
+            game->deck->count_previos_cards++;
+        }
         game->deck->new_card = NULL;
     }
 

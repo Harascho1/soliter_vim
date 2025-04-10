@@ -23,8 +23,8 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        #os: [ubuntu-latest, windows-latest]
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
+        #os: [ubuntu-latest]
         build_type: [Release]
         c_compiler: [gcc, clang, cl]
         include:
@@ -68,6 +68,12 @@ jobs:
           libxrandr-dev \
           libxinerama-dev \
           libxi-dev
+    
+    - name: install packages
+      if: runner.os == 'Windows'
+      run: |
+        choco install nasm
+        echo "C:\Program Files\NASM" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     # jedno od resenja posto ovako trebam da dodaje submodule
     - name: Install FreeType and HarfBuzz dependencies
