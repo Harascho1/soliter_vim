@@ -27,6 +27,10 @@ find_card(DECK *deck, int col, int row) {
         return deck->deck_card;
     }
 
+    if (col == 2 && row == 0) {
+        return view_top_card_in_queue(deck->new_cards);
+    }
+
     for (int i = 0; i < 52; i++) {
         if (deck->cards[i].pos->col == col &&
             deck->cards[i].pos->row == row) {
@@ -58,12 +62,17 @@ shuffle_deck(DECK *deck) {
         SDL_Log("Deck is NULL and therefore cannot be shuffled");
         return;
     }
-    for (int i = 0; i < deck->count; i++) {
-        int j = rand() % deck->count;
+    SDL_Log("radi\n");
+
+    srand((unsigned int)time(NULL));
+    int j;
+    for (int i = deck->count - 1; i > 0; i--) {
+        j = rand() % (i + 1);
         CARD temp = deck->cards[i];
         deck->cards[i] = deck->cards[j];
         deck->cards[j] = temp;
     }
+    SDL_Log("radi\n");
 }
 
 int
@@ -94,9 +103,93 @@ sort_a_card(CARD *card, DECK *deck) {
 }
 
 int
+pop_all(CARD_QUEUE *queue) {
+    queue->p = 0;
+    queue->q = 0;
+    for (int i = 0; i < queue->max_items; i++) {
+        queue->queue[i] = NULL;
+    }
+    queue->count = 0;
+
+}
+
+int
+is_queue_empty(CARD_QUEUE *queue) {
+    return queue->count == 0;
+}
+
+int
+is_queue_full(CARD_QUEUE *queue) {
+    return queue->count == queue->max_items;
+}
+
+int
+push(CARD_QUEUE *queue, CARD *card) {
+    if (is_queue_full(queue)) {
+        pop(queue);
+    }
+
+    queue->queue[queue->p++] = card;
+    card->visible = visible;
+
+    if (queue->p == queue->max_items) {
+        queue->p = 0;
+    }
+
+    queue->count++;
+    return 1;
+}
+
+CARD*
+pop(CARD_QUEUE *queue) {
+    if (is_queue_empty(queue)) {
+        return NULL;
+    }
+    int old_q = queue->q;
+    queue->q++;
+    if (queue->q == queue->max_items) {
+        queue->q = 0;
+    }
+    queue->count--;
+    SDL_Log("Stavljam kartu na not_visible\n");
+    SDL_Log("Karta broja: %d\n", queue->queue[old_q]->value);
+    queue->queue[old_q]->visible = not_visible;
+    return queue->queue[old_q];
+}
+
+CARD*
+view_top_card_in_queue(CARD_QUEUE *queue) {
+    if (queue->count == 0) {
+        return NULL;
+    }
+    int tmp;
+    if (queue->p == 0) {
+        tmp = queue->max_items - 1;
+    } else {
+        tmp = queue->p - 1;
+    }
+    //SDL_Log("tmp: = %d\n", tmp);
+    return queue->queue[tmp];
+}
+
+CARD*
+pop_top(CARD_QUEUE *queue) {
+    if (queue->count == 0) {
+        return NULL;
+    }
+    queue->count--;
+    if (queue->p == 0) {
+        queue->p = queue->max_items - 1;
+    } else {
+        queue->p--;
+    }
+    return queue->queue[queue->p];
+}
+
+int
 can_card_be_placed(CARD *card_below, CARD *card_above) {
     if (card_below->value + 1 != card_above->value) {
-        SDL_Log("Karta nije za jedan manja od ove iznad\n");
+        //SDL_Log("Karta nije za jedan manja od ove iznad\n");
         return 0;
     }
     if ((card_below->suit == suit_clubs || card_below->suit == suit_spades) &&
@@ -107,6 +200,17 @@ can_card_be_placed(CARD *card_below, CARD *card_above) {
         return 1;
     }
     return 0;
+}
+
+CARD_QUEUE*
+create_card_queue(int max_items) {
+    CARD_QUEUE *queue = SDL_malloc(sizeof(CARD_QUEUE));
+    queue->max_items = max_items;
+    queue->p = 0;
+    queue->q = 0;
+    queue->count = 0;
+    queue->queue = (CARD**)SDL_malloc(sizeof(CARD*) * max_items);
+    return queue;
 }
 
 DECK* 
@@ -130,9 +234,9 @@ create_deck() {
             i++;
         }
     }
-    deck->new_card = NULL;
-    deck->deck_card = &deck->cards[28];
     shuffle_deck(deck);
+    deck->new_cards = create_card_queue(3);
+    deck->deck_card = &deck->cards[deck->count];
     return deck;
 }
 
@@ -152,6 +256,7 @@ void destroy_deck(DECK *deck) {
             destroy_card(deck->sorted_cards[i]);
             SDL_free(deck->sorted_cards[i]);
         }
+        SDL_free(deck->new_cards);
         SDL_free(deck);
     }
 }

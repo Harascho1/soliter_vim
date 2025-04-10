@@ -52,6 +52,23 @@ typedef struct _CARD {
     int on_field;
 } CARD;
 
+
+typedef struct _CARD_QUEUE {
+    int p;
+    int q;
+    int max_items;
+    int count;
+    CARD **queue;
+} CARD_QUEUE;
+
+CARD* pop(CARD_QUEUE *queue);
+CARD* pop_top(CARD_QUEUE *queue);
+int push(CARD_QUEUE *queue, CARD *card);
+int is_queue_full(CARD_QUEUE *queue);
+int is_queue_empty(CARD_QUEUE *queue);
+CARD* view_top_card_in_queue(CARD_QUEUE *queue);
+int pop_all(CARD_QUEUE *queue);
+
 typedef struct _HAND {
     CARD *cards;
     int count;
@@ -60,10 +77,8 @@ typedef struct _HAND {
 typedef struct _DECK {
     CARD cards[52];
     int count;
-    CARD *new_card;
+    CARD_QUEUE *new_cards;
     CARD *deck_card;
-    CARD *previous_cards[2];
-    int count_previos_cards;
 
     //TODO OVO MOZDA MOZE BOLJE DA SE OSMISLI
     CARD *sorted_cards[4];
