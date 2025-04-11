@@ -11,8 +11,6 @@ enum {
     selected
 };
 
-extern int card_width;
-extern int card_height;
 
 typedef enum _SUIT {
     suit_clubs,
@@ -85,7 +83,10 @@ typedef struct _DECK {
 
 } DECK;
 
-extern CARD invisible_card[7];
+extern int g_card_width;
+extern int card_height;
+extern CARD g_invisible_card[7];
+extern int padding_of_card;
 
 DECK* create_deck();
 void destroy_deck(DECK *deck);

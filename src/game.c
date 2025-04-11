@@ -17,8 +17,7 @@ const char *game_over_items[] = {
 Uint32 g_change_scene_event_type = (Uint32) - 1;
 
 int game_update = 0;
-CARD invisible_card[7];
-int padding_of_card = 20;
+CARD g_invisible_card[7];
 
 int
 load_game_field(DECK *deck) {
@@ -27,13 +26,13 @@ load_game_field(DECK *deck) {
     
     for (int i = 0; i < number_of_cards_in_row; i++) {
         int y_coord = 2 * padding_of_card + card_height;
-        invisible_card[i].frame = SDL_malloc(sizeof(SDL_FPoint));
-        invisible_card[i].pos = SDL_malloc(sizeof(POSITION));
-        invisible_card[i].pos->row = 1;
-        invisible_card[i].pos->col = i + 1;
-        invisible_card[i].frame->x = x_coord;
-        invisible_card[i].frame->y = y_coord;
-        invisible_card[i].value = 14;
+        g_invisible_card[i].frame = SDL_malloc(sizeof(SDL_FPoint));
+        g_invisible_card[i].pos = SDL_malloc(sizeof(POSITION));
+        g_invisible_card[i].pos->row = 1;
+        g_invisible_card[i].pos->col = i + 1;
+        g_invisible_card[i].frame->x = x_coord;
+        g_invisible_card[i].frame->y = y_coord;
+        g_invisible_card[i].value = 14;
         for (int j = 0; j < i + 1; j++) {
             if (i == j) {
                 deck->cards[count].visible = visible;
@@ -47,7 +46,7 @@ load_game_field(DECK *deck) {
             y_coord += padding_of_card;
             count++;
         }
-        x_coord += padding_of_card + card_width;
+        x_coord += padding_of_card + g_card_width;
     }
     for (; count < 52; count++) {
         deck->cards[count].frame->x = padding_of_card / 2;
@@ -58,7 +57,7 @@ load_game_field(DECK *deck) {
 
     }
 
-    int padding_width = 3 * (card_width + padding_of_card) + padding_of_card /2;
+    int padding_width = 3 * (g_card_width + padding_of_card) + padding_of_card /2;
     for (int suit = suit_clubs; suit <= suit_spades; suit++) {
         deck->sorted_cards[suit] = SDL_malloc(sizeof(CARD));
         deck->sorted_cards[suit]->frame = SDL_malloc(sizeof(SDL_FPoint));
@@ -68,7 +67,7 @@ load_game_field(DECK *deck) {
         deck->sorted_cards[suit]->pos = SDL_malloc(sizeof(POSITION));
         deck->sorted_cards[suit]->pos->col = suit + 3;
         deck->sorted_cards[suit]->pos->row = 0;
-        padding_width += padding_of_card + card_width;
+        padding_width += padding_of_card + g_card_width;
 
         deck->sorted_cards[suit]->suit = suit;
         deck->sorted_cards[suit]->value = 0;
@@ -89,10 +88,10 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
 
     int width = res->width, height = res->height;
 
-    float card_width_height_ratio = 7/5.0f;
+    float g_card_width_height_ratio = 7/5.0f;
     padding_of_card = width / 30;
-    card_width = (width - number_of_cards_in_row * padding_of_card) / number_of_cards_in_row; 
-    card_height = card_width * card_width_height_ratio;
+    g_card_width = (width - number_of_cards_in_row * padding_of_card) / number_of_cards_in_row; 
+    card_height = g_card_width * g_card_width_height_ratio;
 
     game->renderer = SDL_CreateRenderer(game->window, NULL);
     if (game->renderer == NULL) {

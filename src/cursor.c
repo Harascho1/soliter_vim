@@ -11,7 +11,7 @@ create_cursor(int col, int row) {
     cursor->cursor = SDL_malloc(sizeof(SDL_FRect));
     cursor->cursor->x = padding_of_card / 2 - padding_of_card / 4;
     cursor->cursor->y = padding_of_card * 2 + card_height - padding_of_card / 4;
-    cursor->cursor->w = card_width + padding_of_card / 2;
+    cursor->cursor->w = g_card_width + padding_of_card / 2;
     cursor->cursor->h = card_height + padding_of_card / 2;
 
     cursor->mode = 0;

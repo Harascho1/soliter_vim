@@ -1,8 +1,9 @@
 #include "card.h"
 #include "texture.h"
 
-int card_width = 0;
+int g_card_width = 0;
 int card_height = 0;
+int padding_of_card = 20;
 
 int
 same_card_selected(CARD *card1, CARD *card2) {
@@ -354,7 +355,7 @@ render_card(SDL_Renderer *renderer, CARD *card, SDL_FPoint *point) {
         renderer,
         texture,
         NULL,
-        &(SDL_FRect){point->x, point->y, card_width, card_height}
+        &(SDL_FRect){point->x, point->y, g_card_width, card_height}
     );
 
     if (status == 0) {

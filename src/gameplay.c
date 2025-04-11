@@ -55,7 +55,7 @@ draw_next_card(DECK *deck) {
 
     if (next_new_card == NULL) {
         SDL_Log("Nije uspeo da izvuce novu kartu\n");
-        return NULL;
+        //? return NULL;
     } else {
         next_new_card->visible = visible;
         push(deck->new_cards, next_new_card);
@@ -140,9 +140,9 @@ place_king(CARD **card, int num, CURSOR *cursor) {
     int x_coord, y_coord;
 
     for (int i = 0; i < number_of_cards_in_row; i++) {
-        if (cursor_col == invisible_card[i].pos->col) {
-            x_coord = invisible_card[i].frame->x;
-            y_coord = invisible_card[i].frame->y;
+        if (cursor_col == g_invisible_card[i].pos->col) {
+            x_coord = g_invisible_card[i].frame->x;
+            y_coord = g_invisible_card[i].frame->y;
 
             card[0]->pos->col = cursor_col;
             card[0]->pos->row = cursor_row;
@@ -362,7 +362,7 @@ change_cursor_frame(GAME *game) {
         return 0;
     }
     if (same_card_selected(card, view_top_card_in_queue(game->deck->new_cards)) == 1) {
-        game->cursor->cursor->x = padding_of_card * 3/2 + card_width - padding_of_card / 4; 
+        game->cursor->cursor->x = padding_of_card * 3/2 + g_card_width - padding_of_card / 4; 
         game->cursor->cursor->y = padding_of_card / 4;    
     } else {
         game->cursor->cursor->x = card->frame->x - padding_of_card / 4; 
@@ -382,8 +382,8 @@ change_cursor_frame(GAME *game) {
 int
 go_to_invisible_card(GAME *game, int col) {
     game->cursor->pos->col = col;
-    game->cursor->cursor->x = invisible_card[col - 1].frame->x - padding_of_card / 4;
-    game->cursor->cursor->y = invisible_card[col - 1].frame->y - padding_of_card / 4;
+    game->cursor->cursor->x = g_invisible_card[col - 1].frame->x - padding_of_card / 4;
+    game->cursor->cursor->y = g_invisible_card[col - 1].frame->y - padding_of_card / 4;
 }
 
 int
@@ -519,6 +519,10 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 if (game->cursor->pos->col == 7) {
                     break;
                 }
+                if (game->cursor->pos->row == 0 &&
+                    game->cursor->pos->col == 2) {
+                        break;
+                    }
                 int new_col = game->cursor->pos->col + 1;
                 if (find_card(game->deck, new_col, game->cursor->pos->row) == 0) {
                     if (game->cursor->pos->row == 1) {
@@ -557,6 +561,9 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 }
                 int new_row = game->cursor->pos->row + 1;
                 if (find_card(game->deck, game->cursor->pos->col, new_row) == 0) {
+                    if (game->cursor->pos->row == 0) {
+                        go_to_invisible_card(game, game->cursor->pos->col);
+                    }
                     break;
                 }
                 game->cursor->pos->row++;
@@ -568,7 +575,8 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                     break;
                 }
                 if (game->cursor->pos->row == 1) {
-                    if (game->cursor->pos->col != 1) {
+                    if (game->cursor->pos->col != 1 &&
+                        game->cursor->pos->col != 2) {
                         break;
                     }
                 }
@@ -744,7 +752,7 @@ gameplay_render(GAME* game) {
             game->renderer,
             card,
             &(SDL_FPoint){
-                .x = padding_of_card / 2 + padding_of_card + card_width,
+                .x = padding_of_card / 2 + padding_of_card + g_card_width,
                 .y = padding_of_card / 2
             }
         );
