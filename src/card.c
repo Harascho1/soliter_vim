@@ -63,7 +63,7 @@ shuffle_deck(DECK *deck) {
         SDL_Log("Deck is NULL and therefore cannot be shuffled");
         return;
     }
-    SDL_Log("radi\n");
+    //SDL_Log("radi\n");
 
     srand((unsigned int)time(NULL));
     int j;
@@ -73,7 +73,7 @@ shuffle_deck(DECK *deck) {
         deck->cards[i] = deck->cards[j];
         deck->cards[j] = temp;
     }
-    SDL_Log("radi\n");
+    //SDL_Log("radi\n");
 }
 
 int
@@ -105,6 +105,7 @@ sort_a_card(CARD *card, DECK *deck) {
 
 int
 pop_all(CARD_QUEUE *queue) {
+    SDL_Log("popujem sve karte iz new_cards\n");
     queue->p = 0;
     queue->q = 0;
     for (int i = 0; i < queue->max_items; i++) {

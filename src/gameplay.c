@@ -29,13 +29,13 @@ top_deck_card(DECK *deck) {
 
 CARD*
 next_deck_card(DECK *deck) {
+    SDL_Log("deck->count je: %d", deck->count);
     if (deck->count >= 52) {
         SDL_Log("deck->count je veci ili jednak sa 52\n");
-        deck->count = 28;
+        deck->count = -1;
         return NULL;
     }
-    if (deck->count == 28) {
-        SDL_Log("pop_all\n");
+    if (deck->deck_card == NULL) {
         pop_all(deck->new_cards);
     }
     while (deck->count < 52) {
