@@ -468,7 +468,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 game->cursor->pos->col = 2;
                 change_cursor_frame(game);
                 break;
-            
+            case SDLK_KP_1:
             case SDLK_1:
                 tmp = 1;
                 if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
@@ -493,6 +493,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 }
                 delete_hover_flag(game->cursor);
                 break;
+            case SDLK_KP_2:
             case SDLK_2:
                 tmp = 2;
                 if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
@@ -509,6 +510,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 }
                 delete_hover_flag(game->cursor);
                 break;
+            case SDLK_KP_3:
             case SDLK_3:
                 tmp = 3;
                 if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
@@ -525,6 +527,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 }
                 delete_hover_flag(game->cursor);
                 break;
+            case SDLK_KP_4:
             case SDLK_4:
                 tmp = 4;
                 if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
@@ -541,6 +544,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 }
                 delete_hover_flag(game->cursor);
                 break;
+            case SDLK_KP_5:
             case SDLK_5:
                 tmp = 5;
                 if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
@@ -557,6 +561,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 }
                 delete_hover_flag(game->cursor);
                 break;
+            case SDLK_KP_6:
             case SDLK_6:
                 tmp = 6;
                 if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
@@ -573,6 +578,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 }
                 delete_hover_flag(game->cursor);
                 break;
+            case SDLK_KP_7:
             case SDLK_7:
                 tmp = 7;
                 if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
@@ -589,6 +595,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 }
                 delete_hover_flag(game->cursor);
                 break;
+            case SDLK_KP_8:
             case SDLK_8:
                 tmp = 8;
                 if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
@@ -604,6 +611,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 }
                 delete_hover_flag(game->cursor);
                 break;
+            case SDLK_KP_9:
             case SDLK_9:
                 tmp = 9;
                 if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
@@ -619,6 +627,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 }
                 delete_hover_flag(game->cursor);
                 break;
+            case SDLK_KP_0:
             case SDLK_0:
                 tmp = 10;
                 if ((status = have_number_hover(game->cursor)) == 0) {
