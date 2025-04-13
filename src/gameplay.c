@@ -1,8 +1,8 @@
 #include "game.h"
 #include "texture.h"
 
-CARD* is_there_a_card(GAME *game, int *row, int *col);
 int change_cursor_frame(GAME *game);
+static char buffer[10] = "";
 
 static const char* modes[4] = {
     "mode:normal",
@@ -51,9 +51,29 @@ next_deck_card(DECK *deck) {
     return NULL;
 }
 
-//TODO OVO JE PROBLEM ZA KASNIJE
+int
+have_more_cards(DECK *deck) {
+    if (deck->deck_card != NULL) {
+        return 1;
+    } 
+    int count = 0;
+    for (int i = 28; i < 52; i++) {
+        if (deck->cards[i].on_field == 0) {
+            count++;
+        }
+    }
+    SDL_Log("%d\n", count);
+    if (count > 1) {
+        return 1;
+    }
+    return 0;
+}
+
 CARD*
 draw_next_card(DECK *deck) {
+    if (have_more_cards(deck) == 0) {
+        return NULL;
+    }
     CARD *next_new_card = top_deck_card(deck);
 
     if (next_new_card == NULL) {
@@ -326,6 +346,9 @@ select_a_card(GAME *game) {
     //    game->deck->deck_card
     //);
     if (same_card_selected(card, game->deck->deck_card)) {
+        if (have_more_cards(game->deck) == 0) {
+            return 1;
+        }
         card->selected = !card->selected;
         set_a_flag(game->cursor, CURSOR_SELECT_MODE);
         return 1;
@@ -342,26 +365,6 @@ select_a_card(GAME *game) {
     int selected_cards = select_card_below(card, game->deck);
     set_a_flag(game->cursor, CURSOR_SELECT_MODE);
     return 1;
-}
-
-CARD*
-is_there_a_card(GAME *game, int *changed_row, int *changed_col) {
-    int col, row;
-    col = game->cursor->pos->col;
-    row = game->cursor->pos->row;
-    if (changed_col != NULL) {
-        col = *changed_col;
-    } 
-    if (changed_row != NULL) {
-        row = *changed_row;
-    }
-    for (int i = 0; i < 52; i++) {
-        if (game->deck->cards[i].pos->col == col &&
-            game->deck->cards[i].pos->row == row) {
-                return &game->deck->cards[i];
-        }
-    }
-    return NULL;
 }
 
 int
@@ -516,8 +519,9 @@ int
 fly_mode(GAME *game, const SDL_Event *event) {
     int tmp;
     int status;
+    int num;
     if (event->type == SDL_EVENT_KEY_DOWN) {
-        switch (event->key.key) {
+        switch ((num = event->key.key)) {
             case SDLK_X:
                 game->cursor->mode = CURSOR_NORMAL_MODE;
                 break;
@@ -535,6 +539,9 @@ fly_mode(GAME *game, const SDL_Event *event) {
             
             case SDLK_1:
                 tmp = 1;
+                if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
+                    tmp = tmp + 10;
+                }
                 if ((status = have_number_hover(game->cursor)) == 0) {
                     set_a_flag(game->cursor, CURSOR_HOVER_1);
                     break;
@@ -544,6 +551,10 @@ fly_mode(GAME *game, const SDL_Event *event) {
                     delete_hover_flag(game->cursor);
                     change_cursor_frame(game);
                 } else {
+                    if (tmp > 10) {
+
+                        break;
+                    }
                     game->cursor->pos->row = tmp;
                     go_to_invisible_card(game, status);
 
@@ -552,6 +563,9 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_2:
                 tmp = 2;
+                if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
+                    tmp = tmp + 10;
+                }
                 if ((status = have_number_hover(game->cursor)) == 0) {
                     set_a_flag(game->cursor, CURSOR_HOVER_2);
                     break;
@@ -565,6 +579,9 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_3:
                 tmp = 3;
+                if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
+                    tmp = tmp + 10;
+                }
                 if ((status = have_number_hover(game->cursor)) == 0) {
                     set_a_flag(game->cursor, CURSOR_HOVER_3);
                     break;
@@ -578,6 +595,9 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_4:
                 tmp = 4;
+                if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
+                    tmp = tmp + 10;
+                }
                 if ((status = have_number_hover(game->cursor)) == 0) {
                     set_a_flag(game->cursor, CURSOR_HOVER_4);
                     break;
@@ -591,6 +611,9 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_5:
                 tmp = 5;
+                if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
+                    tmp = tmp + 10;
+                }
                 if ((status = have_number_hover(game->cursor)) == 0) {
                     set_a_flag(game->cursor, CURSOR_HOVER_5);
                     break;
@@ -604,6 +627,9 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_6:
                 tmp = 6;
+                if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
+                    tmp = tmp + 10;
+                }
                 if ((status = have_number_hover(game->cursor)) == 0) {
                     set_a_flag(game->cursor, CURSOR_HOVER_6);
                     break;
@@ -617,10 +643,59 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_7:
                 tmp = 7;
+                if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
+                    tmp = tmp + 10;
+                }
                 if ((status = have_number_hover(game->cursor)) == 0) {
                     set_a_flag(game->cursor, CURSOR_HOVER_7);
                     break;
                 } else if (find_card(game->deck, status, tmp) != NULL) {
+                    game->cursor->pos->col = status;
+                    game->cursor->pos->row = tmp;
+                    delete_hover_flag(game->cursor);
+                    change_cursor_frame(game);
+                }
+                delete_hover_flag(game->cursor);
+                break;
+            case SDLK_8:
+                tmp = 8;
+                if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
+                    tmp = tmp + 10;
+                }
+                if ((status = have_number_hover(game->cursor)) == 0) {
+                    break;
+                } else if (find_card(game->deck, status, tmp) != NULL) {
+                    game->cursor->pos->col = status;
+                    game->cursor->pos->row = tmp;
+                    delete_hover_flag(game->cursor);
+                    change_cursor_frame(game);
+                }
+                delete_hover_flag(game->cursor);
+                break;
+            case SDLK_9:
+                tmp = 9;
+                if (have_a_flag(game->cursor, CURSOR_HOVER_10)) {
+                    tmp = tmp + 10;
+                }
+                if ((status = have_number_hover(game->cursor)) == 0) {
+                    break;
+                } else if (find_card(game->deck, status, tmp) != NULL) {
+                    game->cursor->pos->col = status;
+                    game->cursor->pos->row = tmp;
+                    delete_hover_flag(game->cursor);
+                    change_cursor_frame(game);
+                }
+                delete_hover_flag(game->cursor);
+                break;
+            case SDLK_0:
+                tmp = 10;
+                if ((status = have_number_hover(game->cursor)) == 0) {
+                    break;
+                } else if (have_a_flag(game->cursor, CURSOR_HOVER_10) == 0) {
+                    set_a_flag(game->cursor, CURSOR_HOVER_10);
+                    break;
+                }
+                else if (find_card(game->deck, status, tmp) != NULL) {
                     game->cursor->pos->col = status;
                     game->cursor->pos->row = tmp;
                     delete_hover_flag(game->cursor);
@@ -634,9 +709,20 @@ fly_mode(GAME *game, const SDL_Event *event) {
             case SDLK_RETURN:
             case SDLK_SPACE:
                 interact(game);
+                buffer[0] = '0';
                 break;
             default:
                 break;
+        }
+        num = num - 0x30u;
+        if (num >= 0 && num <= 9) {
+            char slovo[2];
+            sprintf(slovo, "%d", num);
+            printf("%c\n", *slovo);
+            strcat(buffer, slovo);
+            if (strlen(buffer) > 3) {
+                strcpy(buffer, "");
+            }
         }
     }
     return 1;
@@ -688,9 +774,62 @@ gameplay_update(GAME* game) {
         push_user_event(g_change_scene_event_type, game_state_game_over);
     }
 
+    if (have_number_hover(game->cursor) == 0) {
+        strcpy(buffer, "");
+    }
+
 
 
     return 1;
+}
+
+int
+render_commands(GAME *game) {
+    if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
+        return 0;
+    }
+
+    if (have_number_hover(game->cursor) == 0) {
+        return 0;
+    }
+
+    //render
+    int status;
+    int text_width, text_height;
+
+    if (strlen(buffer) == 0) {
+        return 0;
+    }
+    
+    status = get_text_size(
+        game->font,
+        buffer,
+        title_size,
+        &text_width,
+        &text_height
+    );
+    if (status == 0) {
+        return 0;
+    }
+
+    int width, height;
+    status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
+
+    status = render_text(
+        game->font,
+        game->renderer,
+        buffer,
+        title_size,
+        &(SDL_Point){
+            .x = (width - text_width) / 2,
+            .y = (height - text_height - padding_of_card)
+        },
+        &(SDL_Color){255, 255, 255, 255}
+    );
+    if (status == 0) {
+        return 0;
+    }
+
 }
 
 int render_cursor(GAME *game) {
@@ -776,6 +915,8 @@ gameplay_render(GAME* game) {
         push_user_event(SDL_EVENT_QUIT, 0);
         return 0;
     }
+
+    render_commands(game);
 
     int width, height;
     status = SDL_GetWindowSizeInPixels(game->window, &width, &height);

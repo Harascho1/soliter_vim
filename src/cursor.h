@@ -17,6 +17,9 @@
 #define CURSOR_HOVER_5 0x500
 #define CURSOR_HOVER_6 0x600
 #define CURSOR_HOVER_7 0x700
+#define CURSOR_HOVER_8 0x800
+#define CURSOR_HOVER_9 0x900
+#define CURSOR_HOVER_10 0x1000
 
 typedef struct _CURSOR {
     SDL_FRect *cursor;

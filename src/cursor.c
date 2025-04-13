@@ -60,5 +60,5 @@ delete_hover_flag(CURSOR *cursor) {
 int
 have_number_hover(CURSOR *cursor) {
     //SDL_Log("hover num je: %d", cursor->mode / CURSOR_HOVER_1);
-    return cursor->mode / CURSOR_HOVER_1;
+    return (cursor->mode % CURSOR_HOVER_10) / CURSOR_HOVER_1;
 }
