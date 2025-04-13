@@ -6,7 +6,11 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <pthread.h>
+#endif
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>

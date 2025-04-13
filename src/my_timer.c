@@ -29,7 +29,12 @@ void* count_down(void *atribute) {
 
 int reset_timer(MY_TIMER *timer) {
     timer->start_timer = 0;
+    #ifdef _WIN32
+    WaitForSingleObject(timer->thread_clock, INFINITE);
+    CloseHandle(timer->thread_clock);
+    #else
     pthread_join(timer->thread_clock, NULL);
+    #endif
     timer->time_elapsed = 0;
 }
 
@@ -37,6 +42,10 @@ int start_timer(MY_TIMER *timer) {
     timer->start_timer = 1;
     timer->time_elapsed = 0;
     timer->begin_time = SDL_GetTicks();
+    #ifdef _WIN32
+    timer->thread_clock = CreateThread(NULL, 0, count_down, (void*)timer, 0, NULL);
+    #else
     pthread_create(&timer->thread_clock, NULL, count_down, (void*)timer);
+    #endif
 
 }

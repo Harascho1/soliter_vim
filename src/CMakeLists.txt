@@ -34,6 +34,8 @@ set_target_properties(${PROJECT_NAME}
     RUNTIME_OUTPUT_DIRECTORY_DEBUG      "${CMAKE_SOURCE_DIR}/build"
     RUNTIME_OUTPUT_DIRECTORY_RELEASE    "${CMAKE_SOURCE_DIR}/build")
 
+set(ASSETS_PATH ${CMAKE_SOURCE_DIR}/assets)
+
 find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads SDL3_ttf::SDL3_ttf SDL3_image::SDL3_image SDL3::SDL3)
 
@@ -47,6 +49,10 @@ if (LINUX)
     SET(SDL_IMAGE_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_image/libSDL3_image.so.0")
     SET(SDL_TTF_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_ttf/libSDL3_ttf.so.0")
     SET(SDL_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL/libSDL3.so.0")
+else()
+    SET(SDL_IMAGE_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_image/Release/SDL3_image.dll")
+    SET(SDL_TTF_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_ttf/Release/SDL3_ttf.dll")
+    SET(SDL_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL/Release/SDL3.dll")
 endif()
 
 add_custom_command(
