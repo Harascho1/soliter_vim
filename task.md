@@ -1,1 +1,0 @@
-**1.** kad ostane jedna karta u spilu tad se desi seg fault
