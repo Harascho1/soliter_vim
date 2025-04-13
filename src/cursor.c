@@ -28,7 +28,6 @@ destroy_cursor(CURSOR *cursor) {
     }
 }
 
-//TODO
 int
 set_a_flag(CURSOR *cursor, int flag) {
     if (flag == 0) {
@@ -38,8 +37,6 @@ set_a_flag(CURSOR *cursor, int flag) {
         cursor->mode = cursor->mode & ~flag;
     }
     cursor->mode += flag;
-    SDL_Log("setted flag: %d", cursor->mode / CURSOR_HOVER_1);
-    //cursor->mode |= flag;
 
 }
 
@@ -54,11 +51,9 @@ have_a_flag(CURSOR *cursor, int flag) {
 int
 delete_hover_flag(CURSOR *cursor) {
     cursor->mode = cursor->mode % CURSOR_HOVER_1;
-    SDL_Log("Cursor mode: %d", cursor->mode);
 }
 
 int
 have_number_hover(CURSOR *cursor) {
-    //SDL_Log("hover num je: %d", cursor->mode / CURSOR_HOVER_1);
     return (cursor->mode % CURSOR_HOVER_10) / CURSOR_HOVER_1;
 }

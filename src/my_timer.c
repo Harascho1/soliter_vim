@@ -21,7 +21,6 @@ void* count_down(void *atribute) {
         int m_sec = (now - timer->begin_time)/ 1000;
         if (m_sec > old_sec) {
             old_sec = m_sec;
-            //SDL_Log("seconds: %d\n", m_sec);
             timer->time_elapsed = old_sec;
         }
     }

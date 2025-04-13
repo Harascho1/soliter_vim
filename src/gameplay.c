@@ -17,9 +17,6 @@ top_deck_card(DECK *deck) {
         return NULL;
     }
     if (deck->count >= 52) {
-        //SDL_Log("deck->count je veci ili jednak sa 52\n");
-        //deck->count = 28;
-        //pop_all(deck->new_cards);
         return NULL;
     }
     while (deck->count < 52) {
@@ -33,9 +30,7 @@ top_deck_card(DECK *deck) {
 
 CARD*
 next_deck_card(DECK *deck) {
-    //SDL_Log("deck->count je: %d", deck->count);
     if (deck->count >= 52) {
-        //SDL_Log("deck->count je veci ili jednak sa 52\n");
         deck->count = -1;
         return NULL;
     }
@@ -62,7 +57,6 @@ have_more_cards(DECK *deck) {
             count++;
         }
     }
-    SDL_Log("%d\n", count);
     if (count > 1) {
         return 1;
     }
@@ -76,32 +70,18 @@ draw_next_card(DECK *deck) {
     }
     CARD *next_new_card = top_deck_card(deck);
 
-    if (next_new_card == NULL) {
-        SDL_Log("Nije uspeo da izvuce novu kartu\n");
-        //? return NULL;
-    } else {
+    if (next_new_card != NULL) {
         next_new_card->visible = visible;
         push(deck->new_cards, next_new_card);
     }
 
-    //SDL_Log(
-    //    "%d %d",
-    //    next_new_card->suit,
-    //    next_new_card->value
-    //);
-
     deck->count++;
     deck->deck_card = next_deck_card(deck);
-    if (deck->deck_card != NULL) {
-        SDL_Log("deck card ima value: %d\n",deck->deck_card->value);
-    }
-    //SDL_Log("broj karte za deck_card: %d", deck->count);
     return next_new_card;
 }
 
 int
 reveal_card_below(GAME *game) {
-    //TODO dodati da moze da vidi ako je postavio new card da otkrije kartu ispod nje ako je ima
 
     for (int i = 1; i <= number_of_cards_in_row; i++) {
         int j = 1;
@@ -113,20 +93,14 @@ reveal_card_below(GAME *game) {
         }
         j--;
         if (j == 0) {
-            //SDL_Log("j je 0\n");
             continue;
         }
         if (last_card_visible == 0) {
-            //SDL_Log("sad cemo da okrenemo kartu\n");
             card = find_card(game->deck, i, j);
-            if (card == NULL) {
-                SDL_Log("card je NULL\n");
-            }
             card->visible = visible;
             return 1;
         } 
     }
-    SDL_Log("NISAM USPEO DA OTKRIJEM KARTU\n");
 
     return 1;
 }
@@ -150,12 +124,6 @@ selected_card(DECK *deck, CARD **selected_cards) {
             }
         }
     }
-    //for (int i = 0; i < count; i++) {
-    //    SDL_Log(
-    //        "karta je: %d\n",
-    //        selected_cards[i]->value
-    //    );
-    //}
     return count;
 }
 
@@ -210,22 +178,17 @@ place_a_card(GAME *game) {
     num_of_selected_cards = selected_card(game->deck, s_card);
 
     if (num_of_selected_cards == 0) {
-        SDL_Log("Ni jedna karta nije selektovana\n");
         return 0;
     }
 
     if (card == NULL) {
-        //TODO - da probas da postavis kralja
-        SDL_Log("Karta na koju postavljas kartu/e nije pronadjena\n");
         if (place_king(s_card, num_of_selected_cards, game->cursor) == 0) {
-            SDL_Log("Nije uspeo da postavi kralja\n");
             game_update = 0;
             deselect_all_cards(game->deck);
             set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
             return 0;
         }
         if (same_card_selected(view_top_card_in_queue(game->deck->new_cards), *s_card) == 0) {
-            SDL_Log("Kralj je bio na fildu\n");
             game_update = 1;
         } else {
             pop_top(game->deck->new_cards);
@@ -242,12 +205,9 @@ place_a_card(GAME *game) {
     }
 
     if (same_card_selected(card, *s_card) == 1 && num_of_selected_cards == 1) {
-        //TODO dodaj da vuce kartu ako je selektovao deck card
         if (same_card_selected(card, game->deck->deck_card)) {
             CARD *next_card = draw_next_card(game->deck);
-            //push(game->deck->new_cards, next_card);
             if (next_card == NULL) {
-                SDL_Log("error u same_card_selected\n");
             }
             deselect_all_cards(game->deck);
             set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
@@ -263,7 +223,6 @@ place_a_card(GAME *game) {
             set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
             return 1;
         }
-        SDL_Log("Karta ne moze da se sortira\n");
     }       
 
     if (same_card_selected(*s_card, game->deck->deck_card)) {
@@ -273,19 +232,12 @@ place_a_card(GAME *game) {
     }
 
     if (card->on_field == 0) {
-        //SDL_Log("Tu karta ne moze da se postavi\n");
         deselect_all_cards(game->deck);
         set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
         return 0;
     }
     
     if (can_card_be_placed(*s_card, card) == 0) {
-        //SDL_Log(
-        //    "card1 addr: %ld & card2: %ld",
-        //    s_card,
-        //    card
-        //);
-        SDL_Log("Karta ne moze da se postavi\n");
         set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
         deselect_all_cards(game->deck);
         return 0;
@@ -309,12 +261,10 @@ place_a_card(GAME *game) {
         y_card_pos += padding_of_card;
     }
 
-    //SDL_Log("postavljam kartu\n");
     set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
 
     CARD *new_card = view_top_card_in_queue(game->deck->new_cards);
     if (same_card_selected(*s_card, new_card)) {
-        SDL_Log("da li sam usao ovde\n");
         pop_top(game->deck->new_cards);
         deselect_all_cards(game->deck);
         game_update = 0;
@@ -337,14 +287,8 @@ select_a_card(GAME *game) {
             draw_next_card(game->deck);
             return 1;
         }
-        SDL_Log("Selected card not found\n");
         return 0;
     }
-    //SDL_Log(
-    //    "card addr: %ld & deck_card: %ld",
-    //    card,
-    //    game->deck->deck_card
-    //);
     if (same_card_selected(card, game->deck->deck_card)) {
         if (have_more_cards(game->deck) == 0) {
             return 1;
@@ -388,13 +332,6 @@ change_cursor_frame(GAME *game) {
         game->cursor->cursor->y = card->frame->y - padding_of_card / 4;    
 
     }
-    //SDL_Log(
-    //    "(%f, %f) [%f, %f]\n",
-    //    game->cursor->cursor->x,
-    //    game->cursor->cursor->y,
-    //    game->cursor->cursor->w,
-    //    game->cursor->cursor->h
-    //);
     return 1;
 }
 
@@ -414,7 +351,6 @@ interact(GAME *game) {
     }
 }
 
-//TODO 
 int
 normal_select_mode(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
@@ -442,7 +378,6 @@ normal_select_mode(GAME *game, const SDL_Event *event) {
                     } 
                     break;
                 }
-                //SDL_Log("Nasao je kartu desno\n");
                 game->cursor->pos->col++;
                 change_cursor_frame(game);
                 break;                
@@ -471,7 +406,6 @@ normal_select_mode(GAME *game, const SDL_Event *event) {
                 if (find_card(game->deck, game->cursor->pos->col, new_row) == 0) {
                     if (game->cursor->pos->row == 0) {
                         go_to_invisible_card(game, game->cursor->pos->col);
-                        //? mislim da sam fiksao
                         game->cursor->pos->row = new_row;
                     }
                     break;
@@ -496,7 +430,6 @@ normal_select_mode(GAME *game, const SDL_Event *event) {
                         break;
                     }
                 }
-                //SDL_Log("promenio sam poziciju kursora\n");
                 game->cursor->pos->row--;
                 change_cursor_frame(game);
                 break;                
@@ -528,7 +461,6 @@ fly_mode(GAME *game, const SDL_Event *event) {
 
             case SDLK_TAB:
                 status = have_number_hover(game->cursor);
-                SDL_Log("status: %d\n", status);
                 if (status != 0) {
                     break;
                 }
@@ -769,7 +701,6 @@ gameplay_update(GAME* game) {
     }
 
     if (count == 4) {
-        SDL_Log("Pobedio siiiiii\n");
         g_game_win = 1;
         push_user_event(g_change_scene_event_type, game_state_game_over);
     }
@@ -838,32 +769,12 @@ int render_cursor(GAME *game) {
     const char *path = "../assets/cursor.png";
     SDL_Texture *texture = create_texture_from_image(game->renderer, path);
     if (texture == NULL) {
-        SDL_Log("create_texture_from_image error...\n");
         return 0;
     }
 
     if (game->cursor->cursor == NULL) {
-        SDL_Log("nema kursor FRect-a\n");
     } 
 
-    //SDL_Log(
-    //    "(%f, %f) [%f, %f]\n",
-    //    game->cursor->cursor->x,
-    //    game->cursor->cursor->y,
-    //    game->cursor->cursor->w,
-    //    game->cursor->cursor->h
-    //);
-    //SDL_Log(
-    //    "(%d, %d)\n",
-    //    game->cursor->pos->row,
-    //    game->cursor->pos->col
-    //);
-
-    //SDL_Log(
-    //    "queue->p: %d\nqueue->q: %d",
-    //    game->deck->new_cards->p,
-    //    game->deck->new_cards->q
-    //);
     status = SDL_RenderTexture(
         game->renderer,
         texture,
@@ -930,10 +841,8 @@ gameplay_render(GAME* game) {
         );
     }
 
-    //TODO popravi ovo ovo je samo za test za kursor
     // *RENDERING DECK AND ONE MORE CARD ON LEFT RIGHT CORNER
 
-    //TODO Prepravi ovo
     if (game->deck->deck_card != NULL) {
         status = render_card(
             game->renderer,
@@ -942,7 +851,7 @@ gameplay_render(GAME* game) {
         );
         if (status == 0) {
             SDL_Log("render card error...\n");
-            //return 0;
+            return 0;
         }
     }
     if (game->cursor->pos->col == 1 &&
@@ -981,7 +890,6 @@ gameplay_render(GAME* game) {
 
     // * RENDERING TEXT THAT SHOWS WHAT IN WHAT MODE ARE U
     int mode = game->cursor->mode % 4;
-    //SDL_Log("mode: %d\n", mode);
     int text_width, text_height;
     status = get_text_size(
         game->font,

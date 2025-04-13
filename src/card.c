@@ -7,11 +7,6 @@ int padding_of_card = 20;
 
 int
 same_card_selected(CARD *card1, CARD *card2) {
-    //SDL_Log(
-    //    "card1 addr: %ld & card2: %ld",
-    //    card1,
-    //    card2
-    //);
     return card1 == card2;
 }
 
@@ -83,32 +78,28 @@ sort_a_card(CARD *card, DECK *deck) {
             if (deck->sorted_cards[suit]->value + 1 != card->value) {
                 return 0;
             }
-            //SDL_Log("Alo momak\n");
             int card_value = card->value;
             card->pos->col = deck->sorted_cards[suit]->pos->col;
             card->pos->row = deck->sorted_cards[suit]->pos->row;
             card->frame->x = deck->sorted_cards[suit]->frame->x;
             card->frame->y = deck->sorted_cards[suit]->frame->y;
             card->on_field = 1;
-            //SDL_Log(
-            //    "(%d, %d)",
-            //    card->pos->col,
-            //    card->pos->row
-            //);
+            
             deck->sorted_cards[suit]->value = card_value;
             return 1;
         }
     }
-    SDL_Log("SI IZASO\n");
     return 0;
 }
 
 int
 pop_all(CARD_QUEUE *queue) {
-    SDL_Log("popujem sve karte iz new_cards\n");
     queue->p = 0;
     queue->q = 0;
     for (int i = 0; i < queue->max_items; i++) {
+        if (queue->queue[i] == NULL) {
+            continue;
+        }
         if (queue->queue[i]->on_field == 0) {
             queue->queue[i]->visible = not_visible;
         }
@@ -156,8 +147,6 @@ pop(CARD_QUEUE *queue) {
         queue->q = 0;
     }
     queue->count--;
-    SDL_Log("Stavljam kartu na not_visible\n");
-    SDL_Log("Karta broja: %d\n", queue->queue[old_q]->value);
     queue->queue[old_q]->visible = not_visible;
     return queue->queue[old_q];
 }
@@ -173,7 +162,6 @@ view_top_card_in_queue(CARD_QUEUE *queue) {
     } else {
         tmp = queue->p - 1;
     }
-    //SDL_Log("tmp: = %d\n", tmp);
     return queue->queue[tmp];
 }
 
@@ -194,7 +182,6 @@ pop_top(CARD_QUEUE *queue) {
 int
 can_card_be_placed(CARD *card_below, CARD *card_above) {
     if (card_below->value + 1 != card_above->value) {
-        //SDL_Log("Karta nije za jedan manja od ove iznad\n");
         return 0;
     }
     if ((card_below->suit == suit_clubs || card_below->suit == suit_spades) &&
