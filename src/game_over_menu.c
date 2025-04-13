@@ -6,6 +6,9 @@ static const char *title[2] = {
     "YOU WIN"
 };
 
+static char* win_in_seconds[255];
+win_in_seconds = "";
+
 int
 game_over_menu_event_handler(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
@@ -52,9 +55,58 @@ game_over_menu_event_handler(GAME *game, const SDL_Event *event) {
 int
 game_over_menu_update(GAME *game) {
     if (game->timer->start_timer == 1) {
+        if (g_game_win == 1) {
+            sprintf(win_in_seconds, "time: %d", game->timer->time_elapsed);
+            g_game_win = 0;
+        }
         reset_timer(game->timer);
     }
     return 1; 
+}
+
+int
+render_time(GAME *game) {
+    if (strlen(win_in_seconds) <= 0) {
+        return 0;
+    }
+    int status;
+    int text_witdh, text_height;
+
+    int width, height;
+    status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
+    if (status == 0) {
+        SDL_Log("SDL_GetWindowSizeInPixels failed: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    status = get_text_size(
+        game->font,
+        win_in_seconds,
+        standard_font_size,
+        &text_witdh,
+        &text_height
+    );
+
+    if (status == 0) {
+        return 0;
+    }
+
+    status = render_text(
+        game->font,
+        game->renderer,
+        win_in_seconds,
+        standard_font_size,
+        &(SDL_Point){
+            .x = (width - text_witdh) / 2,
+            .y = padding_of_card
+        },
+        &(SDL_Color) {
+            255,255,255,255
+        }
+    );
+    if (status == 0) {
+        return 0;
+    }
 }
 
 int
@@ -102,6 +154,11 @@ game_over_menu_render(GAME *game) {
         return 0;
     }
     int text_width, text_height;
+
+    status = render_time(game);
+    if (status == 0) {
+        return 0;
+    }
 
     status = get_text_size(
         game->font,
