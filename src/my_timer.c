@@ -6,6 +6,7 @@ MY_TIMER* create_timer() {
     timer->thread_clock;
     timer->time_elapsed = 0;
     timer->start_timer = 0;
+    return timer;
 }
 
 void destroy_timer(MY_TIMER *timer) {

@@ -7,7 +7,6 @@ static const char *title[2] = {
 };
 
 static char* win_in_seconds[255];
-win_in_seconds = "";
 
 int
 game_over_menu_event_handler(GAME *game, const SDL_Event *event) {
