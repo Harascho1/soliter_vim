@@ -6,7 +6,7 @@ static const char *title[2] = {
     "YOU WIN"
 };
 
-static char* win_in_seconds[255];
+static char win_in_seconds[255];
 
 int
 game_over_menu_event_handler(GAME *game, const SDL_Event *event) {

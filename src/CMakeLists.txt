@@ -64,5 +64,5 @@ add_custom_command(
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy "${ASSETS_PATH}" "${CMAKE_SOURCE_DIR}/output/assets"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${ASSETS_PATH}" "${CMAKE_SOURCE_DIR}/output/assets"
     COMMENT "Copying assets")
