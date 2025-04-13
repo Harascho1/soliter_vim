@@ -4,14 +4,18 @@
 CARD* is_there_a_card(GAME *game, int *row, int *col);
 int change_cursor_frame(GAME *game);
 
-static const char* modes[3] = {
+static const char* modes[4] = {
     "mode:normal",
     "mode:select",
-    "mode:fly"
+    "mode:fly",
+    "mode:fly-select"
 };
 
 CARD*
 top_deck_card(DECK *deck) {
+    if (deck->deck_card == NULL) {
+        return NULL;
+    }
     if (deck->count >= 52) {
         //SDL_Log("deck->count je veci ili jednak sa 52\n");
         //deck->count = 28;
@@ -29,9 +33,9 @@ top_deck_card(DECK *deck) {
 
 CARD*
 next_deck_card(DECK *deck) {
-    SDL_Log("deck->count je: %d", deck->count);
+    //SDL_Log("deck->count je: %d", deck->count);
     if (deck->count >= 52) {
-        SDL_Log("deck->count je veci ili jednak sa 52\n");
+        //SDL_Log("deck->count je veci ili jednak sa 52\n");
         deck->count = -1;
         return NULL;
     }
@@ -42,7 +46,6 @@ next_deck_card(DECK *deck) {
         if (deck->cards[deck->count].on_field == 0) {
             return &deck->cards[deck->count];
         }
-        
         deck->count++;
     }
     return NULL;
@@ -69,6 +72,9 @@ draw_next_card(DECK *deck) {
 
     deck->count++;
     deck->deck_card = next_deck_card(deck);
+    if (deck->deck_card != NULL) {
+        SDL_Log("deck card ima value: %d\n",deck->deck_card->value);
+    }
     //SDL_Log("broj karte za deck_card: %d", deck->count);
     return next_new_card;
 }
@@ -87,7 +93,7 @@ reveal_card_below(GAME *game) {
         }
         j--;
         if (j == 0) {
-            SDL_Log("j je 0\n");
+            //SDL_Log("j je 0\n");
             continue;
         }
         if (last_card_visible == 0) {
@@ -139,6 +145,10 @@ place_king(CARD **card, int num, CURSOR *cursor) {
     int cursor_row = cursor->pos->row;
     int x_coord, y_coord;
 
+    if ((*card)->value != 13) {
+        return 0;
+    }
+
     for (int i = 0; i < number_of_cards_in_row; i++) {
         if (cursor_col == g_invisible_card[i].pos->col) {
             x_coord = g_invisible_card[i].frame->x;
@@ -189,6 +199,9 @@ place_a_card(GAME *game) {
         SDL_Log("Karta na koju postavljas kartu/e nije pronadjena\n");
         if (place_king(s_card, num_of_selected_cards, game->cursor) == 0) {
             SDL_Log("Nije uspeo da postavi kralja\n");
+            game_update = 0;
+            deselect_all_cards(game->deck);
+            set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
             return 0;
         }
         if (same_card_selected(view_top_card_in_queue(game->deck->new_cards), *s_card) == 0) {
@@ -198,13 +211,13 @@ place_a_card(GAME *game) {
             pop_top(game->deck->new_cards);
         }
         deselect_all_cards(game->deck);
-        game->cursor->mode = 0;
+        set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
         return 1;
     }
 
     if (card == not_visible) {
         deselect_all_cards(game->deck);
-        game->cursor->mode = 0;
+        set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
         return 0;
     }
 
@@ -217,7 +230,7 @@ place_a_card(GAME *game) {
                 SDL_Log("error u same_card_selected\n");
             }
             deselect_all_cards(game->deck);
-            game->cursor->mode = 0;
+            set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
             return 1;
 
         }
@@ -227,7 +240,7 @@ place_a_card(GAME *game) {
                 pop_top(game->deck->new_cards);
             }
             deselect_all_cards(game->deck);
-            game->cursor->mode = 0;
+            set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
             return 1;
         }
         SDL_Log("Karta ne moze da se sortira\n");
@@ -235,14 +248,14 @@ place_a_card(GAME *game) {
 
     if (same_card_selected(*s_card, game->deck->deck_card)) {
         deselect_all_cards(game->deck);
-        game->cursor->mode = 0;
+        set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
         return 0;
     }
 
     if (card->on_field == 0) {
         //SDL_Log("Tu karta ne moze da se postavi\n");
         deselect_all_cards(game->deck);
-        game->cursor->mode = 0;
+        set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
         return 0;
     }
     
@@ -253,7 +266,7 @@ place_a_card(GAME *game) {
         //    card
         //);
         SDL_Log("Karta ne moze da se postavi\n");
-        game->cursor->mode = 0;
+        set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
         deselect_all_cards(game->deck);
         return 0;
     }
@@ -277,7 +290,7 @@ place_a_card(GAME *game) {
     }
 
     //SDL_Log("postavljam kartu\n");
-    game->cursor->mode = 0;
+    set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
 
     CARD *new_card = view_top_card_in_queue(game->deck->new_cards);
     if (same_card_selected(*s_card, new_card)) {
@@ -305,7 +318,7 @@ select_a_card(GAME *game) {
             return 1;
         }
         SDL_Log("Selected card not found\n");
-        exit(0);
+        return 0;
     }
     //SDL_Log(
     //    "card addr: %ld & deck_card: %ld",
@@ -314,12 +327,12 @@ select_a_card(GAME *game) {
     //);
     if (same_card_selected(card, game->deck->deck_card)) {
         card->selected = !card->selected;
-        game->cursor->mode = 1;
+        set_a_flag(game->cursor, CURSOR_SELECT_MODE);
         return 1;
     }
     if (same_card_selected(card, view_top_card_in_queue(game->deck->new_cards))) {
         card->selected = !card->selected;
-        game->cursor->mode = 1;
+        set_a_flag(game->cursor, CURSOR_SELECT_MODE);
         return 1;
     }
     if (card->visible == not_visible) {
@@ -327,7 +340,7 @@ select_a_card(GAME *game) {
     }
     card->selected = !card->selected;
     int selected_cards = select_card_below(card, game->deck);
-    game->cursor->mode = 1;
+    set_a_flag(game->cursor, CURSOR_SELECT_MODE);
     return 1;
 }
 
@@ -358,8 +371,11 @@ change_cursor_frame(GAME *game) {
         game->cursor->pos->col,
         game->cursor->pos->row
     );
-    if (card == NULL) {
-        return 0;
+    // * deck_card
+    if (card == NULL && game->cursor->pos->row == 0) {
+        game->cursor->cursor->x = padding_of_card / 4;
+        game->cursor->cursor->y = padding_of_card / 4;
+        return 1;
     }
     if (same_card_selected(card, view_top_card_in_queue(game->deck->new_cards)) == 1) {
         game->cursor->cursor->x = padding_of_card * 3/2 + g_card_width - padding_of_card / 4; 
@@ -388,134 +404,26 @@ go_to_invisible_card(GAME *game, int col) {
 
 int
 interact(GAME *game) {
-    if (game->cursor->mode == 0) {
+    if (game->cursor->mode % 2 == 0) {
         select_a_card(game);
-    } else if (game->cursor->mode == 1) {
+    } else if (game->cursor->mode % 2 == 1) {
         place_a_card(game);
     }
 }
 
+//TODO 
 int
-gamaplay_event_handler(GAME *game, const SDL_Event *event) {
-    int tmp;
-    int status;
+normal_select_mode(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch (event->key.key) {
             case SDLK_ESCAPE:
                 push_user_event(g_change_scene_event_type, game_state_game_over);
                 break;
-            case SDLK_X:
-                game->cursor->mode = CURSOR_NORMAL_MODE;
-                break;
             case SDLK_C:
-                //TODO omoguci da se koristi fly mode
-                //SDL_Log("Trenutno je core mehanika u izgradnji");
-                //break;
                 game->cursor->mode = CURSOR_FLY_MODE;
-                break;
-            case SDLK_1:
-                tmp = 1;
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
-                    break;
-                }
-                if (have_a_flag(game->cursor, CURSOR_HOVER_1) == 0) {
-                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_1;
-                    break;
-                } else if (is_there_a_card(game, NULL, &(tmp))) {
-                    game->cursor->pos->col = tmp;
-                    delete_hover_flag(game->cursor, CURSOR_HOVER_1);
-                    change_cursor_frame(game);
-                }
-                break;
-            case SDLK_2:
-                tmp = 2;
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
-                    break;
-                }
-                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
-                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
-                    break;
-                } else if (is_there_a_card(game, NULL, &(tmp))) {
-                    game->cursor->pos->col = tmp;
-                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
-                    change_cursor_frame(game);
-                }
-                break;
-            case SDLK_3:
-                tmp = 3;
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
-                    break;
-                }
-                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
-                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
-                    break;
-                } else if (is_there_a_card(game, NULL, &(tmp))) {
-                    game->cursor->pos->col = tmp;
-                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
-                    change_cursor_frame(game);
-                }
-                break;
-            case SDLK_4:
-                tmp = 4;
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
-                    break;
-                }
-                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
-                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
-                    break;
-                } else if (is_there_a_card(game, NULL, &(tmp))) {
-                    game->cursor->pos->col = tmp;
-                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
-                    change_cursor_frame(game);
-                }
-                break;
-            case SDLK_5:
-                tmp = 5;
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
-                    break;
-                }
-                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
-                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
-                    break;
-                } else if (is_there_a_card(game, NULL, &(tmp))) {
-                    game->cursor->pos->col = tmp;
-                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
-                    change_cursor_frame(game);
-                }
-                break;
-            case SDLK_6:
-                tmp = 6;
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
-                    break;
-                }
-                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
-                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
-                    break;
-                } else if (is_there_a_card(game, NULL, &(tmp))) {
-                    game->cursor->pos->col = tmp;
-                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
-                    change_cursor_frame(game);
-                }
-                break;
-            case SDLK_7:
-                tmp = 7;
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
-                    break;
-                }
-                if (have_a_flag(game->cursor, CURSOR_HOVER_2) == 0) {
-                    game->cursor->mode = game->cursor->mode | CURSOR_HOVER_2;
-                    break;
-                } else if (is_there_a_card(game, NULL, &(tmp))) {
-                    game->cursor->pos->col = tmp;
-                    delete_hover_flag(game->cursor, CURSOR_HOVER_2);
-                    change_cursor_frame(game);
-                }
                 break;
             case SDLK_D:
             case SDLK_RIGHT:
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
-                    break;
-                }
                 if (game->cursor->pos->col == 7) {
                     break;
                 }
@@ -537,9 +445,6 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 break;                
             case SDLK_A:
             case SDLK_LEFT:
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
-                    break;
-                }
                 if (game->cursor->pos->col == 1) {
                     break;
                 }
@@ -549,20 +454,22 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                         go_to_invisible_card(game, new_col);
                         break;
                     }
-                    break;
+                    if (game->cursor->pos->row != 0) {
+                        break;
+
+                    }
                 }
                 game->cursor->pos->col--;
                 change_cursor_frame(game);
                 break;                
             case SDLK_S:
             case SDLK_DOWN:
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
-                    break;
-                }
                 int new_row = game->cursor->pos->row + 1;
                 if (find_card(game->deck, game->cursor->pos->col, new_row) == 0) {
                     if (game->cursor->pos->row == 0) {
                         go_to_invisible_card(game, game->cursor->pos->col);
+                        //? mislim da sam fiksao
+                        game->cursor->pos->row = new_row;
                     }
                     break;
                 }
@@ -571,7 +478,7 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 break;                
             case SDLK_W:
             case SDLK_UP:
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
+                if (game->cursor->pos->row == 0) {
                     break;
                 }
                 if (game->cursor->pos->row == 1) {
@@ -582,7 +489,9 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 }
                 new_row = game->cursor->pos->row - 1;
                 if (find_card(game->deck, game->cursor->pos->col, new_row) == 0) {
-                    break;
+                    if (game->cursor->pos->col != 1) {
+                        break;
+                    }
                 }
                 //SDL_Log("promenio sam poziciju kursora\n");
                 game->cursor->pos->row--;
@@ -590,13 +499,140 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
                 break;                
             case SDLK_N:
                 CARD *card = draw_next_card(game->deck);
-                //push(game->deck->new_cards, card);
                 break;
             case SDLK_RETURN:
             case SDLK_SPACE:
-                if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
+                interact(game);
+                break;
+            default:
+                break;
+
+        }
+    }
+    return 1;
+}
+
+int
+fly_mode(GAME *game, const SDL_Event *event) {
+    int tmp;
+    int status;
+    if (event->type == SDL_EVENT_KEY_DOWN) {
+        switch (event->key.key) {
+            case SDLK_X:
+                game->cursor->mode = CURSOR_NORMAL_MODE;
+                break;
+
+            case SDLK_TAB:
+                status = have_number_hover(game->cursor);
+                SDL_Log("status: %d\n", status);
+                if (status != 0) {
                     break;
                 }
+                game->cursor->pos->row = 0;
+                game->cursor->pos->col = 2;
+                change_cursor_frame(game);
+                break;
+            
+            case SDLK_1:
+                tmp = 1;
+                if ((status = have_number_hover(game->cursor)) == 0) {
+                    set_a_flag(game->cursor, CURSOR_HOVER_1);
+                    break;
+                } else if (find_card(game->deck, status, tmp) != NULL) {
+                    game->cursor->pos->col = status;
+                    game->cursor->pos->row = tmp;
+                    delete_hover_flag(game->cursor);
+                    change_cursor_frame(game);
+                } else {
+                    game->cursor->pos->row = tmp;
+                    go_to_invisible_card(game, status);
+
+                }
+                delete_hover_flag(game->cursor);
+                break;
+            case SDLK_2:
+                tmp = 2;
+                if ((status = have_number_hover(game->cursor)) == 0) {
+                    set_a_flag(game->cursor, CURSOR_HOVER_2);
+                    break;
+                } else if (find_card(game->deck, status, tmp) != NULL) {
+                    game->cursor->pos->col = status;
+                    game->cursor->pos->row = tmp;
+                    delete_hover_flag(game->cursor);
+                    change_cursor_frame(game);
+                }
+                delete_hover_flag(game->cursor);
+                break;
+            case SDLK_3:
+                tmp = 3;
+                if ((status = have_number_hover(game->cursor)) == 0) {
+                    set_a_flag(game->cursor, CURSOR_HOVER_3);
+                    break;
+                } else if (find_card(game->deck, status, tmp) != NULL) {
+                    game->cursor->pos->col = status;
+                    game->cursor->pos->row = tmp;
+                    delete_hover_flag(game->cursor);
+                    change_cursor_frame(game);
+                }
+                delete_hover_flag(game->cursor);
+                break;
+            case SDLK_4:
+                tmp = 4;
+                if ((status = have_number_hover(game->cursor)) == 0) {
+                    set_a_flag(game->cursor, CURSOR_HOVER_4);
+                    break;
+                } else if (find_card(game->deck, status, tmp) != NULL) {
+                    game->cursor->pos->col = status;
+                    game->cursor->pos->row = tmp;
+                    delete_hover_flag(game->cursor);
+                    change_cursor_frame(game);
+                }
+                delete_hover_flag(game->cursor);
+                break;
+            case SDLK_5:
+                tmp = 5;
+                if ((status = have_number_hover(game->cursor)) == 0) {
+                    set_a_flag(game->cursor, CURSOR_HOVER_5);
+                    break;
+                } else if (find_card(game->deck, status, tmp) != NULL) {
+                    game->cursor->pos->col = status;
+                    game->cursor->pos->row = tmp;
+                    delete_hover_flag(game->cursor);
+                    change_cursor_frame(game);
+                }
+                delete_hover_flag(game->cursor);
+                break;
+            case SDLK_6:
+                tmp = 6;
+                if ((status = have_number_hover(game->cursor)) == 0) {
+                    set_a_flag(game->cursor, CURSOR_HOVER_6);
+                    break;
+                } else if (find_card(game->deck, status, tmp) != NULL) {
+                    game->cursor->pos->col = status;
+                    game->cursor->pos->row = tmp;
+                    delete_hover_flag(game->cursor);
+                    change_cursor_frame(game);
+                }
+                delete_hover_flag(game->cursor);
+                break;
+            case SDLK_7:
+                tmp = 7;
+                if ((status = have_number_hover(game->cursor)) == 0) {
+                    set_a_flag(game->cursor, CURSOR_HOVER_7);
+                    break;
+                } else if (find_card(game->deck, status, tmp) != NULL) {
+                    game->cursor->pos->col = status;
+                    game->cursor->pos->row = tmp;
+                    delete_hover_flag(game->cursor);
+                    change_cursor_frame(game);
+                }
+                delete_hover_flag(game->cursor);
+                break;
+            case SDLK_Q:
+                CARD *card = draw_next_card(game->deck);
+                break;
+            case SDLK_RETURN:
+            case SDLK_SPACE:
                 interact(game);
                 break;
             default:
@@ -607,8 +643,30 @@ gamaplay_event_handler(GAME *game, const SDL_Event *event) {
 }
 
 int
+gamaplay_event_handler(GAME *game, const SDL_Event *event) {
+    int status;
+    if (have_a_flag(game->cursor, CURSOR_FLY_MODE)) {
+        fly_mode(game, event);
+
+    } else if (have_a_flag(game->cursor, CURSOR_SELECT_MODE)) {
+        normal_select_mode(game, event);
+
+    } else {
+        normal_select_mode(game, event);
+
+    }
+
+
+    return 1;
+}
+
+int
 gameplay_update(GAME* game) {
     int status;
+    if (game->timer->start_timer == 0) {
+        start_timer(game->timer);
+    }
+
     if (game_update == 1) {
         status = reveal_card_below(game);
         if (status != 0) {
@@ -617,10 +675,20 @@ gameplay_update(GAME* game) {
     }
     // TODO - auto sort da update sam sortira karte koje su na polju
 
-    return 1;
-}
+    int count = 0;
+    for (int i = suit_clubs; i <= suit_spades; i++) {
+        if (game->deck->sorted_cards[i]->value == 13) {
+            count++;
+        }
+    }
 
-int render_deck(GAME *game) {
+    if (count == 4) {
+        SDL_Log("Pobedio siiiiii\n");
+        g_game_win = 1;
+        push_user_event(g_change_scene_event_type, game_state_game_over);
+    }
+
+
 
     return 1;
 }
@@ -823,6 +891,27 @@ gameplay_render(GAME* game) {
                 }
         }
     }
+
+    char timer[50];
+    snprintf(timer, sizeof(timer), "seconds: %d", game->timer->time_elapsed);
+    status = get_text_size(
+        game->font,
+        timer,
+        standard_font_size,
+        &text_width,
+        &text_height
+    );
+    if (status == 0) {
+        SDL_Log("get_text_size error...\n");
+    }
+    status = render_text(
+        game->font,
+        game->renderer,
+        timer,
+        standard_font_size,
+        &(SDL_Point){width - padding_of_card - text_width, height - text_height - padding_of_card},
+        &(SDL_Color){255,255,255,255}
+    );
 
     status = SDL_RenderPresent(game->renderer);
     if (status == 0) {

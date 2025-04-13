@@ -9,6 +9,7 @@ set(HEADER_FILES
     ${CMAKE_SOURCE_DIR}/src/game.h
     ${CMAKE_SOURCE_DIR}/src/texture.h
     ${CMAKE_SOURCE_DIR}/src/card.h
+    ${CMAKE_SOURCE_DIR}/src/my_timer.h
 )
 
 file(GLOB_RECURSE soliter_src 
@@ -21,6 +22,7 @@ file(GLOB_RECURSE soliter_src
     ${CMAKE_SOURCE_DIR}/src/menu.c
     ${CMAKE_SOURCE_DIR}/src/game.c
     ${CMAKE_SOURCE_DIR}/src/card.c
+    ${CMAKE_SOURCE_DIR}/src/my_timer.c
     ${CMAKE_SOURCE_DIR}/src/main.c
 )
 
@@ -32,7 +34,8 @@ set_target_properties(${PROJECT_NAME}
     RUNTIME_OUTPUT_DIRECTORY_DEBUG      "${CMAKE_SOURCE_DIR}/build"
     RUNTIME_OUTPUT_DIRECTORY_RELEASE    "${CMAKE_SOURCE_DIR}/build")
 
-target_link_libraries(${PROJECT_NAME} PUBLIC SDL3_ttf::SDL3_ttf SDL3_image::SDL3_image SDL3::SDL3)
+find_package(Threads REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads SDL3_ttf::SDL3_ttf SDL3_image::SDL3_image SDL3::SDL3)
 
 include_directories(${CMAKE_SOURCE_DIR}/sdl/SDL/include)
 include_directories(${CMAKE_SOURCE_DIR}/sdl/SDL_ttf/include)

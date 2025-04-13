@@ -10,16 +10,18 @@ static SCENE* g_game_scenes[] = {
 
 static int g_scene_fps[] = {
     60,
+    60,
     60
 };
 
 static bool
 is_period_pass(int period, int last_update_time) {
 
-    int currentTime = SDL_GetTicks();
-    if ((currentTime - last_update_time) >= period) {
+    int current_time = SDL_GetTicks();
+    if ((current_time - last_update_time) >= period) {
        return 1;
     }
+    
     return 0;
 }
 
@@ -93,6 +95,7 @@ int main() {
             last_frame_time = SDL_GetTicks();
         }
     }
+    //pthread_detach(thread_clock);
 
     game_quit(&game);
     cleanup();

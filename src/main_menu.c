@@ -1,5 +1,6 @@
 #include "game.h"
 #include "texture.h"
+#include "my_timer.h"
 
 static const char *title = "SoVIMter";
 
@@ -55,6 +56,9 @@ main_menu_event_handler(GAME *game, const SDL_Event *event) {
 
 int
 main_menu_update(GAME* game) {
+    if (game->timer->start_timer == 1) {
+        reset_timer(game->timer);
+    }
     return 1;
 }
 

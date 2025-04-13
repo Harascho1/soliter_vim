@@ -6,6 +6,7 @@
 #include "card.h"
 #include "texture.h"
 #include "cursor.h"
+#include "my_timer.h"
 
 extern Uint32 g_change_scene_event_type;
 
@@ -44,6 +45,7 @@ typedef struct _GAME{
     DECK            *deck;
     FIELD           field;
     CURSOR          *cursor;
+    MY_TIMER        *timer;
 } GAME;
 
 typedef struct _RESOULUTION {
@@ -66,6 +68,7 @@ extern SCENE gameplay_scene;
 extern SCENE game_over_menu_scene;
 
 extern int game_update;
+extern int g_game_win;
 
 int game_init(GAME* game, const char *title, const RESOLUTION *res);
 void game_quit(GAME* game);

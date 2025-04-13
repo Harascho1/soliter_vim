@@ -1,5 +1,11 @@
 #include "game.h"
 
+
+static const char *title[2] = {
+    "GAME OVER",
+    "YOU WIN"
+};
+
 int
 game_over_menu_event_handler(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
@@ -45,6 +51,9 @@ game_over_menu_event_handler(GAME *game, const SDL_Event *event) {
 
 int
 game_over_menu_update(GAME *game) {
+    if (game->timer->start_timer == 1) {
+        reset_timer(game->timer);
+    }
     return 1; 
 }
 
@@ -94,11 +103,9 @@ game_over_menu_render(GAME *game) {
     }
     int text_width, text_height;
 
-    const char *title = "GAME OVER";
-
     status = get_text_size(
         game->font,
-        title,
+        title[g_game_win],
         title_size,
         &text_width,
         &text_height
@@ -111,7 +118,7 @@ game_over_menu_render(GAME *game) {
     status = render_text(
         game->font,
         game->renderer,
-        title, 
+        title[g_game_win], 
         title_size,
         &(SDL_Point){.x = (width - text_width) / 2, .y = height / 4},
         &(SDL_Color){255, 255, 255, 255}

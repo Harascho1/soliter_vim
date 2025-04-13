@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include <pthread.h>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>

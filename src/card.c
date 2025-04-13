@@ -63,17 +63,17 @@ shuffle_deck(DECK *deck) {
         SDL_Log("Deck is NULL and therefore cannot be shuffled");
         return;
     }
-    //SDL_Log("radi\n");
 
     srand((unsigned int)time(NULL));
     int j;
-    for (int i = deck->count - 1; i > 0; i--) {
+    int count = 0;
+    for (int i = deck->count - 1; i >= 0; i--) {
         j = rand() % (i + 1);
         CARD temp = deck->cards[i];
         deck->cards[i] = deck->cards[j];
         deck->cards[j] = temp;
+        count++;
     }
-    //SDL_Log("radi\n");
 }
 
 int
@@ -109,6 +109,9 @@ pop_all(CARD_QUEUE *queue) {
     queue->p = 0;
     queue->q = 0;
     for (int i = 0; i < queue->max_items; i++) {
+        if (queue->queue[i]->on_field == 0) {
+            queue->queue[i]->visible = not_visible;
+        }
         queue->queue[i] = NULL;
     }
     queue->count = 0;
@@ -222,7 +225,7 @@ create_deck() {
     if (deck == NULL) {
         return deck;
     }
-    deck->count = 28;
+    deck->count = 52;
     int i = 0;
     for (int suit = suit_clubs; suit <= suit_spades; suit++) {
         for (int value = value_ace; value <= value_king; value++) {
@@ -237,6 +240,7 @@ create_deck() {
         }
     }
     shuffle_deck(deck);
+    deck->count = 28;
     deck->new_cards = create_card_queue(3);
     deck->deck_card = &deck->cards[deck->count];
     return deck;

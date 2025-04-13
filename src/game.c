@@ -17,6 +17,7 @@ const char *game_over_items[] = {
 Uint32 g_change_scene_event_type = (Uint32) - 1;
 
 int game_update = 0;
+int g_game_win = 0;
 CARD g_invisible_card[7];
 
 int
@@ -110,6 +111,13 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         return status;
     }
 
+    game->timer = create_timer();
+    if (game->timer == NULL) {
+        SDL_Log("create_timer failed\n");
+        game_quit(game);
+        return status;
+    }
+
     game->game_over_menu = create_menu(
         game_over_items,
         sizeof(game_over_items) / sizeof(game_over_items[0])
@@ -177,6 +185,9 @@ void game_quit(GAME* game) {
     }
     if (game->background_texture != NULL) {
         SDL_DestroyTexture(game->background_texture);
+    }
+    if (game->timer != NULL) {
+        destroy_timer(game->timer);
     }
 }
 
