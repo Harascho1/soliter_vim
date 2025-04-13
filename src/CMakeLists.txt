@@ -30,9 +30,9 @@ add_executable(${PROJECT_NAME} ${HEADER_FILES} ${soliter_src})
 
 set_target_properties(${PROJECT_NAME}
     PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY            "${CMAKE_SOURCE_DIR}/build"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG      "${CMAKE_SOURCE_DIR}/build"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE    "${CMAKE_SOURCE_DIR}/build")
+    RUNTIME_OUTPUT_DIRECTORY            "${CMAKE_SOURCE_DIR}/output"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG      "${CMAKE_SOURCE_DIR}/output"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE    "${CMAKE_SOURCE_DIR}/output")
 
 set(ASSETS_PATH ${CMAKE_SOURCE_DIR}/assets)
 
@@ -57,7 +57,12 @@ endif()
 
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/build"
-    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_IMAGE_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/build"
-    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_TTF_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/build"
+    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/output"
+    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_IMAGE_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/output"
+    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_TTF_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/output"
     COMMENT "Copying shared libraries")
+
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy "${ASSETS_PATH}" "${CMAKE_SOURCE_DIR}/output/assets"
+    COMMENT "Copying assets")

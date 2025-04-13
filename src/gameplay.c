@@ -766,7 +766,7 @@ render_commands(GAME *game) {
 int render_cursor(GAME *game) {
     int status = 0;
 
-    const char *path = "../assets/cursor.png";
+    const char *path = "assets/cursor.png";
     SDL_Texture *texture = create_texture_from_image(game->renderer, path);
     if (texture == NULL) {
         return 0;
@@ -806,7 +806,7 @@ gameplay_render(GAME* game) {
 
     if (game->background_texture == NULL) {
         SDL_Log("g_background_texture is NULL\n");
-        game->background_texture = create_texture_from_image(game->renderer, "../assets/background.png");
+        game->background_texture = create_texture_from_image(game->renderer, "assets/background.png");
         if (game->background_texture == NULL) {
             SDL_Log("Background texture is NULL\n");
             return 0;

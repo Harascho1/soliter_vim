@@ -259,16 +259,16 @@ char* find_path(CARD *card) {
     path = SDL_malloc(sizeof(char) * 100);
 
     if (card->value == 0) {
-        sprintf(path, "../assets/cards/blank_front_with_num_boarders_white.png");
+        sprintf(path, "assets/cards/blank_front_with_num_boarders_white.png");
         return path;
     }
 
     if (card->visible == not_visible) {
         if (card->selected == selected) {
-            sprintf(path, "../assets/cards/back_red_basic.png");
+            sprintf(path, "assets/cards/back_red_basic.png");
             return path;
         }
-        sprintf(path, "../assets/cards/back_red_basic_white.png");
+        sprintf(path, "assets/cards/back_red_basic_white.png");
         return path;
     }
 
@@ -312,12 +312,12 @@ char* find_path(CARD *card) {
     }
 
     if (card->selected == 1) {
-        sprintf(path, "../assets/cards/%s_%s.png", value, suit);
+        sprintf(path, "assets/cards/%s_%s.png", value, suit);
         return path;
 
     }
 
-    sprintf(path, "../assets/cards/%s_%s_white.png", value, suit);
+    sprintf(path, "assets/cards/%s_%s_white.png", value, suit);
 
     return path;
 }

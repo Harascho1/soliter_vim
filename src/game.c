@@ -129,7 +129,7 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
     }
 
     game->font = create_font(
-        "../assets/font.ttf"
+        "assets/font.ttf"
     );
     if (game->font == NULL) {
         SDL_Log("font_init failed.\n");
@@ -139,7 +139,7 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
 
     game->background_texture = create_texture_from_image(
         game->renderer,
-        "../assets/table.png"
+        "assets/table.png"
     );
     if (game->background_texture == NULL) {
         SDL_Log("Background texture is NULL\n");
