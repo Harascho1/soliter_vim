@@ -1,5 +1,7 @@
 #include "my_timer.h"
 
+static int m_fps = 60;
+
 MY_TIMER* create_timer() {
     MY_TIMER *timer = SDL_malloc(sizeof(MY_TIMER));
     timer->begin_time = SDL_GetTicks();
@@ -11,7 +13,7 @@ MY_TIMER* create_timer() {
 
 void destroy_timer(MY_TIMER *timer) {
     #ifdef _WIN32
-    CloseHandle(timer->thread_clock);
+    //CloseHandle(timer->thread_clock);
     #endif
     SDL_free(timer);
 }
@@ -27,6 +29,7 @@ void* count_down(void *atribute) {
             old_sec = m_sec;
             timer->time_elapsed = old_sec;
         }
+        SDL_Delay(10);
     }
     return NULL;
 }
@@ -35,7 +38,7 @@ int reset_timer(MY_TIMER *timer) {
     timer->start_timer = 0;
     #ifdef _WIN32
     WaitForSingleObject(timer->thread_clock, INFINITE);
-    //CloseHandle(timer->thread_clock);
+    CloseHandle(timer->thread_clock);
     #else
     pthread_join(timer->thread_clock, NULL);
     #endif

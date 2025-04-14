@@ -85,14 +85,13 @@ int main() {
     int flag = 1;
 
     while (1) {
-        if (SDL_PollEvent(&event)) {
+        if (SDL_WaitEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 break;
             } else if (event.type == g_change_scene_event_type) {
                 g_current_game_state = event.user.code;
             }
         }
-
         if (g_game_scenes[g_current_game_state]->handle_events(&game, &event) == 0) {
             break;
         }
