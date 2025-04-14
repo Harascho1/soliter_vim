@@ -17,6 +17,7 @@ file(GLOB_RECURSE soliter_src
     ${CMAKE_SOURCE_DIR}/src/cursor.c
     ${CMAKE_SOURCE_DIR}/src/texture.c
     ${CMAKE_SOURCE_DIR}/src/main_menu.c
+    ${CMAKE_SOURCE_DIR}/src/settings.c
     ${CMAKE_SOURCE_DIR}/src/gameplay.c
     ${CMAKE_SOURCE_DIR}/src/game_over_menu.c
     ${CMAKE_SOURCE_DIR}/src/menu.c

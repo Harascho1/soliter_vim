@@ -359,6 +359,7 @@ normal_select_mode(GAME *game, const SDL_Event *event) {
                 push_user_event(g_change_scene_event_type, game_state_game_over);
                 break;
             case SDLK_C:
+                deselect_all_cards(game->deck);
                 game->cursor->mode = CURSOR_FLY_MODE;
                 break;
             case SDLK_D:
@@ -435,6 +436,8 @@ normal_select_mode(GAME *game, const SDL_Event *event) {
                 break;                
             case SDLK_N:
                 CARD *card = draw_next_card(game->deck);
+                deselect_all_cards(game->deck);
+                set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
                 break;
             case SDLK_RETURN:
             case SDLK_SPACE:
@@ -456,6 +459,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch ((num = event->key.key)) {
             case SDLK_X:
+                deselect_all_cards(game->deck);
                 game->cursor->mode = CURSOR_NORMAL_MODE;
                 break;
 
@@ -646,6 +650,8 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_Q:
                 CARD *card = draw_next_card(game->deck);
+                deselect_all_cards(game->deck);
+                set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
                 break;
             case SDLK_KP_ENTER:
             case SDLK_RETURN:
@@ -664,7 +670,6 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 num_pad = 0;
             }
             sprintf(slovo, "%d", num_pad);
-            printf("%c\n", *slovo);
             strcat(buffer, slovo);
             if (strlen(buffer) > 3) {
                 strcpy(buffer, "");
@@ -674,7 +679,6 @@ fly_mode(GAME *game, const SDL_Event *event) {
         if (num >= 0 && num <= 9) {
             char slovo[2];
             sprintf(slovo, "%d", num);
-            printf("%c\n", *slovo);
             strcat(buffer, slovo);
             if (strlen(buffer) > 3) {
                 strcpy(buffer, "");

@@ -12,10 +12,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 static SCENE* g_game_scenes[] = {
     &main_menu_scene,
     &gameplay_scene,
-    &game_over_menu_scene
+    &game_over_menu_scene,
+    &setting_scene
 };
 
 static int g_scene_fps[] = {
+    60,
     60,
     60,
     60
@@ -73,7 +75,7 @@ int main() {
     }
 
     GAME game;
-    status = game_init(&game, "Soliter", &(RESOLUTION){900, 900});
+    status = game_init(&game, "SoVIMter", &(RESOLUTION){900, 900});
     if (status == 0) {
         SDL_Log("game_init failed: %s\n", SDL_GetError());
         cleanup();

@@ -211,6 +211,8 @@ run_a_game(GAME *game) {
         SDL_Log("create_cursor error\n");
         game_quit(game);
     }
+
+    g_game_win = 0;
     game_update = 0;
     load_game_field(game->deck);
 }

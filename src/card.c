@@ -83,6 +83,7 @@ sort_a_card(CARD *card, DECK *deck) {
             card->pos->row = deck->sorted_cards[suit]->pos->row;
             card->frame->x = deck->sorted_cards[suit]->frame->x;
             card->frame->y = deck->sorted_cards[suit]->frame->y;
+            card->selected = not_selected;
             card->on_field = 1;
             
             deck->sorted_cards[suit]->value = card_value;
