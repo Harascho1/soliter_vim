@@ -10,7 +10,9 @@ MY_TIMER* create_timer() {
 }
 
 void destroy_timer(MY_TIMER *timer) {
+    #ifdef _WIN32
     CloseHandle(timer->thread_clock);
+    #endif
     SDL_free(timer);
 }
 

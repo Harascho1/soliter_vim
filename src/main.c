@@ -2,10 +2,12 @@
 
 static GAME_STATE g_current_game_state = game_state_main_menu;
 
+#ifdef _WIN32
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nCmdShow) {
     return main(__argc, __argv);
 }
+#endif
 
 static SCENE* g_game_scenes[] = {
     &main_menu_scene,
