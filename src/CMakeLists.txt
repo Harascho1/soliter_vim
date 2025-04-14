@@ -28,6 +28,13 @@ file(GLOB_RECURSE soliter_src
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${soliter_src})
 
+if (WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE TRUE
+    )
+endif()
+
+
 set_target_properties(${PROJECT_NAME}
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY            "${CMAKE_SOURCE_DIR}/output"

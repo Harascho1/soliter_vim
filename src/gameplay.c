@@ -647,6 +647,7 @@ fly_mode(GAME *game, const SDL_Event *event) {
             case SDLK_Q:
                 CARD *card = draw_next_card(game->deck);
                 break;
+            case SDLK_KP_ENTER:
             case SDLK_RETURN:
             case SDLK_SPACE:
                 interact(game);
@@ -654,6 +655,20 @@ fly_mode(GAME *game, const SDL_Event *event) {
                 break;
             default:
                 break;
+        }
+        unsigned int num_pad = num;
+        num_pad = num_pad - SDLK_KP_1 + 1;
+        if (num_pad >= 1 && num_pad <= 10) {
+            char slovo[2];
+            if (num_pad == 10) {
+                num_pad = 0;
+            }
+            sprintf(slovo, "%d", num_pad);
+            printf("%c\n", *slovo);
+            strcat(buffer, slovo);
+            if (strlen(buffer) > 3) {
+                strcpy(buffer, "");
+            }
         }
         num = num - 0x30u;
         if (num >= 0 && num <= 9) {

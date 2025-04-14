@@ -57,6 +57,8 @@ game_over_menu_update(GAME *game) {
         if (g_game_win == 1) {
             sprintf(win_in_seconds, "time: %d", game->timer->time_elapsed);
             g_game_win = 0;
+        } else {
+            win_in_seconds[0] = '\0';
         }
         reset_timer(game->timer);
     }
@@ -106,6 +108,7 @@ render_time(GAME *game) {
     if (status == 0) {
         return 0;
     }
+    return 1;
 }
 
 int

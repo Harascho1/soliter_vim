@@ -10,6 +10,7 @@ MY_TIMER* create_timer() {
 }
 
 void destroy_timer(MY_TIMER *timer) {
+    CloseHandle(timer->thread_clock);
     SDL_free(timer);
 }
 
@@ -32,7 +33,7 @@ int reset_timer(MY_TIMER *timer) {
     timer->start_timer = 0;
     #ifdef _WIN32
     WaitForSingleObject(timer->thread_clock, INFINITE);
-    CloseHandle(timer->thread_clock);
+    //CloseHandle(timer->thread_clock);
     #else
     pthread_join(timer->thread_clock, NULL);
     #endif
@@ -44,7 +45,7 @@ int start_timer(MY_TIMER *timer) {
     timer->time_elapsed = 0;
     timer->begin_time = SDL_GetTicks();
     #ifdef _WIN32
-    timer->thread_clock = CreateThread(NULL, 0, count_down, (void*)timer, 0, NULL);
+    timer->thread_clock = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)count_down, (void*)timer, 0, NULL);
     #else
     pthread_create(&timer->thread_clock, NULL, count_down, (void*)timer);
     #endif

@@ -2,6 +2,11 @@
 
 static GAME_STATE g_current_game_state = game_state_main_menu;
 
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+    LPSTR lpCmdLine, int nCmdShow) {
+    return main(__argc, __argv);
+}
+
 static SCENE* g_game_scenes[] = {
     &main_menu_scene,
     &gameplay_scene,
@@ -95,7 +100,6 @@ int main() {
             last_frame_time = SDL_GetTicks();
         }
     }
-    //pthread_detach(thread_clock);
 
     game_quit(&game);
     cleanup();
