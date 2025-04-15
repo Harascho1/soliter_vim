@@ -17,8 +17,8 @@ file(GLOB_RECURSE soliter_src
     ${CMAKE_SOURCE_DIR}/src/cursor.c
     ${CMAKE_SOURCE_DIR}/src/texture.c
     ${CMAKE_SOURCE_DIR}/src/main_menu.c
-    ${CMAKE_SOURCE_DIR}/src/settings.c
     ${CMAKE_SOURCE_DIR}/src/gameplay.c
+    ${CMAKE_SOURCE_DIR}/src/settings.c
     ${CMAKE_SOURCE_DIR}/src/game_over_menu.c
     ${CMAKE_SOURCE_DIR}/src/menu.c
     ${CMAKE_SOURCE_DIR}/src/game.c
@@ -27,7 +27,11 @@ file(GLOB_RECURSE soliter_src
     ${CMAKE_SOURCE_DIR}/src/main.c
 )
 
-add_executable(${PROJECT_NAME} ${HEADER_FILES} ${soliter_src})
+if (WIN32)
+    add_executable(${PROJECT_NAME} WIN32 ${HEADER_FILES} ${soliter_src} ${ASSETS_PATH}/icon.rc)
+else()
+    add_executable(${PROJECT_NAME} ${HEADER_FILES} ${soliter_src})
+endif()
 
 if (WIN32)
     set_target_properties(${PROJECT_NAME} PROPERTIES

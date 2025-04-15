@@ -74,19 +74,24 @@ shuffle_deck(DECK *deck) {
 int
 sort_a_card(CARD *card, DECK *deck) {
     for (int suit = 0; suit <= suit_spades; suit++) {
+        if (deck->sorted_cards[suit] == NULL && card->value == 1) {
+            card->on_field = 1;
+            card->pos->col = suit + 4;
+            card->pos->row = 0;
+            deck->sorted_cards[suit] = card;
+            return 1;
+        }
+        if (deck->sorted_cards[suit] == NULL) {
+            return 0;
+        }
         if (card->suit == deck->sorted_cards[suit]->suit) {
             if (deck->sorted_cards[suit]->value + 1 != card->value) {
                 return 0;
             }
-            int card_value = card->value;
-            card->pos->col = deck->sorted_cards[suit]->pos->col;
-            card->pos->row = deck->sorted_cards[suit]->pos->row;
-            card->frame->x = deck->sorted_cards[suit]->frame->x;
-            card->frame->y = deck->sorted_cards[suit]->frame->y;
-            card->selected = not_selected;
             card->on_field = 1;
-            
-            deck->sorted_cards[suit]->value = card_value;
+            card->pos->col = 0;
+            card->pos->row = 0;
+            deck->sorted_cards[suit] = card;
             return 1;
         }
     }
@@ -177,7 +182,8 @@ pop_top(CARD_QUEUE *queue) {
     } else {
         queue->p--;
     }
-    return queue->queue[queue->p];
+    queue->queue[queue->p] = NULL;
+    return NULL;
 }
 
 int
@@ -207,7 +213,7 @@ create_card_queue(int max_items) {
 }
 
 DECK* 
-create_deck() {
+create_deck(SDL_Renderer *renderer) {
     DECK *deck = NULL;
     deck = SDL_malloc(sizeof(DECK));
     if (deck == NULL) {
@@ -231,6 +237,13 @@ create_deck() {
     deck->count = 28;
     deck->new_cards = create_card_queue(3);
     deck->deck_card = &deck->cards[deck->count];
+    int status;
+    
+    deck->empty_sorted_card = create_texture_from_image(renderer, "assets/cards/total_blank_front_white.png");
+    if (deck->empty_sorted_card == NULL) {
+        SDL_Log("create_texture_from_image error\n");
+        return NULL;
+    }
     return deck;
 }
 
@@ -243,12 +256,9 @@ void destroy_card(CARD *card) {
 
 void destroy_deck(DECK *deck) {
     if (deck != NULL) {
+        SDL_DestroyTexture(deck->empty_sorted_card);
         for (int i = 0; i < 52; i++) {
             destroy_card(&deck->cards[i]);
-        }
-        for (int i = 0; i < 4; i++) {
-            destroy_card(deck->sorted_cards[i]);
-            SDL_free(deck->sorted_cards[i]);
         }
         SDL_free(deck->new_cards);
         SDL_free(deck);
@@ -259,10 +269,6 @@ char* find_path(CARD *card) {
     char *path;
     path = SDL_malloc(sizeof(char) * 100);
 
-    if (card->value == 0) {
-        sprintf(path, "assets/cards/blank_front_with_num_boarders_white.png");
-        return path;
-    }
 
     if (card->visible == not_visible) {
         if (card->selected == selected) {
@@ -358,46 +364,5 @@ render_card(SDL_Renderer *renderer, CARD *card, SDL_FPoint *point) {
 
     SDL_DestroyTexture(texture);
     SDL_free(path);
-    return status;
-}
-
-int render_hand(SDL_Renderer *renderer, HAND *hand, SDL_FRect *rect) {
-    int status = 0;
-
-    if (renderer == NULL || hand == NULL) {
-        SDL_Log("Renderer or card is NULL");
-        return status;
-    }
-    
-    SDL_Surface *surface;
-    SDL_Texture *texture;
-    char *path;
-    for (int i = 0; i < hand->count; i++) {
-        path = find_path(&hand->cards[i]);
-        if (path == NULL) {
-            SDL_Log("Path is NULL");
-            return status;
-        }
-        surface = IMG_Load(path);
-        if (surface == NULL) {
-            SDL_Log("IMG_Load error: %s", SDL_GetError());
-            return status;
-        }
-        texture = SDL_CreateTextureFromSurface(renderer, surface);
-        if (texture == NULL) {
-            SDL_Log("SDL_CreateTextureFromSurface error: %s", SDL_GetError());
-            SDL_DestroySurface(surface);
-            return status;
-        }
-        status = SDL_RenderTexture(renderer, texture, NULL, rect);
-        if (status == 0) {
-            SDL_Log("SDL_RenderTexture error: %s", SDL_GetError());
-            return status;
-        }
-        rect->x += 60;
-    }
-    SDL_free(path);
-    SDL_DestroySurface(surface);
-    SDL_DestroyTexture(texture);
     return status;
 }

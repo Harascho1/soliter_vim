@@ -44,7 +44,7 @@ typedef struct _CARD {
     VALUE value;
     SUIT suit;
     int visible;
-    int selected; //0 if not selected, 1 if selected
+    int selected;
     SDL_FPoint *frame;
     POSITION *pos;
     int on_field;
@@ -67,19 +67,13 @@ int is_queue_empty(CARD_QUEUE *queue);
 CARD* view_top_card_in_queue(CARD_QUEUE *queue);
 int pop_all(CARD_QUEUE *queue);
 
-typedef struct _HAND {
-    CARD *cards;
-    int count;
-} HAND;
-
 typedef struct _DECK {
     CARD cards[52];
     int count;
     CARD_QUEUE *new_cards;
     CARD *deck_card;
-
-    //TODO OVO MOZDA MOZE BOLJE DA SE OSMISLI
     CARD *sorted_cards[4];
+    SDL_Texture *empty_sorted_card;
 
 } DECK;
 
@@ -88,7 +82,7 @@ extern int card_height;
 extern CARD g_invisible_card[7];
 extern int padding_of_card;
 
-DECK* create_deck();
+DECK* create_deck(SDL_Renderer *renderer);
 void destroy_deck(DECK *deck);
 
 int render_card(SDL_Renderer *renderer, CARD *card, SDL_FPoint *point);

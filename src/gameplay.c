@@ -215,14 +215,14 @@ place_a_card(GAME *game) {
 
         }
         game_update = sort_a_card(*s_card, game->deck);
-        if (game_update != 0) {
-            if (same_card_selected(*s_card, view_top_card_in_queue(game->deck->new_cards))) {
-                pop_top(game->deck->new_cards);
-            }
-            deselect_all_cards(game->deck);
-            set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
-            return 1;
+
+        CARD *top_card = view_top_card_in_queue(game->deck->new_cards);
+        if (same_card_selected(*s_card, top_card) && game_update == 1) {
+            pop_top(game->deck->new_cards);
         }
+        deselect_all_cards(game->deck->cards);
+        set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
+        return 1;
     }       
 
     if (same_card_selected(*s_card, game->deck->deck_card)) {
@@ -356,6 +356,7 @@ normal_select_mode(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch (event->key.key) {
             case SDLK_ESCAPE:
+                save_score(game);
                 push_user_event(g_change_scene_event_type, game_state_game_over);
                 break;
             case SDLK_C:
@@ -723,6 +724,9 @@ gameplay_update(GAME* game) {
 
     int count = 0;
     for (int i = suit_clubs; i <= suit_spades; i++) {
+        if (game->deck->sorted_cards[i] == NULL) {
+            break;
+        }
         if (game->deck->sorted_cards[i]->value == 13) {
             count++;
         }
@@ -819,6 +823,48 @@ int render_cursor(GAME *game) {
 }
 
 int
+sorted_card_render(GAME *game) {
+    int status;
+    int padding_width = 3 * (g_card_width + padding_of_card) + padding_of_card / 2;
+    for (int suit = 0; suit < 4; suit++) {
+        if (game->deck->sorted_cards[suit] == NULL) {
+            status = SDL_RenderTexture(
+                game->renderer,
+                game->deck->empty_sorted_card,
+                NULL,
+                &(SDL_FRect) {
+                    .x = padding_width,
+                    .y = padding_of_card / 2,
+                    .w = g_card_width,
+                    .h = card_height
+                }
+            );
+            if (status == 0) {
+                SDL_Log("SDL_RenderTexture error %s\n", SDL_GetError());
+                return status;
+            }
+        } else {
+            status = render_card(
+                game->renderer,
+                game->deck->sorted_cards[suit],
+                //game->deck->sorted_cards[suit]->frame
+                &(SDL_FPoint) {
+                    .x = padding_width,
+                    .y = padding_of_card / 2
+                }
+            );
+            if (status == 0) {
+                SDL_Log("render_card error...\n");
+                return status;
+            }
+        }
+        padding_width += g_card_width + padding_of_card;
+    }
+
+    return status;
+}
+
+int
 gameplay_render(GAME* game) {
     int status;
     
@@ -861,12 +907,9 @@ gameplay_render(GAME* game) {
     status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
 
     // *RENDERING SORTED_CARDS
-    for (int i = 0; i < 4; i++) {
-        status = render_card(
-            game->renderer,
-            game->deck->sorted_cards[i],
-            game->deck->sorted_cards[i]->frame
-        );
+    status = sorted_card_render(game);
+    if (status == 0) {
+        SDL_Log("sorted_card_render error...\n");
     }
 
     // *RENDERING DECK AND ONE MORE CARD ON LEFT RIGHT CORNER

@@ -14,6 +14,8 @@ const char *game_over_items[] = {
     "Exit"
 };
 
+static FILE *saves_file;
+
 Uint32 g_change_scene_event_type = (Uint32) - 1;
 
 int game_update = 0;
@@ -58,21 +60,9 @@ load_game_field(DECK *deck) {
 
     }
 
-    int padding_width = 3 * (g_card_width + padding_of_card) + padding_of_card /2;
     for (int suit = suit_clubs; suit <= suit_spades; suit++) {
-        deck->sorted_cards[suit] = SDL_malloc(sizeof(CARD));
-        deck->sorted_cards[suit]->frame = SDL_malloc(sizeof(SDL_FPoint));
-        deck->sorted_cards[suit]->frame->x = padding_width;
-        deck->sorted_cards[suit]->frame->y = padding_of_card / 2;
-
-        deck->sorted_cards[suit]->pos = SDL_malloc(sizeof(POSITION));
-        deck->sorted_cards[suit]->pos->col = suit + 3;
-        deck->sorted_cards[suit]->pos->row = 0;
-        padding_width += padding_of_card + g_card_width;
-
-        deck->sorted_cards[suit]->suit = suit;
-        deck->sorted_cards[suit]->value = 0;
-        deck->sorted_cards[suit]->visible = 1;
+        deck->sorted_cards[suit] = NULL;
+                          
     }
 
     return 1;
@@ -147,6 +137,16 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         return status;
     }
 
+    game->menu_texture = create_texture_from_image(
+        game->renderer,
+        "assets/logo.png"
+    );
+    if (game->background_texture == NULL) {
+        SDL_Log("Background texture is NULL\n");
+        game_quit(game);
+        return status;
+    }
+
     Uint32 event_type = SDL_RegisterEvents(1);
     if (event_type == (Uint32) - 1) {
         SDL_Log("SDL_RegisterEvents failed: %s\n", SDL_GetError());
@@ -200,7 +200,7 @@ run_a_game(GAME *game) {
     destroy_cursor(game->cursor);
     destroy_deck(game->deck);
 
-    game->deck = create_deck();
+    game->deck = create_deck(game->renderer);
     if (game->deck == NULL) {
         SDL_Log("create_deck error\n");
         game_quit(game);
@@ -217,10 +217,46 @@ run_a_game(GAME *game) {
     load_game_field(game->deck);
 }
 
-int push_user_event(Uint32 type, Sint32 code) {
+int
+push_user_event(Uint32 type, Sint32 code) {
     SDL_Event event;
     memset(&event, 0, sizeof(event));
     event.type = type;
     event.user.code = code;
     return SDL_PushEvent(&event);
+}
+
+void
+save_score(GAME *game) {
+    //if (g_game_win != 1) {
+    //    return;
+    //}
+
+    saves_file = fopen("assets/saves.txt", "a+");
+
+    if (saves_file == NULL) {
+        SDL_Log("Nije uspeo da otvori fajl\n");
+        return NULL;
+    }
+
+    char buff[255];
+    while (fgets(buff, 255, saves_file)) {
+
+    }
+    time_t t;
+    struct tm *tm_info;
+
+    time(&t);
+    tm_info = localtime(&t);
+    char time_buff[80];
+
+    strftime(time_buff, 80, "%Y-%m-%d %H:%M:%S", tm_info);
+
+    sprintf(buff, "seconds: %d mode: normal time: %s\r\n", game->timer->time_elapsed, time_buff);
+
+    fputs(buff, saves_file);
+
+    fclose(saves_file);
+
+
 }

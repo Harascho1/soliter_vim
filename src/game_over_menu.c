@@ -149,6 +149,22 @@ game_over_menu_render(GAME *game) {
         return 0;
     }
 
+    if (game->menu_texture == NULL) {
+        SDL_Log("menu_texture is NULL\n");
+        game->menu_texture = create_texture_from_image(game->renderer, "assets/logo.png");
+        if (game->menu_texture == NULL) {
+            SDL_Log("menu_texture is NULL\n");
+            return 0;
+        }
+    }
+
+    status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL, NULL);
+    if (status == 0) {
+        SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
+        push_user_event(SDL_EVENT_QUIT, 0);
+        return 0;
+    }
+
     int width, height;
     status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
     if (status == 0) {
@@ -177,7 +193,7 @@ game_over_menu_render(GAME *game) {
         title[g_game_win], 
         title_size,
         &(SDL_Point){.x = (width - text_width) / 2, .y = height / 4},
-        &(SDL_Color){255, 255, 255, 255}
+        &(SDL_Color){23, 105, 52, 254}
     );
     if (status == 0) {
         SDL_Log("render_text failed...\n");

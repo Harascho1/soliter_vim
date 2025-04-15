@@ -44,6 +44,7 @@ typedef struct _GAME{
     MENU            *game_over_menu;
     FONT            *font;
     SDL_Texture     *background_texture;
+    SDL_Texture     *menu_texture;
     DECK            *deck;
     FIELD           field;
     CURSOR          *cursor;
@@ -77,6 +78,7 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res);
 void game_quit(GAME* game);
 int load_game_field(DECK *game);
 void run_a_game(GAME *game);
+void save_score(GAME *game);
 
 int push_user_event(Uint32 type, Sint32 code);
 
