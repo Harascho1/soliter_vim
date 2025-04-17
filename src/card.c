@@ -254,6 +254,23 @@ void destroy_card(CARD *card) {
     }
 }
 
+int
+have_more_cards(DECK *deck) {
+    if (deck->deck_card != NULL) {
+        return 1;
+    } 
+    int count = 0;
+    for (int i = 28; i < 52; i++) {
+        if (deck->cards[i].on_field == 0) {
+            count++;
+        }
+    }
+    if (count > 1) {
+        return 1;
+    }
+    return 0;
+}
+
 void destroy_deck(DECK *deck) {
     if (deck != NULL) {
         SDL_DestroyTexture(deck->empty_sorted_card);

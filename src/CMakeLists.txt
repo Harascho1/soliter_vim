@@ -4,6 +4,7 @@ set(ASSETS_PATH ${PROJECT_SOURCE_DIR}/assets)
 
 set(HEADER_FILES
     ${CMAKE_SOURCE_DIR}/src/menu.h
+    ${CMAKE_SOURCE_DIR}/src/config.h
     ${CMAKE_SOURCE_DIR}/src/cursor.h
     ${CMAKE_SOURCE_DIR}/src/font.h
     ${CMAKE_SOURCE_DIR}/src/game.h
@@ -13,10 +14,14 @@ set(HEADER_FILES
 )
 
 file(GLOB_RECURSE soliter_src 
+    ${CMAKE_SOURCE_DIR}/src/macro_settings.c
+    ${CMAKE_SOURCE_DIR}/src/config.c
     ${CMAKE_SOURCE_DIR}/src/font.c
     ${CMAKE_SOURCE_DIR}/src/cursor.c
     ${CMAKE_SOURCE_DIR}/src/texture.c
     ${CMAKE_SOURCE_DIR}/src/main_menu.c
+    ${CMAKE_SOURCE_DIR}/src/gameplay_event.c
+    ${CMAKE_SOURCE_DIR}/src/gameplay_render.c
     ${CMAKE_SOURCE_DIR}/src/gameplay.c
     ${CMAKE_SOURCE_DIR}/src/settings.c
     ${CMAKE_SOURCE_DIR}/src/game_over_menu.c

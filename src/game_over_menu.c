@@ -3,10 +3,13 @@
 
 static const char *title[2] = {
     "GAME OVER",
-    "YOU WIN"
+    "YOU W0N"
 };
 
 static char win_in_seconds[255];
+static SDL_Color white_color = {255, 255, 255, 255};
+static SDL_Color green_color = {150, 255, 150, 255};
+static SDL_Color title_color = {23, 150, 52, 255};
 
 int
 game_over_menu_event_handler(GAME *game, const SDL_Event *event) {
@@ -40,9 +43,6 @@ game_over_menu_event_handler(GAME *game, const SDL_Event *event) {
                     default:
                         break;
                 }
-                break;
-            case SDLK_ESCAPE:
-                push_user_event(SDL_EVENT_QUIT, 0);
                 break;
             default:
                 break;
@@ -101,9 +101,7 @@ render_time(GAME *game) {
             .x = (width - text_witdh) / 2,
             .y = padding_of_card
         },
-        &(SDL_Color) {
-            255,255,255,255
-        }
+        &white_color
     );
     if (status == 0) {
         return 0;
@@ -193,7 +191,7 @@ game_over_menu_render(GAME *game) {
         title[g_game_win], 
         title_size,
         &(SDL_Point){.x = (width - text_width) / 2, .y = height / 4},
-        &(SDL_Color){23, 105, 52, 254}
+        &title_color
     );
     if (status == 0) {
         SDL_Log("render_text failed...\n");
@@ -212,35 +210,50 @@ game_over_menu_render(GAME *game) {
         return 0;
     }
 
-    int selected_text_height = text_height + 10;
+    int y_coord = height / 2.5 + padding_of_card;
 
     for (int i = 0; i < game->game_over_menu->count; i++) {
 
-        SDL_Color color = {255, 255, 255, 255};
+        SDL_Color *color;
         int font_size;
+        int selected_height;
+        int render_coord_y;
         if (i == game->game_over_menu->selected_item) {
-            color.r = 150;
-            color.g = 255;
-            color.b = 150;
+            color = &green_color;
             font_size = selected_font_size;
+            status = get_text_size(
+                game->font,
+                game->game_over_menu->items[i].text,
+                font_size,
+                &text_width,
+                &selected_height
+            );
+            if (status == 0) {
+                SDL_Log("get_text_size failed...\n");
+                return 0;
+            } 
+            render_coord_y = y_coord + (text_height - selected_height) / 2;
+            
         } else {
+            color = &white_color;
             font_size = standard_font_size;
+            status = get_text_size(
+                game->font,
+                game->game_over_menu->items[i].text,
+                font_size,
+                &text_width,
+                &text_height
+            );
+            if (status == 0) {
+                SDL_Log("get_text_size failed...\n");
+                return 0;
+            }
+            render_coord_y = y_coord;
         }
 
-        status = get_text_size(
-            game->font,
-            game->game_over_menu->items[i].text,
-            font_size,
-            &text_width,
-            NULL
-        );
-        if (status == 0) {
-            SDL_Log("get_text_size failed...\n");
-            return 0;
-        }
         SDL_Point dst_rect = {
             .x = (width - text_width) / 2,
-            .y = (height - text_height) / 2 + i * (text_height + 10) 
+            .y = render_coord_y
         };
         status = render_text(
             game->font,
@@ -248,12 +261,15 @@ game_over_menu_render(GAME *game) {
             game->game_over_menu->items[i].text, 
             font_size,
             &dst_rect,
-            &color
+            color
         );
         if (status == 0) {
             SDL_Log("render_text failed...\n");
             return 0;
         }
+
+        y_coord += text_height + padding_of_card;
+
     }
 
     status = SDL_RenderPresent(game->renderer);

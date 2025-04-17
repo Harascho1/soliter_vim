@@ -4,7 +4,7 @@ static int m_fps = 60;
 
 MY_TIMER* create_timer() {
     MY_TIMER *timer = SDL_malloc(sizeof(MY_TIMER));
-    timer->begin_time = SDL_GetTicks();
+    timer->begin_time = 0;
     timer->thread_clock;
     timer->time_elapsed = 0;
     timer->start_timer = 0;

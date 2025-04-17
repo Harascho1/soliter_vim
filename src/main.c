@@ -1,4 +1,5 @@
 #include "game.h"
+#include "config.h"
 
 static GAME_STATE g_current_game_state = game_state_main_menu;
 
@@ -13,10 +14,12 @@ static SCENE* g_game_scenes[] = {
     &main_menu_scene,
     &gameplay_scene,
     &game_over_menu_scene,
-    &setting_scene
+    &setting_scene,
+    &macro_setting_scene
 };
 
 static int g_scene_fps[] = {
+    240,
     60,
     60,
     60,
@@ -84,7 +87,15 @@ int main() {
 
     SDL_Event event;
     int last_frame_time = 0;
-    int flag = 1;
+
+    if (does_config_file_exist()) {
+        SDL_Log("Postoji\n");
+    } else {
+        SDL_Log("NE postoji\n");
+        create_config_file();
+    }
+
+    load_config();
 
     while (1) {
         if (SDL_WaitEvent(&event)) {
@@ -92,11 +103,11 @@ int main() {
                 break;
             } else if (event.type == g_change_scene_event_type) {
                 g_current_game_state = event.user.code;
+                g_game_scenes[g_current_game_state]->update(&game);
+                g_game_scenes[g_current_game_state]->render(&game);
             }
         }
-        if (g_game_scenes[g_current_game_state]->handle_events(&game, &event) == 0) {
-            break;
-        }
+        g_game_scenes[g_current_game_state]->handle_events(&game, &event);
         if (is_period_pass(1000 / g_scene_fps[g_current_game_state], last_frame_time)) {
             g_game_scenes[g_current_game_state]->update(&game);
             g_game_scenes[g_current_game_state]->render(&game);

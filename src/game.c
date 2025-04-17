@@ -11,7 +11,13 @@ const char *main_menu_items[] = {
 const char *game_over_items[] = {
     "Restart",
     "Credits",
-    "Exit"
+    "Main Menu"
+};
+
+const char *setting_items[] = {
+    "Options",
+    "Cancel",
+    "Macros"
 };
 
 static FILE *saves_file;
@@ -101,19 +107,29 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         return status;
     }
 
-    game->timer = create_timer();
-    if (game->timer == NULL) {
-        SDL_Log("create_timer failed\n");
-        game_quit(game);
-        return status;
-    }
-
     game->game_over_menu = create_menu(
         game_over_items,
         sizeof(game_over_items) / sizeof(game_over_items[0])
     );
     if (game->game_over_menu == NULL) {
         SDL_Log("menu_init failed.\n");
+        game_quit(game);
+        return status;
+    }
+
+    game->setting_menu = create_menu(
+        setting_items,
+        sizeof(setting_items) / sizeof(setting_items[0])
+    );
+    if (game->setting_menu == NULL) {
+        SDL_Log("menu_init failed.\n");
+        game_quit(game);
+        return status;
+    }
+
+    game->timer = create_timer();
+    if (game->timer == NULL) {
+        SDL_Log("create_timer failed\n");
         game_quit(game);
         return status;
     }
@@ -173,6 +189,9 @@ void game_quit(GAME* game) {
     }
     if (game->game_over_menu != NULL) {
         destroy_menu(game->game_over_menu);
+    }
+    if (game->setting_menu != NULL) {
+        destroy_menu(game->setting_menu);
     }
     if (game->font != NULL) {
         destroy_font(game->font);
@@ -236,7 +255,7 @@ save_score(GAME *game) {
 
     if (saves_file == NULL) {
         SDL_Log("Nije uspeo da otvori fajl\n");
-        return NULL;
+        return;
     }
 
     char buff[255];

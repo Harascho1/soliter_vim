@@ -92,5 +92,6 @@ int can_card_be_placed(CARD *card_below, CARD *card_above);
 int sort_a_card(CARD *card, DECK* deck);
 int select_card_below(CARD *card, DECK *deck);
 int same_card_selected(CARD *card1, CARD *card2);
+int have_more_cards(DECK *deck);
 
 #endif //CARD_H

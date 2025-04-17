@@ -15,13 +15,14 @@ typedef enum {
     game_state_gameplay,
     game_state_game_over,
     game_state_setting,
+    game_state_macro,
     game_state_max
 } GAME_STATE;
 
 enum {
     guide_font_size = 30,
     standard_font_size = 40,
-    selected_font_size = 60,
+    selected_font_size = 70,
     title_size = 100
 };
 
@@ -42,6 +43,7 @@ typedef struct _GAME{
     SDL_Renderer    *renderer;
     MENU            *main_menu;
     MENU            *game_over_menu;
+    MENU            *setting_menu;
     FONT            *font;
     SDL_Texture     *background_texture;
     SDL_Texture     *menu_texture;
@@ -70,6 +72,7 @@ extern SCENE main_menu_scene;
 extern SCENE gameplay_scene;
 extern SCENE game_over_menu_scene;
 extern SCENE setting_scene;
+extern SCENE macro_setting_scene;
 
 extern int game_update;
 extern int g_game_win;

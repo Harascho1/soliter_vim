@@ -6,6 +6,13 @@ enum MENU_ITEM_STATE {
     menu_item_selected
 };
 
+enum SETTINGS_MENU_ITEM_TYPE {
+    settings_item_type_options,
+    settings_item_type_cancel,
+    settings_item_type_macro,
+    settings_item_type_max,
+};
+
 enum MAIN_MENU_ITEM_TYPE {
     menu_item_type_play,
     menu_item_type_settings,

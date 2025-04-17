@@ -3,7 +3,7 @@
 
 typedef struct _MY_TIMER {
     Uint32 begin_time;
-    int time_elapsed;
+    unsigned int time_elapsed;
     #ifdef _WIN32
     HANDLE thread_clock;
     #else
