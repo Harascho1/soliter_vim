@@ -71,6 +71,8 @@ static char* commands[14] = {
     "SPACE"
 };
 
+static char title[] = "Macro";
+
 
 int
 macro_settings_render(GAME *game) {
@@ -115,6 +117,36 @@ macro_settings_render(GAME *game) {
         return 0;
     }
 
+    int title_width, title_height;
+    status = get_text_size(
+        game->font,
+        title,
+        title_size,
+        &title_width,
+        &title_height
+    );
+    if (status == 0) {
+        SDL_Log("get_text_size error...\n");
+        return 0;
+    }
+
+    status = render_text(
+        game->font,
+        game->renderer,
+        title,
+        title_size,
+        &(SDL_Point){
+            .x = (width - title_width) / 2,
+            .y = padding_of_card / 4
+        },
+        &white_color
+    );
+    if (status == 0) {
+        SDL_Log("render_text error...\n");
+        return 0;
+    }
+
+
     int text_width, text_height;
     status = get_text_size(
         game->font,
@@ -128,7 +160,7 @@ macro_settings_render(GAME *game) {
         return 0;
     }
 
-    int y_pos = padding_of_card / 2;
+    int y_pos = (title_height + padding_of_card / 2);
     int text_x_pos = padding_of_card;
     int commands_x_pos = width - 4 * padding_of_card;
     int font = standard_font_size;
