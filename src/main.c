@@ -78,7 +78,7 @@ int main() {
     }
 
     GAME game;
-    status = game_init(&game, "SoVIMter", &(RESOLUTION){900, 900});
+    status = game_init(&game, "SoVIMter", &(RESOLUTION){600, 600});
     if (status == 0) {
         SDL_Log("game_init failed: %s\n", SDL_GetError());
         cleanup();
@@ -87,16 +87,6 @@ int main() {
 
     SDL_Event event;
     int last_frame_time = 0;
-
-    if (does_config_file_exist()) {
-        SDL_Log("Postoji\n");
-    } else {
-        SDL_Log("NE postoji\n");
-        create_config_file();
-    }
-
-    load_config();
-
     while (1) {
         if (SDL_WaitEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {

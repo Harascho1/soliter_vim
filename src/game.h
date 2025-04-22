@@ -4,9 +4,10 @@
 #include "menu.h"
 #include "font.h"
 #include "card.h"
-#include "texture.h"
 #include "cursor.h"
+#include "texture.h"
 #include "my_timer.h"
+#include "field.h"
 
 extern Uint32 g_change_scene_event_type;
 
@@ -29,12 +30,6 @@ enum {
 enum {
     number_of_cards_in_row = 7,
 };
-
-
-typedef struct _FIELD {
-    int g_card_width;
-    int card_height;
-} FIELD;
 
 typedef struct _CURSOR CURSOR;
 

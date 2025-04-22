@@ -101,13 +101,6 @@ main_menu_render(GAME* game) {
         return 0;
     }
 
-    int width, height;
-    status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
-    if (status == 0) {
-        SDL_Log("SDL_GetWindowSizeInPixels failed: %s\n", SDL_GetError());
-        return 0;
-    }
-
     if (game->menu_texture == NULL) {
         SDL_Log("menu_texture is NULL\n");
         game->menu_texture = create_texture_from_image(game->renderer, "assets/logo.png");
@@ -124,12 +117,14 @@ main_menu_render(GAME* game) {
         return 0;
     }
 
+    int width = game->field.screen_width;
+    int height = game->field.screen_height;
     int text_width, text_height;
 
     status = get_text_size(
         game->font,
         title,
-        title_size,
+        game->field.title_font,
         &text_width,
         &text_height
     );
@@ -142,7 +137,7 @@ main_menu_render(GAME* game) {
         game->font,
         game->renderer,
         title, 
-        title_size,
+        game->field.title_font,
         &(SDL_Point){.x = (width - text_width) / 2, .y = height / 4},
         &title_color
     );
@@ -154,7 +149,7 @@ main_menu_render(GAME* game) {
     status = get_text_size(
         game->font,
         game->main_menu->items[0].text,
-        standard_font_size,
+        game->field.item_font,
         NULL,
         &text_height
     );
@@ -163,18 +158,16 @@ main_menu_render(GAME* game) {
         return 0;
     }
 
-
-    int y_coord = height / 2.5 + padding_of_card;
+    int y_coord = height / 2 + game->field.title_padding;
 
     for (int i = 0; i < game->main_menu->count; i++) {
-
         SDL_Color *color;
         int font_size;
         int selected_height;
         int render_coord_y;
         if (i == game->main_menu->selected_item) {
             color = &green_color;
-            font_size = selected_font_size;
+            font_size = game->field.hover_item_font;
             status = get_text_size(
                 game->font,
                 game->main_menu->items[i].text,
@@ -187,10 +180,9 @@ main_menu_render(GAME* game) {
                 return 0;
             } 
             render_coord_y = y_coord + (text_height - selected_height) / 2;
-            
         } else {
             color = &white_color;
-            font_size = standard_font_size;
+            font_size = game->field.item_font;
             status = get_text_size(
                 game->font,
                 game->main_menu->items[i].text,
@@ -222,8 +214,7 @@ main_menu_render(GAME* game) {
             return 0;
         }
 
-        y_coord += text_height + padding_of_card;
-
+        y_coord += text_height + game->field.item_padding;
     }
 
     status = SDL_RenderPresent(game->renderer);

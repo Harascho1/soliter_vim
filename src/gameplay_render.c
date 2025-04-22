@@ -25,7 +25,6 @@ render_commands(GAME *game) {
     if (strlen(buffer) == 0) {
         return 0;
     }
-    
     status = get_text_size(
         game->font,
         buffer,
@@ -54,6 +53,7 @@ render_commands(GAME *game) {
     if (status == 0) {
         return 0;
     }
+    return 1;
 
 }
 
@@ -88,7 +88,7 @@ render_cursor(GAME *game) {
 int
 sorted_card_render(GAME *game) {
     int status;
-    int padding_width = 3 * (g_card_width + padding_of_card) + padding_of_card / 2;
+    int padding_width = 3 * (game->field.card_width + game->field.card_padding) + game->field.screen_padding;
     for (int suit = 0; suit < 4; suit++) {
         if (game->deck->sorted_cards[suit] == NULL) {
             status = SDL_RenderTexture(
@@ -97,9 +97,9 @@ sorted_card_render(GAME *game) {
                 NULL,
                 &(SDL_FRect) {
                     .x = padding_width,
-                    .y = padding_of_card / 2,
-                    .w = g_card_width,
-                    .h = card_height
+                    .y = game->field.screen_padding,
+                    .w = game->field.card_width,
+                    .h = game->field.card_height 
                 }
             );
             if (status == 0) {
@@ -113,7 +113,7 @@ sorted_card_render(GAME *game) {
                 //game->deck->sorted_cards[suit]->frame
                 &(SDL_FPoint) {
                     .x = padding_width,
-                    .y = padding_of_card / 2
+                    .y = game->field.screen_padding
                 }
             );
             if (status == 0) {
@@ -121,7 +121,7 @@ sorted_card_render(GAME *game) {
                 return status;
             }
         }
-        padding_width += g_card_width + padding_of_card;
+        padding_width += game->field.card_width + game->field.card_padding;
     }
 
     return status;

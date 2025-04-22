@@ -70,7 +70,6 @@ load_game_field(DECK *deck) {
 
     for (int suit = suit_clubs; suit <= suit_spades; suit++) {
         deck->sorted_cards[suit] = NULL;
-                          
     }
 
     return 1;
@@ -90,14 +89,7 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
     }
     load_config();
 
-    status = load_field(game->field, res->width, res->height);
-    if (status == 0) {
-        SDL_Log("load_field error...\n");
-        game_quit(game);
-        return 0;
-    }
-
-    int width = res->width, height = res->height;
+    int width = game->field.screen_width, height = game->field.screen_height;
 
     float g_card_width_height_ratio = 7/5.0f;
     padding_of_card = width / 30;
@@ -155,6 +147,13 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         SDL_Log("font_init failed.\n");
         game_quit(game);
         return status;
+    }
+
+    status = load_field(&game->field, res->width, res->height, game->font);
+    if (status == 0) {
+        SDL_Log("load_field error...\n");
+        game_quit(game);
+        return 0;
     }
 
     game->background_texture = create_texture_from_image(

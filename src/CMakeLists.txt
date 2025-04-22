@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 set(ASSETS_PATH ${PROJECT_SOURCE_DIR}/assets)
 
 set(HEADER_FILES
+    ${CMAKE_SOURCE_DIR}/src/field.h
     ${CMAKE_SOURCE_DIR}/src/menu.h
     ${CMAKE_SOURCE_DIR}/src/config.h
     ${CMAKE_SOURCE_DIR}/src/cursor.h
@@ -14,6 +15,7 @@ set(HEADER_FILES
 )
 
 file(GLOB_RECURSE soliter_src 
+    ${CMAKE_SOURCE_DIR}/src/field.c
     ${CMAKE_SOURCE_DIR}/src/macro_settings.c
     ${CMAKE_SOURCE_DIR}/src/config.c
     ${CMAKE_SOURCE_DIR}/src/font.c
