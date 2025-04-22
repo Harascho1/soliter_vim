@@ -68,7 +68,7 @@ render_guide(GAME *game) {
     int text_width, text_height;
     status = set_font_size(
         game->font,
-        standard_font_size
+        game->field.text_font
     );
     if (status == 0) {
         SDL_Log("get_text_size error\n");
@@ -78,10 +78,10 @@ render_guide(GAME *game) {
         game->font,
         game->renderer,
         normal_mode,
-        guide_font_size,
+        game->field.text_font,
         &(SDL_Point) {
-            .x = padding_of_card,
-            .y = padding_of_card
+            .x = game->field.screen_padding,
+            .y = game->field.title_padding,
         },
         &(SDL_Color){255, 255, 255, 255}
     );
@@ -94,10 +94,10 @@ render_guide(GAME *game) {
         game->font,
         game->renderer,
         universal_rule,
-        guide_font_size,
+        game->field.text_font,
         &(SDL_Point) {
-            .x = padding_of_card,
-            .y = height / 1.5 + padding_of_card
+            .x = game->field.screen_padding,
+            .y = height / 1.5 + game->field.title_padding 
         },
         &(SDL_Color){255, 255, 255, 255}
     );
@@ -110,10 +110,10 @@ render_guide(GAME *game) {
         game->font,
         game->renderer,
         fly_mode,
-        guide_font_size,
+        game->field.text_font,
         &(SDL_Point) {
-            .x = padding_of_card,
-            .y = height / 4 + padding_of_card
+            .x = game->field.screen_padding,
+            .y = height / 4 + game->field.text_padding 
         },
         &(SDL_Color){255, 255, 255, 255}
     );
@@ -125,7 +125,7 @@ render_guide(GAME *game) {
     status = get_text_size(
         game->font,
         game->setting_menu->items[0].text,
-        standard_font_size,
+        game->field.item_font,
         &text_width,
         &text_height
     );
@@ -138,7 +138,7 @@ render_guide(GAME *game) {
     status = get_text_size(
         game->font,
         game->setting_menu->items[0].text,
-        selected_font_size,
+        game->field.hover_item_font,
         &selected_text_width,
         &selected_text_height
     );
@@ -150,9 +150,9 @@ render_guide(GAME *game) {
     SDL_Color selected_color = {150, 255, 150, 255};
     SDL_Color not_selected_color = {255, 255, 255, 255};
 
-    int not_selected_width = padding_of_card;
-    int selected_width = padding_of_card;
-    int y_pos = height - text_height - padding_of_card * 2;
+    int not_selected_width = game->field.screen_padding;
+    int selected_width = game->field.screen_padding;
+    int y_pos = height - text_height - game->field.screen_padding * 2;
 
     SDL_Point not_selected_point  = (SDL_Point) {
         .x = not_selected_width,
@@ -165,11 +165,11 @@ render_guide(GAME *game) {
     for (int i = 0; i < game->setting_menu->count; i++) {
         SDL_Color *color = &not_selected_color;
         SDL_Point* point = &not_selected_point;
-        int font_size = standard_font_size;
+        int font_size = game->field.item_font;
 
         if (i == game->setting_menu->selected_item) {
             color = &selected_color;
-            font_size = selected_font_size;
+            font_size = game->field.hover_item_font;
             point = &selected_point;
         }
 
@@ -178,10 +178,6 @@ render_guide(GAME *game) {
             game->renderer,
             game->setting_menu->items[i].text,
             font_size,
-            //&(SDL_Point) {
-            //    .x = tmp_width,
-            //    .y = height - text_height - padding_of_card
-            //},
             point,
             color
         );
@@ -192,7 +188,7 @@ render_guide(GAME *game) {
             status = get_text_size(
                 game->font,
                 game->setting_menu->items[i + 1].text,
-                standard_font_size,
+                game->field.item_font,
                 &text_width,
                 &text_height
             );
@@ -203,7 +199,7 @@ render_guide(GAME *game) {
             status = get_text_size(
                 game->font,
                 game->setting_menu->items[i + 1].text,
-                selected_font_size,
+                game->field.hover_item_font,
                 &selected_text_width,
                 &selected_text_height
             );
@@ -212,8 +208,8 @@ render_guide(GAME *game) {
                 return 0;
             }
         }
-        not_selected_width += (width - text_width) / 2 - padding_of_card;
-        selected_width += (width - selected_text_width) / 2 - padding_of_card;
+        not_selected_width += (width - text_width) / 2 - game->field.screen_padding;
+        selected_width += (width - selected_text_width) / 2 - game->field.screen_padding;
         not_selected_point.x  = not_selected_width;
         selected_point.x  = selected_width;
     }

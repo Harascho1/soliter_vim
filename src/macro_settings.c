@@ -64,7 +64,6 @@ static char title[] = "Macro";
 int
 macro_settings_render(GAME *game) {
     int status;
-        
     if (game == NULL) {
         SDL_Log("game is NULL\n");
         return 0;
@@ -108,7 +107,7 @@ macro_settings_render(GAME *game) {
     status = get_text_size(
         game->font,
         title,
-        title_size,
+        game->field.title_font,
         &title_width,
         &title_height
     );
@@ -121,10 +120,10 @@ macro_settings_render(GAME *game) {
         game->font,
         game->renderer,
         title,
-        title_size,
+        game->field.title_font,
         &(SDL_Point){
             .x = (width - title_width) / 2,
-            .y = padding_of_card / 4
+            .y = game->field.screen_padding
         },
         &white_color
     );
@@ -138,7 +137,7 @@ macro_settings_render(GAME *game) {
     status = get_text_size(
         game->font,
         text[0],
-        standard_font_size,
+        game->field.item_font,
         &text_width,
         &text_height
     );
@@ -147,8 +146,8 @@ macro_settings_render(GAME *game) {
         return 0;
     }
 
-    int y_pos = (title_height + padding_of_card / 2);
-    int text_x_pos = padding_of_card;
+    int y_pos = (title_height + game->field.screen_padding);
+    int text_x_pos = game->field.screen_padding;
     int commands_x_pos = width - 4 * padding_of_card;
     int font = standard_font_size;
     for (int i = 0; i < 14; i++) {

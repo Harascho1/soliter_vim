@@ -1,7 +1,8 @@
 #ifndef CURSOR_H
 #define CURSOR_H
 
-#include "game.h"
+#include "card.h"
+#include "field.h"
 
 #define CURSOR_NORMAL_MODE 0x0
 #define CURSOR_SELECT_MODE 0x1
@@ -27,7 +28,7 @@ typedef struct _CURSOR {
     int mode;
 } CURSOR;
 
-CURSOR* create_cursor(int col, int row);
+CURSOR* create_cursor(FIELD *field, int col, int row);
 void destroy_cursor(CURSOR *cursor);
 
 int have_a_flag(CURSOR *cursor, int flag);

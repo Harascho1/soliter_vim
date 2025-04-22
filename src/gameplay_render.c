@@ -1,3 +1,4 @@
+#include "SDL3/SDL_rect.h"
 #include "gameplay.h"
 #include "texture.h"
 
@@ -7,6 +8,8 @@ static const char* modes[4] = {
     "mode:fly",
     "mode:fly-select"
 };
+
+static SDL_Color white_color = {255, 255, 255, 255};
 
 int
 render_commands(GAME *game) {
@@ -28,7 +31,7 @@ render_commands(GAME *game) {
     status = get_text_size(
         game->font,
         buffer,
-        title_size,
+        game->field.text_font,
         &text_width,
         &text_height
     );
@@ -37,18 +40,19 @@ render_commands(GAME *game) {
     }
 
     int width, height;
-    status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
+    width = game->field.screen_width;
+    height = game->field.screen_height;
 
     status = render_text(
         game->font,
         game->renderer,
         buffer,
-        title_size,
+        game->field.text_font,
         &(SDL_Point){
             .x = (width - text_width) / 2,
-            .y = (height - text_height - padding_of_card)
+            .y = (height - text_height - game->field.card_padding)
         },
-        &(SDL_Color){255, 255, 255, 255}
+        &white_color
     );
     if (status == 0) {
         return 0;
@@ -108,9 +112,9 @@ sorted_card_render(GAME *game) {
             }
         } else {
             status = render_card(
+                &game->field,
                 game->renderer,
                 game->deck->sorted_cards[suit],
-                //game->deck->sorted_cards[suit]->frame
                 &(SDL_FPoint) {
                     .x = padding_width,
                     .y = game->field.screen_padding
@@ -130,7 +134,6 @@ sorted_card_render(GAME *game) {
 int
 gameplay_render(GAME* game) {
     int status;
-    
     if (game == NULL) {
         SDL_Log("game is NULL\n");
         return 0;
@@ -159,7 +162,6 @@ gameplay_render(GAME* game) {
     status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
     if (status == 0) {
         SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
-        printf("ZASTOOOOO\n");
         push_user_event(SDL_EVENT_QUIT, 0);
         return 0;
     }
@@ -167,7 +169,8 @@ gameplay_render(GAME* game) {
     render_commands(game);
 
     int width, height;
-    status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
+    width = game->field.screen_width;
+    height = game->field.screen_height;
 
     // *RENDERING SORTED_CARDS
     status = sorted_card_render(game);
@@ -176,12 +179,15 @@ gameplay_render(GAME* game) {
     }
 
     // *RENDERING DECK AND ONE MORE CARD ON LEFT RIGHT CORNER
-
     if (game->deck->deck_card != NULL) {
         status = render_card(
+            &game->field,
             game->renderer,
             game->deck->deck_card,
-            game->deck->deck_card->frame
+            &(SDL_FPoint) {
+                .x = game->field.screen_padding,
+                .y = game->field.screen_padding
+            }
         );
         if (status == 0) {
             SDL_Log("render card error...\n");
@@ -201,11 +207,12 @@ gameplay_render(GAME* game) {
     CARD *card = view_top_card_in_queue(game->deck->new_cards);
     if (card != NULL) {
         status = render_card(
+            &game->field,
             game->renderer,
             card,
             &(SDL_FPoint){
-                .x = padding_of_card / 2 + padding_of_card + g_card_width,
-                .y = padding_of_card / 2
+                .x = game->field.screen_padding + game->field.card_padding + game->field.card_width,
+                .y = game->field.screen_padding
             }
         );
         if (status == 0) {
@@ -222,13 +229,13 @@ gameplay_render(GAME* game) {
             }
     }
 
-    // * RENDERING TEXT THAT SHOWS WHAT IN WHAT MODE ARE U
+    // * RENDERING TEXT THAT SHOWS WHAT IN WHAT MODE U ARE
     int mode = game->cursor->mode % 4;
     int text_width, text_height;
     status = get_text_size(
         game->font,
         modes[mode],
-        standard_font_size,
+        game->field.text_font,
         &text_width,
         &text_height
     );
@@ -239,9 +246,12 @@ gameplay_render(GAME* game) {
         game->font,
         game->renderer,
         modes[mode],
-        standard_font_size,
-        &(SDL_Point){padding_of_card, height - text_height - padding_of_card},
-        &(SDL_Color){255,255,255,255}
+        game->field.text_font,
+        &(SDL_Point) {
+            .x = game->field.screen_padding,
+            .y = height - text_height - game->field.screen_padding
+        },
+        &white_color
     );
 
 
@@ -251,6 +261,7 @@ gameplay_render(GAME* game) {
         CARD *card;
         while ((card = find_card(game->deck, i, j)) != NULL) {
             render_card(
+                &game->field,
                 game->renderer,
                 card,
                 card->frame
@@ -275,12 +286,13 @@ gameplay_render(GAME* game) {
         }
     }
 
-    char timer[50];
-    snprintf(timer, sizeof(timer), "seconds: %d", game->timer->time_elapsed);
+    // Rendering timer in seconds
+    char timer[20];
+    snprintf(timer, 20, "seconds: %d", game->timer->time_elapsed);
     status = get_text_size(
         game->font,
         timer,
-        standard_font_size,
+        game->field.item_font,
         &text_width,
         &text_height
     );
@@ -291,9 +303,12 @@ gameplay_render(GAME* game) {
         game->font,
         game->renderer,
         timer,
-        standard_font_size,
-        &(SDL_Point){width - padding_of_card - text_width, height - text_height - padding_of_card},
-        &(SDL_Color){255,255,255,255}
+        game->field.item_font,
+        &(SDL_Point){
+            .x = width - game->field.screen_padding - text_width,
+            .y = height - text_height - game->field.screen_padding
+        },
+        &white_color
     );
 
     status = SDL_RenderPresent(game->renderer);

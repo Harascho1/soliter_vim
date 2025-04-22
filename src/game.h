@@ -21,13 +21,6 @@ typedef enum {
 } GAME_STATE;
 
 enum {
-    guide_font_size = 30,
-    standard_font_size = 40,
-    selected_font_size = 70,
-    title_size = 100
-};
-
-enum {
     number_of_cards_in_row = 7,
 };
 
@@ -74,7 +67,7 @@ extern int g_game_win;
 
 int game_init(GAME* game, const char *title, const RESOLUTION *res);
 void game_quit(GAME* game);
-int load_game_field(DECK *game);
+int load_game_field(DECK *game, FIELD *field);
 void run_a_game(GAME *game);
 void save_score(GAME *game);
 

@@ -10,6 +10,7 @@ load_field(FIELD *field, int screen_width, int screen_height, FONT *font) {
     field->screen_padding = field->card_padding / 2;
     field->card_width = (screen_width - 7 * field->card_padding) / 7;
     field->card_height = field->card_width * card_width_height_ratio;
+    field->cursor_padding = field->card_padding / 4;
 
     int tmp_text_height;
     int tmp_text_width;
@@ -48,5 +49,22 @@ load_field(FIELD *field, int screen_width, int screen_height, FONT *font) {
     field->item_padding = tmp_text_height / 2;
 
     field->hover_item_font = screen_height / 15;
+
+    field->text_font = screen_height / 25;
+
+    status = get_text_size(
+        font, 
+        "soVIMter", 
+        field->item_font, 
+        &tmp_text_width, 
+        &tmp_text_height
+    );
+    if (status == 0) {
+        SDL_Log("get_text_size error...\n");
+        return 0;
+    }
+
+    field->text_padding = tmp_text_height / 2;
+
     return 1;
 }

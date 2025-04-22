@@ -103,7 +103,7 @@ selected_card(DECK *deck, CARD **selected_cards) {
 }
 
 int
-place_king(CARD **card, int num, CURSOR *cursor) {
+place_king(CARD **card, int num, CURSOR *cursor, FIELD *field) {
     int cursor_col = cursor->pos->col;
     int cursor_row = cursor->pos->row;
     int x_coord, y_coord;
@@ -124,7 +124,6 @@ place_king(CARD **card, int num, CURSOR *cursor) {
             card[0]->on_field = 1;
 
             game_update = 1;
-            
             break;
         }
     }
@@ -133,11 +132,11 @@ place_king(CARD **card, int num, CURSOR *cursor) {
         card[i]->pos->col = cursor_col;
         card[i]->pos->row = cursor_row + 1;
         card[i]->frame->x = x_coord;
-        card[i]->frame->y = y_coord + padding_of_card;
+        card[i]->frame->y = y_coord + field->card_padding;
         card[i]->on_field = 1;
 
         cursor_row++;
-        y_coord += padding_of_card;
+        y_coord += field->card_padding;
 
     }
 
@@ -157,7 +156,7 @@ place_a_card(GAME *game) {
     }
 
     if (card == NULL) {
-        if (place_king(s_card, num_of_selected_cards, game->cursor) == 0) {
+        if (place_king(s_card, num_of_selected_cards, game->cursor, &game->field) == 0) {
             game_update = 0;
             deselect_all_cards(game->deck);
             set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
@@ -225,15 +224,14 @@ place_a_card(GAME *game) {
 
 
     for (int i = 0; i < num_of_selected_cards; i++) {
-        
         s_card[i]->pos->col = col_of_cursor;
         s_card[i]->pos->row = row_of_cursor + 1;
         s_card[i]->frame->x = x_card_pos;
-        s_card[i]->frame->y = y_card_pos + padding_of_card;
+        s_card[i]->frame->y = y_card_pos + game->field.card_padding;
         s_card[i]->on_field = 1;
 
         row_of_cursor++;
-        y_card_pos += padding_of_card;
+        y_card_pos += game->field.card_padding;
     }
 
     set_a_flag(game->cursor, CURSOR_NORMAL_MODE);

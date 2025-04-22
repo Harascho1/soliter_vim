@@ -1,10 +1,6 @@
 #include "card.h"
 #include "texture.h"
 
-int g_card_width = 0;
-int card_height = 0;
-int padding_of_card = 20;
-
 int
 same_card_selected(CARD *card1, CARD *card2) {
     return card1 == card2;
@@ -112,6 +108,7 @@ pop_all(CARD_QUEUE *queue) {
         queue->queue[i] = NULL;
     }
     queue->count = 0;
+    return 1;
 
 }
 
@@ -238,7 +235,7 @@ create_deck(SDL_Renderer *renderer) {
     deck->new_cards = create_card_queue(3);
     deck->deck_card = &deck->cards[deck->count];
     int status;
-    
+
     deck->empty_sorted_card = create_texture_from_image(renderer, "assets/cards/total_blank_front_white.png");
     if (deck->empty_sorted_card == NULL) {
         SDL_Log("create_texture_from_image error\n");
@@ -347,7 +344,7 @@ char* find_path(CARD *card) {
 }
 
 int
-render_card(SDL_Renderer *renderer, CARD *card, SDL_FPoint *point) {
+render_card(FIELD *field, SDL_Renderer *renderer, CARD *card, SDL_FPoint *point) {
     if (renderer == NULL || card == NULL) {
         SDL_Log("renderer or card are NULL in render_card fun...\n");
         return 0;
@@ -371,7 +368,7 @@ render_card(SDL_Renderer *renderer, CARD *card, SDL_FPoint *point) {
         renderer,
         texture,
         NULL,
-        &(SDL_FRect){point->x, point->y, g_card_width, card_height}
+        &(SDL_FRect){point->x, point->y, field->card_width, field->card_height}
     );
 
     if (status == 0) {

@@ -31,12 +31,12 @@ int g_game_win = 0;
 CARD g_invisible_card[7];
 
 int
-load_game_field(DECK *deck) {
+load_game_field(DECK *deck, FIELD *field) {
     int count = 0;
-    int x_coord = padding_of_card / 2;
-    
+    int x_coord = field->screen_padding;
+
     for (int i = 0; i < number_of_cards_in_row; i++) {
-        int y_coord = 2 * padding_of_card + card_height;
+        int y_coord = 2 * field->card_padding + field->card_height;
         g_invisible_card[i].frame = SDL_malloc(sizeof(SDL_FPoint));
         g_invisible_card[i].pos = SDL_malloc(sizeof(POSITION));
         g_invisible_card[i].pos->row = 1;
@@ -54,18 +54,17 @@ load_game_field(DECK *deck) {
             deck->cards[count].pos->row = j + 1;
             deck->cards[count].on_field = 1;
 
-            y_coord += padding_of_card;
+            y_coord += field->card_padding;
             count++;
         }
-        x_coord += padding_of_card + g_card_width;
+        x_coord += field->card_padding + field->card_width;
     }
     for (; count < 52; count++) {
-        deck->cards[count].frame->x = padding_of_card / 2;
-        deck->cards[count].frame->y = padding_of_card / 2;
+        deck->cards[count].frame->x = field->screen_padding;
+        deck->cards[count].frame->y = field->screen_padding;
         deck->cards[count].pos->col = 1;
         deck->cards[count].pos->row = 0;
         deck->cards[count].on_field = 0;
-
     }
 
     for (int suit = suit_clubs; suit <= suit_spades; suit++) {
@@ -88,13 +87,6 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         create_config_file();
     }
     load_config();
-
-    int width = game->field.screen_width, height = game->field.screen_height;
-
-    float g_card_width_height_ratio = 7/5.0f;
-    padding_of_card = width / 30;
-    g_card_width = (width - number_of_cards_in_row * padding_of_card) / number_of_cards_in_row; 
-    card_height = g_card_width * g_card_width_height_ratio;
 
     game->renderer = SDL_CreateRenderer(game->window, NULL);
     if (game->renderer == NULL) {
@@ -238,7 +230,7 @@ run_a_game(GAME *game) {
         game_quit(game);
     }
 
-    game->cursor = create_cursor(1, 1);
+    game->cursor = create_cursor(&game->field, 1, 1);
     if (game->cursor == NULL) {
         SDL_Log("create_cursor error\n");
         game_quit(game);
@@ -246,7 +238,7 @@ run_a_game(GAME *game) {
 
     g_game_win = 0;
     game_update = 0;
-    load_game_field(game->deck);
+    load_game_field(game->deck, &game->field);
 }
 
 int

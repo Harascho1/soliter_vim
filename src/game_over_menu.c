@@ -83,7 +83,7 @@ render_time(GAME *game) {
     status = get_text_size(
         game->font,
         win_in_seconds,
-        standard_font_size,
+        game->field.text_font,
         &text_witdh,
         &text_height
     );
@@ -96,10 +96,10 @@ render_time(GAME *game) {
         game->font,
         game->renderer,
         win_in_seconds,
-        standard_font_size,
+        game->field.text_font,
         &(SDL_Point){
             .x = (width - text_witdh) / 2,
-            .y = padding_of_card
+            .y = game->field.title_padding
         },
         &white_color
     );
@@ -113,7 +113,6 @@ int
 game_over_menu_render(GAME *game) {
 
     int status;
-        
     if (game == NULL) {
         SDL_Log("game is NULL\n");
         return 0;
@@ -164,11 +163,8 @@ game_over_menu_render(GAME *game) {
     }
 
     int width, height;
-    status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
-    if (status == 0) {
-        SDL_Log("SDL_GetWindowSizeInPixels failed: %s\n", SDL_GetError());
-        return 0;
-    }
+    width = game->field.screen_width;
+    height = game->field.screen_height;
     int text_width, text_height;
 
     status = render_time(game);
@@ -176,7 +172,7 @@ game_over_menu_render(GAME *game) {
     status = get_text_size(
         game->font,
         title[g_game_win],
-        title_size,
+        game->field.title_font,
         &text_width,
         &text_height
     );
@@ -189,7 +185,7 @@ game_over_menu_render(GAME *game) {
         game->font,
         game->renderer,
         title[g_game_win], 
-        title_size,
+        game->field.title_font,
         &(SDL_Point){.x = (width - text_width) / 2, .y = height / 4},
         &title_color
     );
@@ -201,7 +197,7 @@ game_over_menu_render(GAME *game) {
     status = get_text_size(
         game->font,
         game->game_over_menu->items[0].text,
-        standard_font_size,
+        game->field.item_font,
         NULL,
         &text_height
     );
@@ -210,7 +206,7 @@ game_over_menu_render(GAME *game) {
         return 0;
     }
 
-    int y_coord = height / 2.5 + padding_of_card;
+    int y_coord = height / 2 + game->field.title_padding;
 
     for (int i = 0; i < game->game_over_menu->count; i++) {
 
@@ -220,7 +216,7 @@ game_over_menu_render(GAME *game) {
         int render_coord_y;
         if (i == game->game_over_menu->selected_item) {
             color = &green_color;
-            font_size = selected_font_size;
+            font_size = game->field.hover_item_font;
             status = get_text_size(
                 game->font,
                 game->game_over_menu->items[i].text,
@@ -236,7 +232,7 @@ game_over_menu_render(GAME *game) {
             
         } else {
             color = &white_color;
-            font_size = standard_font_size;
+            font_size = game->field.item_font;
             status = get_text_size(
                 game->font,
                 game->game_over_menu->items[i].text,
@@ -268,7 +264,7 @@ game_over_menu_render(GAME *game) {
             return 0;
         }
 
-        y_coord += text_height + padding_of_card;
+        y_coord += text_height + game->field.item_padding;
 
     }
 

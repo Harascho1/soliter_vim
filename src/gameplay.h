@@ -11,7 +11,7 @@ CARD* next_deck_card(DECK *deck);
 CARD* draw_next_card(DECK *deck);
 int reveal_card_below(GAME *game);
 int selected_card(DECK *deck, CARD **selected_cards);
-int place_king(CARD **card, int num, CURSOR *cursor);
+int place_king(CARD **card, int num, CURSOR *cursor, FIELD *field);
 int place_a_card(GAME *game);
 int place_a_card(GAME *game);
 int select_a_card(GAME *game);

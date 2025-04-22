@@ -89,7 +89,7 @@ main_menu_render(GAME* game) {
     }
 
     status = SDL_RenderClear(game->renderer);
-    if (status == 0) {
+   if (status == 0) {
         SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
         return 0;
     }

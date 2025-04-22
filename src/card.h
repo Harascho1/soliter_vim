@@ -1,6 +1,8 @@
 #ifndef CARD_H
 #define CARD_H
 
+#include "field.h"
+
 enum {
     not_visible = 0,
     visible
@@ -77,15 +79,12 @@ typedef struct _DECK {
 
 } DECK;
 
-extern int g_card_width;
-extern int card_height;
 extern CARD g_invisible_card[7];
-extern int padding_of_card;
 
 DECK* create_deck(SDL_Renderer *renderer);
 void destroy_deck(DECK *deck);
 
-int render_card(SDL_Renderer *renderer, CARD *card, SDL_FPoint *point);
+int render_card(FIELD *field, SDL_Renderer *renderer, CARD *card, SDL_FPoint *point);
 void deselect_all_cards(DECK *deck);
 CARD* find_card(DECK *deck, int col, int row);
 int can_card_be_placed(CARD *card_below, CARD *card_above);
