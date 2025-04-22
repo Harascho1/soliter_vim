@@ -1,6 +1,27 @@
 #include "config.h"
+#include "SDL3/SDL_keycode.h"
+#include "SDL3/SDL_stdinc.h"
+#include <stdio.h>
+#include <string.h>
 
 int *config_commands = NULL;
+char *commands_keys[14];
+
+int
+insert_command(SDL_Keycode command, int index) {
+    if (config_commands == NULL) {
+        SDL_Log("config_commands is NULL");
+        return 0;
+    }
+    config_commands[index] = command;
+    const char *buffer = SDL_GetKeyName(command);
+    int size_of_buffer = strlen(buffer);
+    commands_keys[index] = (char*)SDL_realloc((char*)commands_keys, sizeof(char) * (size_of_buffer + 1));
+    strcpy(commands_keys[index], buffer);
+    SDL_Log("zamenjena komanda je: %s\n", commands_keys[index]);
+
+    return 1;
+}
 
 int
 does_config_file_exist() {
@@ -46,17 +67,8 @@ create_config_file() {
         SDLK_Q,
         SDLK_SPACE
     };
+
     fwrite(arr, sizeof(int), 14, config_file);
-
-    rewind(config_file);
-
-    int print_arr[14];
-    fread(print_arr, sizeof(int), 14, config_file);
-    for (int i = 0; i < 14; i++) {
-        SDL_Log("%d ", print_arr[i]);
-    }
-    SDL_Log("\n");
-
     fclose(config_file);
 }
 
@@ -68,6 +80,12 @@ load_config() {
     fread(config_commands, sizeof(int), 14, config_file);
     fclose(config_file);
 
+    for (int i = 0; i < 14; i++) {
+        const char *buffer = SDL_GetKeyName(config_commands[i]);
+        int size_of_buffer = strlen(buffer);
+        commands_keys[i] = (char*)SDL_malloc(sizeof(buffer) * (size_of_buffer + 1));
+        strcpy(commands_keys[i], buffer);
+    }
 
     return config_commands;
 }

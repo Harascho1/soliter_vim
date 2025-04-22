@@ -1,3 +1,5 @@
+#include "SDL3/SDL_keycode.h"
+#include "config.h"
 #include "game.h"
 
 static int selected_index = 0;
@@ -12,13 +14,15 @@ macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
                 push_user_event(g_change_scene_event_type, game_state_setting);
                 break;
             case SDLK_W:
+            case SDLK_UP:
                 if (selected_index <= 0) {
                     break;
                 }
                 selected_index--;
                 break;
             case SDLK_S:
-                if (selected_index >= 15) {
+            case SDLK_DOWN:
+                if (selected_index > 15) {
                     break;
                 }
                 selected_index++;
@@ -40,9 +44,9 @@ macro_settings_update(GAME *game) {
 static char* text[14] = {
     "switch to normal mode",
     "selecting drawn card",
-    "num 1",
-    "num 2",
-    "num 3",
+    "number 1",
+    "number 2",
+    "number 3",
     "num 4",
     "num 5",
     "num 6",
@@ -52,23 +56,6 @@ static char* text[14] = {
     "num 0",
     "draw next card",
     "select card/cards"
-};
-
-static char* commands[14] = {
-    "X",
-    "TAB",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "0",
-    "Q",
-    "SPACE"
 };
 
 static char title[] = "Macro";
@@ -173,7 +160,7 @@ macro_settings_render(GAME *game) {
         if (selected_index == i) {
             status = get_text_size(
                 game->font,
-                commands[i],
+                commands_keys[i],
                 selected_font_size,
                 &text_width,
                 &commands_selected_height
@@ -184,7 +171,7 @@ macro_settings_render(GAME *game) {
         } else {
             status = get_text_size(
                 game->font,
-                commands[i],
+                commands_keys[i],
                 standard_font_size,
                 &text_width,
                 NULL
@@ -212,7 +199,7 @@ macro_settings_render(GAME *game) {
         status = render_text(
             game->font,
             game->renderer,
-            commands[i],
+            commands_keys[i],
             font,
             &(SDL_Point) {
                 .x = commands_x_pos - text_width / 2,

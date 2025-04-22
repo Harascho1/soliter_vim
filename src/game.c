@@ -1,4 +1,6 @@
 #include "game.h"
+#include "config.h"
+#include "field.h"
 #include "texture.h"
 
 const char *main_menu_items[] = {
@@ -81,6 +83,18 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
     if (game->window == NULL) {
         SDL_Log("SDL_CreateWindow failed: %s\n", SDL_GetError());
         return status;
+    }
+
+    if (does_config_file_exist() == 0) {
+        create_config_file();
+    }
+    load_config();
+
+    status = load_field(game->field, res->width, res->height);
+    if (status == 0) {
+        SDL_Log("load_field error...\n");
+        game_quit(game);
+        return 0;
     }
 
     int width = res->width, height = res->height;
