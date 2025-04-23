@@ -93,21 +93,6 @@ create_config_file() {
 
     fwrite(arr, sizeof(int), 14, config_file);
     fclose(config_file);
-
-    FILE *option_file = fopen("assets/bin/option.bin", "wb+");
-    if (option_file == NULL) {
-        SDL_Log("option_file is NULL\n");
-        return;
-    }
-
-    int opt_arr[3] = {
-        0, //fullscreen
-        1, //music
-        50 //%percent of volume
-    };
-
-    fwrite(opt_arr, sizeof(int), 3, option_file);
-    fclose(option_file);
 }
 
 void
@@ -119,7 +104,7 @@ create_option_file() {
     }
 
     int opt_arr[3] = {
-        0, //fullscreen
+        1, //fullscreen
         1, //music
         50 //%percent of volume
     };

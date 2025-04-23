@@ -1,4 +1,6 @@
 #include "game.h"
+#include "SDL3/SDL_error.h"
+#include "SDL3/SDL_video.h"
 #include "config.h"
 #include "field.h"
 #include "texture.h"
@@ -33,10 +35,10 @@ CARD g_invisible_card[7];
 int
 load_game_field(DECK *deck, FIELD *field) {
     int count = 0;
-    int x_coord = field->screen_padding;
+    int x_coord = field->gameplay_screen_padding_width;
 
     for (int i = 0; i < number_of_cards_in_row; i++) {
-        int y_coord = 2 * field->card_padding + field->card_height;
+        int y_coord = 2 * field->card_padding_height + field->card_height;
         g_invisible_card[i].frame = SDL_malloc(sizeof(SDL_FPoint));
         g_invisible_card[i].pos = SDL_malloc(sizeof(POSITION));
         g_invisible_card[i].pos->row = 1;
@@ -54,14 +56,14 @@ load_game_field(DECK *deck, FIELD *field) {
             deck->cards[count].pos->row = j + 1;
             deck->cards[count].on_field = 1;
 
-            y_coord += field->card_padding;
+            y_coord += field->card_padding_height;
             count++;
         }
-        x_coord += field->card_padding + field->card_width;
+        x_coord += field->card_padding_width + field->card_width;
     }
     for (; count < 52; count++) {
-        deck->cards[count].frame->x = field->screen_padding;
-        deck->cards[count].frame->y = field->screen_padding;
+        deck->cards[count].frame->x = field->gameplay_screen_padding_width;
+        deck->cards[count].frame->y = field->gameplay_screen_padding_height;
         deck->cards[count].pos->col = 1;
         deck->cards[count].pos->row = 0;
         deck->cards[count].on_field = 0;
@@ -74,14 +76,21 @@ load_game_field(DECK *deck, FIELD *field) {
     return 1;
 }
 
-int game_init(GAME* game, const char *title, const RESOLUTION *res) {
-    int status = 0;
-
-    game->window = SDL_CreateWindow(title, res->width, res->height, 0);
-    if (game->window == NULL) {
-        SDL_Log("SDL_CreateWindow failed: %s\n", SDL_GetError());
+int
+fullscree_mode(GAME *game) {
+    int status;
+    status = SDL_SetWindowFullscreenMode(game->window, NULL);
+    if (status == 0) {
+        SDL_Log("SDL_SetWindowFullscreen error %s", SDL_GetError());
         return status;
     }
+    return status;
+}
+
+int
+game_init(GAME* game, const char *title, const RESOLUTION *res) {
+    int status = 0;
+
 
     if (does_config_file_exist() == 0) {
         create_config_file();
@@ -90,6 +99,38 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         create_option_file();
     }
     load_config();
+
+    game->window = SDL_CreateWindow(title, 1600, 900, SDL_WINDOW_FULLSCREEN);
+    if (game->window == NULL) {
+        SDL_Log("SDL_CreateWindow failed: %s\n", SDL_GetError());
+        return status;
+    }
+
+    //status = fullscree_mode(game);
+    //if (status == 0) {
+    //    SDL_Log("fullscreen is not set\n");
+    //}
+
+    game->font = create_font(
+        "assets/font.ttf"
+    );
+    if (game->font == NULL) {
+        SDL_Log("font_init failed.\n");
+        game_quit(game);
+        return status;
+    }
+
+    int w, h;
+    status = SDL_GetWindowSizeInPixels(game->window, &w, &h);
+
+    status = load_field(&game->field, w, h, game->font);
+    if (status == 0) {
+        SDL_Log("load_field error...\n");
+        game_quit(game);
+        return 0;
+    }
+
+
 
     game->renderer = SDL_CreateRenderer(game->window, NULL);
     if (game->renderer == NULL) {
@@ -133,22 +174,6 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
         SDL_Log("create_timer failed\n");
         game_quit(game);
         return status;
-    }
-
-    game->font = create_font(
-        "assets/font.ttf"
-    );
-    if (game->font == NULL) {
-        SDL_Log("font_init failed.\n");
-        game_quit(game);
-        return status;
-    }
-
-    status = load_field(&game->field, res->width, res->height, game->font);
-    if (status == 0) {
-        SDL_Log("load_field error...\n");
-        game_quit(game);
-        return 0;
     }
 
     game->background_texture = create_texture_from_image(

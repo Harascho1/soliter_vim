@@ -22,7 +22,7 @@ macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_S:
             case SDLK_DOWN:
-                if (selected_index > 15) {
+                if (selected_index >= 13) {
                     break;
                 }
                 selected_index++;

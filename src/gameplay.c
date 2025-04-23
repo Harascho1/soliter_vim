@@ -133,11 +133,11 @@ place_king(CARD **card, int num, CURSOR *cursor, FIELD *field) {
         card[i]->pos->col = cursor_col;
         card[i]->pos->row = cursor_row + 1;
         card[i]->frame->x = x_coord;
-        card[i]->frame->y = y_coord + field->card_padding;
+        card[i]->frame->y = y_coord + field->card_padding_height;
         card[i]->on_field = 1;
 
         cursor_row++;
-        y_coord += field->card_padding;
+        y_coord += field->card_padding_height;
 
     }
 
@@ -228,11 +228,11 @@ place_a_card(GAME *game) {
         s_card[i]->pos->col = col_of_cursor;
         s_card[i]->pos->row = row_of_cursor + 1;
         s_card[i]->frame->x = x_card_pos;
-        s_card[i]->frame->y = y_card_pos + game->field.card_padding;
+        s_card[i]->frame->y = y_card_pos + game->field.card_padding_height;
         s_card[i]->on_field = 1;
 
         row_of_cursor++;
-        y_card_pos += game->field.card_padding;
+        y_card_pos += game->field.card_padding_height;
     }
 
     set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
@@ -294,14 +294,14 @@ change_cursor_frame(GAME *game) {
     );
     // * deck_card
     if (card == NULL && game->cursor->pos->row == 0) {
-        game->cursor->cursor->x = game->field.cursor_padding;
-        game->cursor->cursor->y = game->field.cursor_padding;
+        game->cursor->cursor->x = game->field.gameplay_screen_padding_width - game->field.cursor_padding;
+        game->cursor->cursor->y = game->field.gameplay_screen_padding_height - game->field.cursor_padding;
         return 1;
     }
     if (same_card_selected(card, view_top_card_in_queue(game->deck->new_cards)) == 1) {
         int right_indent = g_invisible_card[1].frame->x;
         game->cursor->cursor->x = right_indent - game->field.cursor_padding;
-        game->cursor->cursor->y = game->field.cursor_padding;
+        game->cursor->cursor->y = game->field.gameplay_screen_padding_height - game->field.cursor_padding;
     } else {
         game->cursor->cursor->x = card->frame->x - game->field.cursor_padding; 
         game->cursor->cursor->y = card->frame->y - game->field.cursor_padding;

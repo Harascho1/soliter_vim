@@ -50,7 +50,7 @@ render_commands(GAME *game) {
         game->field.text_font,
         &(SDL_Point){
             .x = (width - text_width) / 2,
-            .y = (height - text_height - game->field.card_padding)
+            .y = (height - text_height - game->field.card_padding_height)
         },
         &white_color
     );
@@ -92,7 +92,7 @@ render_cursor(GAME *game) {
 int
 sorted_card_render(GAME *game) {
     int status;
-    int padding_width = 3 * (game->field.card_width + game->field.card_padding) + game->field.screen_padding;
+    int padding_width = 3 * (game->field.card_width + game->field.card_padding_width) + game->field.gameplay_screen_padding_width;
     for (int suit = 0; suit < 4; suit++) {
         if (game->deck->sorted_cards[suit] == NULL) {
             status = SDL_RenderTexture(
@@ -101,7 +101,7 @@ sorted_card_render(GAME *game) {
                 NULL,
                 &(SDL_FRect) {
                     .x = padding_width,
-                    .y = game->field.screen_padding,
+                    .y = game->field.gameplay_screen_padding_height,
                     .w = game->field.card_width,
                     .h = game->field.card_height 
                 }
@@ -125,7 +125,7 @@ sorted_card_render(GAME *game) {
                 return status;
             }
         }
-        padding_width += game->field.card_width + game->field.card_padding;
+        padding_width += game->field.card_width + game->field.card_padding_width;
     }
 
     return status;
@@ -185,8 +185,8 @@ gameplay_render(GAME* game) {
             game->renderer,
             game->deck->deck_card,
             &(SDL_FPoint) {
-                .x = game->field.screen_padding,
-                .y = game->field.screen_padding
+                .x = game->field.gameplay_screen_padding_width,
+                .y = game->field.gameplay_screen_padding_height
             }
         );
         if (status == 0) {
@@ -211,8 +211,8 @@ gameplay_render(GAME* game) {
             game->renderer,
             card,
             &(SDL_FPoint){
-                .x = game->field.screen_padding + game->field.card_padding + game->field.card_width,
-                .y = game->field.screen_padding
+                .x = game->field.gameplay_screen_padding_width + game->field.card_padding_width + game->field.card_width,
+                .y = game->field.gameplay_screen_padding_height
             }
         );
         if (status == 0) {
