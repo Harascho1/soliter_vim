@@ -79,7 +79,13 @@ load_game_field(DECK *deck, FIELD *field) {
 int
 fullscree_mode(GAME *game) {
     int status;
-    status = SDL_SetWindowFullscreenMode(game->window, NULL);
+    SDL_DisplayID id;
+    //SDL_DisplayMode **mode = SDL_GetFullscreenDisplayModes(id, NULL);
+    //if (mode == NULL) {
+    //    SDL_Log("SDL_GetFullscreenDisplayModes error %s\n", SDL_GetError());
+    //    return 0;
+    //}
+    status = SDL_SetWindowFullscreen(game->window, true);
     if (status == 0) {
         SDL_Log("SDL_SetWindowFullscreen error %s", SDL_GetError());
         return status;
@@ -91,7 +97,6 @@ int
 game_init(GAME* game, const char *title, const RESOLUTION *res) {
     int status = 0;
 
-
     if (does_config_file_exist() == 0) {
         create_config_file();
     }
@@ -100,16 +105,18 @@ game_init(GAME* game, const char *title, const RESOLUTION *res) {
     }
     load_config();
 
-    game->window = SDL_CreateWindow(title, 1600, 900, SDL_WINDOW_FULLSCREEN);
+    game->window = SDL_CreateWindow(title, 600, 600, 0);
     if (game->window == NULL) {
         SDL_Log("SDL_CreateWindow failed: %s\n", SDL_GetError());
         return status;
     }
 
-    //status = fullscree_mode(game);
-    //if (status == 0) {
-    //    SDL_Log("fullscreen is not set\n");
-    //}
+    status = fullscree_mode(game);
+    if (status == 0) {
+        SDL_Log("fullscreen is not set\n");
+    }
+
+    SDL_SyncWindow(game->window);
 
     game->font = create_font(
         "assets/font.ttf"

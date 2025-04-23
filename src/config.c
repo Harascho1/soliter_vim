@@ -19,7 +19,7 @@ insert_command(SDL_Keycode command, int index) {
     config_commands[index] = command;
     const char *buffer = SDL_GetKeyName(command);
     int size_of_buffer = strlen(buffer);
-    commands_keys[index] = (char*)SDL_realloc((char*)commands_keys, sizeof(char) * (size_of_buffer + 1));
+    commands_keys[index] = (char*)SDL_realloc(commands_keys[index], sizeof(char) * (size_of_buffer + 1));
     strcpy(commands_keys[index], buffer);
     SDL_Log("zamenjena komanda je: %s\n", commands_keys[index]);
 

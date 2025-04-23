@@ -51,7 +51,7 @@ normal_select_mode(GAME *game, const SDL_Event *event) {
                 }
                 game->cursor->pos->col--;
                 change_cursor_frame(game);
-                break;                
+                break;
             case SDLK_S:
             case SDLK_DOWN:
                 int new_row = game->cursor->pos->row + 1;

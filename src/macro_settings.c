@@ -5,10 +5,17 @@
 static int selected_index = 0;
 static SDL_Color white_color = {255, 255, 255, 255};
 static SDL_Color green_color = {150, 255, 150, 255};
+static int status = 0;
 
 int
 macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
+        if (status == 1) {
+            unsigned int key = event->key.key;
+            insert_command(key, selected_index);
+            status = 0;
+            return 1;
+        }
         switch (event->key.key) {
             case SDLK_ESCAPE:
                 push_user_event(g_change_scene_event_type, game_state_setting);
@@ -27,9 +34,11 @@ macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
                 }
                 selected_index++;
                 break;
+            case SDLK_RETURN:
+            case SDLK_SPACE:
+                status = 1;
+                break;
             default:
-                const char *character = SDL_GetKeyName(event->key.key);
-                SDL_Log("Key: %s\n", character);
                 break;
         }
     }
@@ -59,7 +68,6 @@ static char* text[14] = {
 };
 
 static char title[] = "Macro";
-
 
 int
 macro_settings_render(GAME *game) {
