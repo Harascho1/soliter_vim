@@ -16,6 +16,7 @@ set(HEADER_FILES
 
 file(GLOB_RECURSE soliter_src 
     ${CMAKE_SOURCE_DIR}/src/field.c
+    ${CMAKE_SOURCE_DIR}/src/option_settings.c
     ${CMAKE_SOURCE_DIR}/src/macro_settings.c
     ${CMAKE_SOURCE_DIR}/src/config.c
     ${CMAKE_SOURCE_DIR}/src/font.c

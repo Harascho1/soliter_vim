@@ -17,6 +17,7 @@ typedef enum {
     game_state_game_over,
     game_state_setting,
     game_state_macro,
+    game_state_option,
     game_state_max
 } GAME_STATE;
 
@@ -61,6 +62,7 @@ extern SCENE gameplay_scene;
 extern SCENE game_over_menu_scene;
 extern SCENE setting_scene;
 extern SCENE macro_setting_scene;
+extern SCENE option_setting_scene;
 
 extern int game_update;
 extern int g_game_win;

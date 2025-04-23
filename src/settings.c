@@ -37,6 +37,7 @@ setting_event_handler(GAME *game, const SDL_Event *event) {
         case SDLK_RETURN:
             switch (game->setting_menu->items[game->setting_menu->selected_item].type) {
                 case settings_item_type_options:
+                    push_user_event(g_change_scene_event_type, game_state_option);
                     break;
                 case settings_item_type_cancel:
                     push_user_event(g_change_scene_event_type, game_state_main_menu);

@@ -7,7 +7,7 @@ static SDL_Color white_color = {255, 255, 255, 255};
 static SDL_Color green_color = {150, 255, 150, 255};
 
 int
-macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
+option_settings_event_hendler(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch (event->key.key) {
             case SDLK_ESCAPE:
@@ -37,32 +37,20 @@ macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
 }
 
 int
-macro_settings_update(GAME *game) {
+option_settings_update(GAME *game) {
     return 1;
 }
 
 static char* text[14] = {
-    "switch to normal mode",
-    "selecting drawn card",
-    "number 1",
-    "number 2",
-    "number 3",
-    "num 4",
-    "num 5",
-    "num 6",
-    "num 7",
-    "num 8",
-    "num 9",
-    "num 0",
-    "draw next card",
-    "select card/cards"
+    "fullscreen",
+    "music",
+    "volume"
 };
 
-static char title[] = "Macro";
-
+static char title[] = "Options";
 
 int
-macro_settings_render(GAME *game) {
+option_settings_render(GAME *game) {
     int status;
     if (game == NULL) {
         SDL_Log("game is NULL\n");
@@ -150,7 +138,7 @@ macro_settings_render(GAME *game) {
     int text_x_pos = game->field.screen_padding;
     int commands_x_pos = width - text_width;
     int font = game->field.item_font;
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 3; i++) {
         SDL_Color *color;
         int font = game->field.item_font;
         int commands_y_pos;
@@ -159,7 +147,7 @@ macro_settings_render(GAME *game) {
         if (selected_index == i) {
             status = get_text_size(
                 game->font,
-                commands_keys[i],
+                options_set[i],
                 game->field.hover_item_font,
                 &text_width,
                 &commands_selected_height
@@ -170,7 +158,7 @@ macro_settings_render(GAME *game) {
         } else {
             status = get_text_size(
                 game->font,
-                commands_keys[i],
+                options_set[i],
                 game->field.item_font,
                 &text_width,
                 NULL
@@ -198,7 +186,7 @@ macro_settings_render(GAME *game) {
         status = render_text(
             game->font,
             game->renderer,
-            commands_keys[i],
+            options_set[i],
             font,
             &(SDL_Point) {
                 .x = commands_x_pos - text_width / 2,
@@ -210,7 +198,7 @@ macro_settings_render(GAME *game) {
             SDL_Log("render_text error...\n");
         }
 
-        y_pos += text_height + game->field.text_padding / 2;
+        y_pos += text_height + game->field.item_padding;
     }
 
     status = SDL_RenderPresent(game->renderer);
@@ -223,8 +211,8 @@ macro_settings_render(GAME *game) {
     return 1;
 }
 
-SCENE macro_setting_scene = {
-    .handle_events = macro_settings_event_hendler,
-    .update = macro_settings_update,
-    .render = macro_settings_render
+SCENE option_setting_scene = {
+    .handle_events = option_settings_event_hendler,
+    .update = option_settings_update,
+    .render = option_settings_render
 };

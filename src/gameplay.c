@@ -1,4 +1,5 @@
 #include "gameplay.h"
+#include "card.h"
 #include "texture.h"
 
 char buffer[10] = "";
@@ -293,16 +294,17 @@ change_cursor_frame(GAME *game) {
     );
     // * deck_card
     if (card == NULL && game->cursor->pos->row == 0) {
-        game->cursor->cursor->x = padding_of_card / 4;
-        game->cursor->cursor->y = padding_of_card / 4;
+        game->cursor->cursor->x = game->field.cursor_padding;
+        game->cursor->cursor->y = game->field.cursor_padding;
         return 1;
     }
     if (same_card_selected(card, view_top_card_in_queue(game->deck->new_cards)) == 1) {
-        game->cursor->cursor->x = padding_of_card * 3/2 + g_card_width - padding_of_card / 4; 
-        game->cursor->cursor->y = padding_of_card / 4;    
+        int right_indent = g_invisible_card[1].frame->x;
+        game->cursor->cursor->x = right_indent - game->field.cursor_padding;
+        game->cursor->cursor->y = game->field.cursor_padding;
     } else {
-        game->cursor->cursor->x = card->frame->x - padding_of_card / 4; 
-        game->cursor->cursor->y = card->frame->y - padding_of_card / 4;    
+        game->cursor->cursor->x = card->frame->x - game->field.cursor_padding; 
+        game->cursor->cursor->y = card->frame->y - game->field.cursor_padding;
 
     }
     return 1;
@@ -311,8 +313,9 @@ change_cursor_frame(GAME *game) {
 int
 go_to_invisible_card(GAME *game, int col) {
     game->cursor->pos->col = col;
-    game->cursor->cursor->x = g_invisible_card[col - 1].frame->x - padding_of_card / 4;
-    game->cursor->cursor->y = g_invisible_card[col - 1].frame->y - padding_of_card / 4;
+    game->cursor->cursor->x = g_invisible_card[col - 1].frame->x - game->field.cursor_padding;
+    game->cursor->cursor->y = g_invisible_card[col - 1].frame->y - game->field.cursor_padding;
+    return 1;
 }
 
 int
@@ -322,6 +325,7 @@ interact(GAME *game) {
     } else if (game->cursor->mode % 2 == 1) {
         place_a_card(game);
     }
+    return 1;
 }
 
 int

@@ -86,6 +86,9 @@ int game_init(GAME* game, const char *title, const RESOLUTION *res) {
     if (does_config_file_exist() == 0) {
         create_config_file();
     }
+    if (does_option_file_exist() == 0) {
+        create_option_file();
+    }
     load_config();
 
     game->renderer = SDL_CreateRenderer(game->window, NULL);

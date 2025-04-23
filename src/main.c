@@ -1,5 +1,4 @@
 #include "game.h"
-#include "config.h"
 
 static GAME_STATE g_current_game_state = game_state_main_menu;
 
@@ -15,11 +14,14 @@ static SCENE* g_game_scenes[] = {
     &gameplay_scene,
     &game_over_menu_scene,
     &setting_scene,
-    &macro_setting_scene
+    &macro_setting_scene,
+    &option_setting_scene
 };
 
 static int g_scene_fps[] = {
-    240,
+    60,
+    60,
+    60,
     60,
     60,
     60,
