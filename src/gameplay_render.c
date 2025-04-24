@@ -1,6 +1,7 @@
 #include "SDL3/SDL_rect.h"
 #include "gameplay.h"
 #include "texture.h"
+#include <stdio.h>
 
 static const char* modes[4] = {
     "mode:normal",
@@ -10,6 +11,7 @@ static const char* modes[4] = {
 };
 
 static SDL_Color white_color = {255, 255, 255, 255};
+static SDL_Color trensparent_green_color = {250, 55, 50, 255};
 
 int
 render_commands(GAME *game) {
@@ -273,6 +275,31 @@ gameplay_render(GAME* game) {
                         SDL_Log("render_cursor error...\n");
                         return 0;
                     }
+            }
+            if (j % 3 == 0) {
+                char buff[12];
+                sprintf(buff, "%d", j);
+                status = get_text_size(
+                    game->font,
+                    buff,
+                    game->field.text_font,
+                    &text_width,
+                    &text_height
+                );
+                if (status == 0) {
+                    SDL_Log("get_text_size error...\n");
+                }
+                status = render_text(
+                    game->font,
+                    game->renderer,
+                    buff,
+                    game->field.text_font,
+                    &(SDL_Point){
+                        .x = card->frame->x + (game->field.card_width - text_width) / 2,
+                        .y = card->frame->y
+                    },
+                    &trensparent_green_color
+                );
             }
             j++;
         }

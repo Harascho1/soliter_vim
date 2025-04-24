@@ -11,6 +11,8 @@ option_settings_event_hendler(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch (event->key.key) {
             case SDLK_ESCAPE:
+                update_option_file();
+                reload_window(game);
                 push_user_event(g_change_scene_event_type, game_state_setting);
                 break;
             case SDLK_W:
@@ -27,9 +29,14 @@ option_settings_event_hendler(GAME *game, const SDL_Event *event) {
                 }
                 selected_index++;
                 break;
+            case SDLK_SPACE:
+            case SDLK_RETURN:
+                if (selected_index == 2) {
+                    break;
+                }
+                insert_option(!config_options[selected_index], selected_index);
+                break;
             default:
-                const char *character = SDL_GetKeyName(event->key.key);
-                SDL_Log("Key: %s\n", character);
                 break;
         }
     }

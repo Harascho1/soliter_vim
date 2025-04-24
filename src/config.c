@@ -11,17 +11,44 @@ char *commands_keys[14];
 char *options_set[3];
 
 int
+insert_option(unsigned int option_value, int index) {
+    if (config_options == NULL) {
+        SDL_Log("config_options is NULL\n");
+        return 0;
+    }
+    config_options[index] = option_value;
+    char buffer[10];
+    if (option_value == 1) {
+        strcpy(buffer, "On");
+    } else {
+        strcpy(buffer, "Off");
+    }
+    int size_of_buffer = strlen(buffer) + 1;
+    options_set[index] = (char*)SDL_realloc(options_set[index], sizeof(char) * (size_of_buffer + 1));
+    strcpy(options_set[index], buffer);
+    //SDL_Log("zamenjena komanda je: %s\n", options_set[index]);
+    return 1;
+}
+
+int
 insert_command(SDL_Keycode command, int index) {
     if (config_commands == NULL) {
         SDL_Log("config_commands is NULL");
         return 0;
     }
+
+    for (int i = 0; i < 13; i++) {
+        if (config_commands[i] == command) {
+            return 0;
+        }
+    }
+
     config_commands[index] = command;
     const char *buffer = SDL_GetKeyName(command);
     int size_of_buffer = strlen(buffer);
     commands_keys[index] = (char*)SDL_realloc(commands_keys[index], sizeof(char) * (size_of_buffer + 1));
     strcpy(commands_keys[index], buffer);
-    SDL_Log("zamenjena komanda je: %s\n", commands_keys[index]);
+    //SDL_Log("zamenjena komanda je: %s\n", commands_keys[index]);
 
     return 1;
 }
@@ -96,6 +123,19 @@ create_config_file() {
 }
 
 void
+update_option_file() {
+    FILE *option_file = fopen("assets/bin/option.bin", "wb+");
+
+    if (option_file == NULL) {
+        SDL_Log("config_file is NULL\n");
+        return;
+    }
+
+    fwrite(config_options, sizeof(int), 3, option_file);
+    fclose(option_file);
+}
+
+void
 update_config_file() {
     FILE *config_file = fopen("assets/bin/config.bin", "wb+");
 
@@ -152,9 +192,9 @@ load_config() {
             continue;
         }
         if (config_options[i] == 1) {
-            strcpy(options_set[i], "Yes");
+            strcpy(options_set[i], "On");
         } else {
-            strcpy(options_set[i], "No");
+            strcpy(options_set[i], "Off");
         }
     }
     SDL_Log("Prosao sam");

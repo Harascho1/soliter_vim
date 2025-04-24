@@ -12,6 +12,7 @@ load_field(FIELD *field, int screen_width, int screen_height, FONT *font) {
     field->card_padding_height = screen_height / 35;
     field->screen_padding = screen_width / 45;
     field->gameplay_screen_padding_width = (screen_width - screen_height + field->screen_padding) / 2;
+    field->square_screen_padding_width = (screen_width - screen_height) / 2;
     field->gameplay_screen_padding_height = field->screen_padding;
     field->card_width = (screen_width - 6 * field->card_padding_width - field->gameplay_screen_padding_width * 2) / 7;
     field->card_height = field->card_width * card_width_height_ratio;

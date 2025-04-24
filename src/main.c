@@ -91,7 +91,7 @@ int main() {
     SDL_Event event;
     int last_frame_time = 0;
     while (1) {
-        if (SDL_PollEvent(&event)) {
+        if (SDL_WaitEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 break;
             } else if (event.type == g_change_scene_event_type) {

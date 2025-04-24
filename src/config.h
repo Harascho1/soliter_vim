@@ -10,6 +10,7 @@ void create_option_file();
 void update_option_file();
 int* load_config();
 int insert_command(unsigned int command, int index);
+int insert_option(unsigned int command, int index);
 
 extern int *config_commands;
 extern int *config_options;

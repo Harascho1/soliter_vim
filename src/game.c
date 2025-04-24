@@ -80,17 +80,36 @@ int
 fullscree_mode(GAME *game) {
     int status;
     SDL_DisplayID id;
-    //SDL_DisplayMode **mode = SDL_GetFullscreenDisplayModes(id, NULL);
-    //if (mode == NULL) {
-    //    SDL_Log("SDL_GetFullscreenDisplayModes error %s\n", SDL_GetError());
-    //    return 0;
-    //}
     status = SDL_SetWindowFullscreen(game->window, config_options[0]);
     if (status == 0) {
         SDL_Log("SDL_SetWindowFullscreen error %s", SDL_GetError());
         return status;
     }
     return status;
+}
+
+int
+reload_window(GAME *game) {
+
+    int status;
+    status = fullscree_mode(game);
+    if (status == 0) {
+        SDL_Log("fullscreen is not set\n");
+        return 0;
+    }
+    SDL_SyncWindow(game->window);
+
+    int w, h;
+    status = SDL_GetWindowSizeInPixels(game->window, &w, &h);
+
+    status = load_field(&game->field, w, h, game->font);
+    if (status == 0) {
+        SDL_Log("load_field error...\n");
+        game_quit(game);
+        return 0;
+    }
+
+    return 1;
 }
 
 int
@@ -136,8 +155,6 @@ game_init(GAME* game, const char *title, const RESOLUTION *res) {
         game_quit(game);
         return 0;
     }
-
-
 
     game->renderer = SDL_CreateRenderer(game->window, NULL);
     if (game->renderer == NULL) {
@@ -294,7 +311,7 @@ save_score(GAME *game) {
     saves_file = fopen("assets/saves.txt", "a+");
 
     if (saves_file == NULL) {
-        SDL_Log("Nije uspeo da otvori fajl\n");
+        SDL_Log("Couldn't open a file\n");
         return;
     }
 
@@ -311,7 +328,7 @@ save_score(GAME *game) {
 
     strftime(time_buff, 80, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    sprintf(buff, "seconds: %d mode: normal time: %s\r\n", game->timer->time_elapsed, time_buff);
+    sprintf(buff, "seconds:%d mode:normal time:%s\r\n", game->timer->time_elapsed, time_buff);
 
     fputs(buff, saves_file);
 

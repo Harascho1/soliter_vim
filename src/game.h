@@ -69,6 +69,8 @@ extern int g_game_win;
 
 int game_init(GAME* game, const char *title, const RESOLUTION *res);
 void game_quit(GAME* game);
+
+int reload_window(GAME *game);
 int load_game_field(DECK *game, FIELD *field);
 void run_a_game(GAME *game);
 void save_score(GAME *game);
