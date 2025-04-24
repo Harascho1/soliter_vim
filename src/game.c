@@ -85,7 +85,7 @@ fullscree_mode(GAME *game) {
     //    SDL_Log("SDL_GetFullscreenDisplayModes error %s\n", SDL_GetError());
     //    return 0;
     //}
-    status = SDL_SetWindowFullscreen(game->window, true);
+    status = SDL_SetWindowFullscreen(game->window, config_options[0]);
     if (status == 0) {
         SDL_Log("SDL_SetWindowFullscreen error %s", SDL_GetError());
         return status;

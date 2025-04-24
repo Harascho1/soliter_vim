@@ -1,23 +1,25 @@
 #include "SDL3/SDL_keycode.h"
+#include "SDL3/SDL_log.h"
 #include "config.h"
 #include "game.h"
 
 static int selected_index = 0;
 static SDL_Color white_color = {255, 255, 255, 255};
 static SDL_Color green_color = {150, 255, 150, 255};
-static int status = 0;
+static int event_status = 0;
 
 int
 macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
-        if (status == 1) {
+        if (event_status == 1) {
             unsigned int key = event->key.key;
             insert_command(key, selected_index);
-            status = 0;
+            event_status = 0;
             return 1;
         }
         switch (event->key.key) {
             case SDLK_ESCAPE:
+                update_config_file();
                 push_user_event(g_change_scene_event_type, game_state_setting);
                 break;
             case SDLK_W:
@@ -36,13 +38,52 @@ macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_RETURN:
             case SDLK_SPACE:
-                status = 1;
+                event_status = 1;
                 break;
             default:
                 break;
         }
     }
     return 1;
+}
+
+static const char* press_key = "Press key to bind";
+
+int
+render_press_key_popout(GAME *game) {
+    int width, height;
+    int status;
+    status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
+    if (status == 0) {
+        SDL_Log("SDL_GetWindowSizeInPixels error: %s\n", SDL_GetError());
+        return status;
+    }
+
+    int text_width, text_height;
+    status = get_text_size(
+        game->font,
+        press_key,
+        game->field.title_font, // ? nzm da li je font okej?
+        &text_width,
+        &text_height
+    );
+    if (status == 0) {
+        SDL_Log("get_text_size error...\n");
+        return 0;
+    }
+
+    status = render_text(
+        game->font,
+        game->renderer,
+        press_key,
+        game->field.title_font,
+        &(SDL_Point) {
+            .x = (width - text_width) / 2,
+            .y = (height - text_height) / 2
+        },
+        &white_color
+    );
+    return status;
 }
 
 int
@@ -219,6 +260,14 @@ macro_settings_render(GAME *game) {
         }
 
         y_pos += text_height + game->field.text_padding / 2;
+    }
+
+    if (event_status == 1) {
+        status = render_press_key_popout(game);
+        if (status == 0) {
+            SDL_Log("render_press_key_popout error\n");
+            return status;
+        }
     }
 
     status = SDL_RenderPresent(game->renderer);

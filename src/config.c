@@ -96,6 +96,19 @@ create_config_file() {
 }
 
 void
+update_config_file() {
+    FILE *config_file = fopen("assets/bin/config.bin", "wb+");
+
+    if (config_file == NULL) {
+        SDL_Log("config_file is NULL\n");
+        return;
+    }
+
+    fwrite(config_commands, sizeof(int), 14, config_file);
+    fclose(config_file);
+}
+
+void
 create_option_file() {
     FILE *option_file = fopen("assets/bin/option.bin", "wb+");
     if (option_file == NULL) {
