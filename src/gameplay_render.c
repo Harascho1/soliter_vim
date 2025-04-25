@@ -134,6 +134,45 @@ sorted_card_render(GAME *game) {
 }
 
 int
+render_coutning_time(GAME *game) {
+    // Rendering timer in seconds
+    int status;
+    int text_width, text_height;
+    int width, height;
+    width = game->field.screen_width;
+    height = game->field.screen_height;
+    char timer[20];
+    snprintf(timer, 20, "seconds: %d", game->timer->time_elapsed);
+    status = get_text_size(
+        game->font,
+        timer,
+        game->field.item_font,
+        &text_width,
+        &text_height
+    );
+    if (status == 0) {
+        SDL_Log("get_text_size error...\n");
+        return  status;
+    }
+    status = render_text(
+        game->font,
+        game->renderer,
+        timer,
+        game->field.item_font,
+        &(SDL_Point){
+            .x = width - game->field.screen_padding - text_width,
+            .y = height - text_height - game->field.screen_padding
+        },
+        &white_color
+    );
+    if (status == 0) {
+        SDL_Log("render_text error...\n");
+        return  status;
+    }
+    return status;
+}
+
+int
 gameplay_render(GAME* game) {
     int status;
     if (game == NULL) {
@@ -288,6 +327,7 @@ gameplay_render(GAME* game) {
                 );
                 if (status == 0) {
                     SDL_Log("get_text_size error...\n");
+                    return 0;
                 }
                 status = render_text(
                     game->font,
@@ -313,30 +353,6 @@ gameplay_render(GAME* game) {
         }
     }
 
-    // Rendering timer in seconds
-    char timer[20];
-    snprintf(timer, 20, "seconds: %d", game->timer->time_elapsed);
-    status = get_text_size(
-        game->font,
-        timer,
-        game->field.item_font,
-        &text_width,
-        &text_height
-    );
-    if (status == 0) {
-        SDL_Log("get_text_size error...\n");
-    }
-    status = render_text(
-        game->font,
-        game->renderer,
-        timer,
-        game->field.item_font,
-        &(SDL_Point){
-            .x = width - game->field.screen_padding - text_width,
-            .y = height - text_height - game->field.screen_padding
-        },
-        &white_color
-    );
 
     status = SDL_RenderPresent(game->renderer);
     if (status == 0) {

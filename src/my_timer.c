@@ -43,6 +43,7 @@ int reset_timer(MY_TIMER *timer) {
     pthread_join(timer->thread_clock, NULL);
     #endif
     timer->time_elapsed = 0;
+    return 1;
 }
 
 int start_timer(MY_TIMER *timer) {
@@ -54,5 +55,5 @@ int start_timer(MY_TIMER *timer) {
     #else
     pthread_create(&timer->thread_clock, NULL, count_down, (void*)timer);
     #endif
-
+    return 1;
 }

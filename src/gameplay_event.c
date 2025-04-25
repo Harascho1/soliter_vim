@@ -84,7 +84,7 @@ normal_select_mode(GAME *game, const SDL_Event *event) {
                 }
                 game->cursor->pos->row--;
                 change_cursor_frame(game);
-                break;                
+                break;
             case SDLK_RETURN:
             case SDLK_SPACE:
                 interact(game);
