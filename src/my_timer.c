@@ -1,4 +1,5 @@
 #include "my_timer.h"
+#include "SDL3/SDL_events.h"
 
 static int m_fps = 60;
 
@@ -6,6 +7,7 @@ MY_TIMER* create_timer() {
     MY_TIMER *timer = SDL_malloc(sizeof(MY_TIMER));
     timer->begin_time = 0;
     timer->thread_clock;
+    timer->thread_render_clock;
     timer->time_elapsed = 0;
     timer->start_timer = 0;
     return timer;
@@ -28,6 +30,9 @@ void* count_down(void *atribute) {
         if (m_sec > old_sec) {
             old_sec = m_sec;
             timer->time_elapsed = old_sec;
+            SDL_Event user;
+            user.type = SDL_EVENT_PRIVATE0;
+            SDL_PushEvent(&user);
         }
         SDL_Delay(10);
     }

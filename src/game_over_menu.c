@@ -155,7 +155,14 @@ game_over_menu_render(GAME *game) {
         }
     }
 
-    status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL, NULL);
+    SDL_FRect *rect = &(SDL_FRect) {
+        .x = game->field.square_screen_padding_width,
+        .y = 0,
+        .w = game->field.screen_height,
+        .h = game->field.screen_height,
+    };
+
+    status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL, rect);
     if (status == 0) {
         SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
         push_user_event(SDL_EVENT_QUIT, 0);

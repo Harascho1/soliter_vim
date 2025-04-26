@@ -1,3 +1,4 @@
+#include "SDL3/SDL_events.h"
 #include "game.h"
 #include "texture.h"
 #include "my_timer.h"
@@ -109,14 +110,14 @@ main_menu_render(GAME* game) {
             return 0;
         }
     }
+    SDL_FRect *rect = &(SDL_FRect) {
+        .x = game->field.square_screen_padding_width,
+        .y = 0,
+        .w = game->field.screen_height,
+        .h = game->field.screen_height,
+    };
 
-    status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL,
-                               &(SDL_FRect) {
-                                .x = game->field.square_screen_padding_width,
-                                .y = 0,
-                                .w = game->field.screen_height,
-                                .h = game->field.screen_height,
-                               });
+    status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL, rect);
     if (status == 0) {
         SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
         push_user_event(SDL_EVENT_QUIT, 0);

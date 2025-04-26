@@ -9,7 +9,7 @@ create_cursor(FIELD *field,int col, int row) {
 
     cursor->cursor = SDL_malloc(sizeof(SDL_FRect));
     cursor->cursor->x = field->gameplay_screen_padding_width - field->cursor_padding;
-    cursor->cursor->y = 2 * field->card_padding_height + field->card_height - field->cursor_padding;
+    cursor->cursor->y = field->gameplay_screen_padding_height + field->card_padding_height + field->card_height - field->cursor_padding;
     cursor->cursor->w = field->card_width + field->cursor_padding * 2;
     cursor->cursor->h = field->card_height + field->cursor_padding * 2;
 

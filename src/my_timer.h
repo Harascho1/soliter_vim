@@ -8,6 +8,7 @@ typedef struct _MY_TIMER {
     HANDLE thread_clock;
     #else
     pthread_t thread_clock;
+    pthread_t thread_render_clock;
     #endif
     int start_timer;
 

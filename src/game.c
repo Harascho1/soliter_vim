@@ -38,7 +38,7 @@ load_game_field(DECK *deck, FIELD *field) {
     int x_coord = field->gameplay_screen_padding_width;
 
     for (int i = 0; i < number_of_cards_in_row; i++) {
-        int y_coord = 2 * field->card_padding_height + field->card_height;
+        int y_coord = field->gameplay_screen_padding_height + field->card_padding_height + field->card_height;
         g_invisible_card[i].frame = SDL_malloc(sizeof(SDL_FPoint));
         g_invisible_card[i].pos = SDL_malloc(sizeof(POSITION));
         g_invisible_card[i].pos->row = 1;
@@ -98,6 +98,8 @@ reload_window(GAME *game) {
         return 0;
     }
     SDL_SyncWindow(game->window);
+
+    SDL_Delay(20);
 
     int w, h;
     status = SDL_GetWindowSizeInPixels(game->window, &w, &h);

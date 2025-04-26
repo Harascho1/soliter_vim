@@ -4,10 +4,12 @@
 
 - [ ] nestane karta kada se igra na fly mode-u
 
-- [x] ako se selekta karta na new_cards i izvuce se nova karta, a odmah posle se postavi ta karta koja je selektana
+- [X] ako se selekta karta na new_cards i izvuce se nova karta, a odmah posle se postavi ta karta koja je selektana
 
-- [ ] nestane karta kad se selekta kralj pa onda spil
+- [X] nestane karta kad se selekta kralj pa onda spil
 
-- [ ] popravi izgled menu i game_over scene tako da bude veci razmak izmedju selectovanih stvari
+- [X] popravi izgled menu i game_over scene tako da bude veci razmak izmedju selectovanih stvari
 
-- [ ] kada hoces da izadjes iz settings-a malo duze se ceka mozda je probem u SDL_WaitEvents
+- [X] kada hoces da izadjes iz settings-a malo duze se ceka mozda je probem u SDL_WaitEvents
+
+- [ ] Sporo rendorovanje zbog SDL_WaitEvents-a kada se promeni sa 600x600 npr u fullscreen

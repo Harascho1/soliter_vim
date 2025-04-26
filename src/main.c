@@ -1,4 +1,5 @@
 #include "SDL3/SDL_events.h"
+#include "SDL3/SDL_oldnames.h"
 #include "game.h"
 
 static GAME_STATE g_current_game_state = game_state_main_menu;
@@ -92,6 +93,10 @@ int main() {
     int last_frame_time = 0;
     while (1) {
         if (SDL_WaitEvent(&event)) {
+            if (event.type == SDL_EVENT_PRIVATE0) {
+                g_game_scenes[g_current_game_state]->render(&game);
+                continue;
+            }
             if (event.type == SDL_EVENT_QUIT) {
                 break;
             } else if (event.type == g_change_scene_event_type) {

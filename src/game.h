@@ -74,7 +74,7 @@ int reload_window(GAME *game);
 int load_game_field(DECK *game, FIELD *field);
 void run_a_game(GAME *game);
 void save_score(GAME *game);
-
+int render_counting_time(GAME *game);
 int push_user_event(Uint32 type, Sint32 code);
 
 #endif // GAME_H

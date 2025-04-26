@@ -1,6 +1,8 @@
 #include "gameplay.h"
 #include "card.h"
+#include "game.h"
 #include "texture.h"
+#include <pthread.h>
 
 char buffer[10] = "";
 
@@ -198,7 +200,7 @@ place_a_card(GAME *game) {
         deselect_all_cards(game->deck);
         set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
         return 1;
-    }       
+    }
 
     if (same_card_selected(*s_card, game->deck->deck_card)) {
         deselect_all_cards(game->deck);
@@ -211,8 +213,15 @@ place_a_card(GAME *game) {
         set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
         return 0;
     }
-    
+
     if (can_card_be_placed(*s_card, card) == 0) {
+        set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
+        deselect_all_cards(game->deck);
+        return 0;
+    }
+
+    if (find_card(game->deck, card->pos->col, card->pos->row + 1) != NULL) {
+        SDL_Log("komso\n");
         set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
         deselect_all_cards(game->deck);
         return 0;

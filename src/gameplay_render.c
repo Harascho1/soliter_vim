@@ -1,4 +1,11 @@
+#include "SDL3/SDL_error.h"
+#include "SDL3/SDL_log.h"
+#include "SDL3/SDL_pixels.h"
 #include "SDL3/SDL_rect.h"
+#include "SDL3/SDL_render.h"
+#include "SDL3/SDL_stdinc.h"
+#include "SDL3/SDL_surface.h"
+#include "cursor.h"
 #include "gameplay.h"
 #include "texture.h"
 #include <stdio.h>
@@ -134,14 +141,91 @@ sorted_card_render(GAME *game) {
 }
 
 int
-render_coutning_time(GAME *game) {
+render_fly_notaions(GAME *game) {
+    if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
+        return 1;
+    }
+    int status;
+    int height_indent, width_indent;
+
+    int width = game->field.screen_width;
+    int height = game->field.screen_height;
+
+    height_indent = game->field.gameplay_screen_padding_height
+                    + game->field.card_height
+                    + game->field.card_padding_height
+                    + 2 * game->field.card_padding_height;
+    width_indent = game->field.gameplay_screen_padding_width;
+
+    int rect_width = width - 2 * game->field.gameplay_screen_padding_width;
+    int rect_height = game->field.card_padding_height;
+
+    SDL_Rect rect = {
+        .x = width_indent,
+        .y = height_indent,
+        .w = rect_width,
+        .h = rect_height
+    };
+
+    SDL_FRect frect;
+    SDL_RectToFRect(&rect, &frect);
+
+    SDL_Surface *surface = SDL_CreateSurface(rect_width, rect_height, SDL_PIXELFORMAT_RGBA32);
+    if (surface == NULL) {
+        SDL_Log("SDL_CreateSurface error: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    const SDL_PixelFormatDetails *format_details = SDL_GetPixelFormatDetails(surface->format);
+    if (format_details == NULL) {
+        SDL_DestroySurface(surface);
+        SDL_Log("SDL_GetPixelFormatDetails error: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    Uint32 color = SDL_MapRGBA(format_details, NULL, 255, 255, 255, 25);
+
+    status = SDL_FillSurfaceRect(surface, NULL, color);
+    if (status == 0) {
+        SDL_DestroySurface(surface);
+        SDL_Log("SDL_FillSurfaceRect error: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(game->renderer, surface);
+    if (texture == NULL) {
+        SDL_DestroySurface(surface);
+        SDL_Log("SDL_CreateTextureFromSurface error: %s\n", SDL_GetError());
+        return 0;
+    }
+
+
+    for (int i = 0; i < 4; i++) {
+        status = SDL_RenderTexture(game->renderer, texture, NULL, &frect);
+        if (status == 0) {
+            SDL_DestroySurface(surface);
+            SDL_DestroyTexture(texture);
+            SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
+            return 0;
+        }
+        frect.y = frect.y + 3 * game->field.card_padding_height;
+    }
+
+    SDL_DestroyTexture(texture);
+    SDL_DestroySurface(surface);
+    return 1;
+}
+
+int
+render_counting_time(GAME *game) {
     // Rendering timer in seconds
     int status;
-    int text_width, text_height;
     int width, height;
     width = game->field.screen_width;
     height = game->field.screen_height;
+
     char timer[20];
+    int text_width, text_height;
     snprintf(timer, 20, "seconds: %d", game->timer->time_elapsed);
     status = get_text_size(
         game->font,
@@ -203,6 +287,13 @@ gameplay_render(GAME* game) {
     status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
     if (status == 0) {
         SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
+        push_user_event(SDL_EVENT_QUIT, 0);
+        return 0;
+    }
+
+    status = render_fly_notaions(game);
+    if (status == 0) {
+        SDL_Log("render_fly_notaions failed... \n");
         push_user_event(SDL_EVENT_QUIT, 0);
         return 0;
     }
@@ -315,32 +406,6 @@ gameplay_render(GAME* game) {
                         return 0;
                     }
             }
-            if (j % 3 == 0) {
-                char buff[12];
-                sprintf(buff, "%d", j);
-                status = get_text_size(
-                    game->font,
-                    buff,
-                    game->field.text_font,
-                    &text_width,
-                    &text_height
-                );
-                if (status == 0) {
-                    SDL_Log("get_text_size error...\n");
-                    return 0;
-                }
-                status = render_text(
-                    game->font,
-                    game->renderer,
-                    buff,
-                    game->field.text_font,
-                    &(SDL_Point){
-                        .x = card->frame->x + (game->field.card_width - text_width) / 2,
-                        .y = card->frame->y
-                    },
-                    &trensparent_green_color
-                );
-            }
             j++;
         }
         if (game->cursor->pos->col == i &&
@@ -353,6 +418,11 @@ gameplay_render(GAME* game) {
         }
     }
 
+    status = render_counting_time(game);
+    if (status == 0) {
+        SDL_Log("render_counting_time failed");
+        return 0;
+    }
 
     status = SDL_RenderPresent(game->renderer);
     if (status == 0) {
