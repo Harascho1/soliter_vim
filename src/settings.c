@@ -5,9 +5,10 @@
 
 #include "game.h"
 
-static char* normal_mode = "NORMAL mode:\n\nW-A-S-D/ARROWS for moving cursor;\nSPACE/ENTER for selecting and placing a card;\nESC is for exiting a game";
-static char* fly_mode = "FLY mode:\n\nUse your numbers to jump to the card. For an example:\nby typing 32 you will jump to 2nd card in the 3rd column.\nFirst number is column number and second is card in that column.\nIf you have more than 9 card in column you will type\n[column]00 for 10th card [column]01 for 11th card and so on.\nSPACE/ENTER for selecting and placing card.\nQ - Drawing cards from a deck.\nTAB - JUMP to the drawn card press.";
-static char* universal_rule = "Going to the NORMAL mode is by pressing X\nGoint to the FLY mode is by pressing C";
+//TODO ubaci u assets direktoriju .txt fajl koji uzima sav ovaj tekst
+static char* normal_mode = "NORMAL mode:\n\nW-A-S-D/ARROWS - moving cursor;\nSPACE/ENTER - selecting and placing a card;\nESC - exiting a game";
+static char* fly_mode = "FLY mode:\n\nUse numbers to jump to the card. For an example:\nby typing 32 you will jump to 2nd card in the 3rd column.\nFirst number is column number and second is card in that column.\nIf you have more than 9 card in column you will type\n[column]00 for 10th card [column]01 for 11th card and so on.\nSPACE/ENTER - selecting and placing card.\nQ - Drawing cards from a deck.\nTAB - JUMP to the drawn card press.";
+static char* universal_rule = "X - move to NORMAL mode\nC - move to FLY mode";
 static int width, height;
 
 int

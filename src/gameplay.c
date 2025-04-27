@@ -85,7 +85,6 @@ reveal_card_below(GAME *game) {
 
 int
 selected_card(DECK *deck, CARD **selected_cards) {
-    
     int count = 0;
     for (int i = 0; i < 52; i++) {
         if (deck->cards[i].selected == selected) {

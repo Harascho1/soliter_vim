@@ -141,6 +141,71 @@ sorted_card_render(GAME *game) {
 }
 
 int
+render_name_textbox(GAME *game) {
+    int status;
+    int height_indent, width_indent;
+
+    int width = game->field.screen_width;
+    int height = game->field.screen_height;
+
+
+    int rect_width = game->field.name_textbox_width;
+    int rect_height = game->field.name_textbox_height;
+
+    height_indent = (height - rect_height) / 2;
+    width_indent = game->field.gameplay_screen_padding_width;
+
+    SDL_FRect rect = {
+        .x = width_indent,
+        .y = height_indent,
+        .w = rect_width,
+        .h = rect_height
+    };
+
+    SDL_Surface *surface = SDL_CreateSurface(rect_width, rect_height, SDL_PIXELFORMAT_RGBA32);
+    if (surface == NULL) {
+        SDL_Log("SDL_CreateSurface error: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    const SDL_PixelFormatDetails *format_details = SDL_GetPixelFormatDetails(surface->format);
+    if (format_details == NULL) {
+        SDL_DestroySurface(surface);
+        SDL_Log("SDL_GetPixelFormatDetails error: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    Uint32 color = SDL_MapRGBA(format_details, NULL, 255, 255, 255, 255);
+
+    status = SDL_FillSurfaceRect(surface, NULL, color);
+    if (status == 0) {
+        SDL_DestroySurface(surface);
+        SDL_Log("SDL_FillSurfaceRect error: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(game->renderer, surface);
+    if (texture == NULL) {
+        SDL_DestroySurface(surface);
+        SDL_Log("SDL_CreateTextureFromSurface error: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    status = SDL_RenderTexture(game->renderer, texture, NULL, &rect);
+    if (status == 0) {
+        SDL_DestroySurface(surface);
+        SDL_DestroyTexture(texture);
+        SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
+        return 0;
+    }
+
+    SDL_DestroyTexture(texture);
+    SDL_DestroySurface(surface);
+    return 1;
+    return 1;
+}
+
+int
 render_fly_notaions(GAME *game) {
     if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
         return 1;
@@ -416,6 +481,13 @@ gameplay_render(GAME* game) {
                     return 0;
                 }
         }
+    }
+
+    //TODO Kad ubacim lazy load valjda mu nece biti toliko tesko da loaduje
+    //status = render_name_textbox(game);
+    if (status == 0) {
+        SDL_Log("render_name_textbox failed");
+        return 0;
     }
 
     status = render_counting_time(game);

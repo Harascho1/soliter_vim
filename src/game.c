@@ -99,8 +99,6 @@ reload_window(GAME *game) {
     }
     SDL_SyncWindow(game->window);
 
-    SDL_Delay(20);
-
     int w, h;
     status = SDL_GetWindowSizeInPixels(game->window, &w, &h);
 
@@ -136,8 +134,6 @@ game_init(GAME* game, const char *title, const RESOLUTION *res) {
     if (status == 0) {
         SDL_Log("fullscreen is not set\n");
     }
-
-    SDL_SyncWindow(game->window);
 
     game->font = create_font(
         "assets/font.ttf"

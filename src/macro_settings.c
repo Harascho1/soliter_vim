@@ -185,7 +185,7 @@ macro_settings_render(GAME *game) {
     int text_width, text_height;
     status = get_text_size(
         game->font,
-        "shift",
+        "ht shift", // right indent for smth long like: right shift, right ctrl, left ctrl...
         game->field.item_font,
         &text_width,
         &text_height

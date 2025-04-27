@@ -5,7 +5,7 @@ load_field(FIELD *field, int screen_width, int screen_height, FONT *font) {
     field->screen_height = screen_height;
     field->screen_width = screen_width;
 
-    float screen_width_height_ratio = screen_width / screen_height;
+    float screen_width_height_ratio = (float) screen_width / screen_height;
 
     float card_width_height_ratio = 7/5.0f;
     field->card_padding_width = screen_height / 30;
@@ -17,6 +17,9 @@ load_field(FIELD *field, int screen_width, int screen_height, FONT *font) {
     field->card_width = (screen_width - 6 * field->card_padding_width - field->gameplay_screen_padding_width * 2) / 7;
     field->card_height = field->card_width * card_width_height_ratio;
     field->cursor_padding = field->card_padding_width / 4;
+
+    field->name_textbox_width = screen_width - 2 * (field->gameplay_screen_padding_width);
+    field->name_textbox_height = field->name_textbox_width / 7;
 
     int tmp_text_height;
     int tmp_text_width;

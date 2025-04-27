@@ -8,13 +8,18 @@ typedef struct _FIELD {
     int screen_height;
     int screen_padding;
     int square_screen_padding_width;
+
     int gameplay_screen_padding_width;
     int gameplay_screen_padding_height;
+
+    int name_textbox_width;
+    int name_textbox_height;
 
     int card_padding_width;
     int card_padding_height;
     int card_width;
     int card_height;
+
     int cursor_padding;
 
     int title_font;

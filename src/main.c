@@ -1,5 +1,6 @@
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_oldnames.h"
+#include "SDL3_mixer/SDL_mixer.h"
 #include "game.h"
 
 static GAME_STATE g_current_game_state = game_state_main_menu;
@@ -37,7 +38,6 @@ is_period_pass(int period, int last_update_time) {
     if ((current_time - last_update_time) >= period) {
        return 1;
     }
-    
     return 0;
 }
 
@@ -69,6 +69,7 @@ sld_init() {
 void cleanup() {
     SDL_QuitSubSystem(SDL_INIT_EVENTS);
     TTF_Quit();
+    Mix_Quit();
     SDL_Quit();
 }
 
