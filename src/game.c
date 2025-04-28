@@ -1,6 +1,8 @@
 #include "game.h"
+#include "SDL3/SDL_audio.h"
 #include "SDL3/SDL_error.h"
 #include "SDL3/SDL_video.h"
+#include "SDL3_mixer/SDL_mixer.h"
 #include "config.h"
 #include "field.h"
 #include "texture.h"
@@ -218,6 +220,27 @@ game_init(GAME* game, const char *title, const RESOLUTION *res) {
         return status;
     }
 
+    SDL_AudioDeviceID devid;
+    SDL_AudioSpec spec;
+    SDL_memset(&spec, 0, sizeof(spec));
+    spec.format = SDL_AUDIO_F32;
+    spec.channels = 2;
+    spec.freq = 48000;
+
+    devid = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec);
+    if (devid == 0) {
+        SDL_Log("SDL_OpenAudioDevice failed: %s\n", SDL_GetError());
+        game_quit(game);
+        return status;
+    }
+
+    game->click_sound = Mix_LoadWAV("assets/sounds/sound.wav");
+    if (game->click_sound == NULL) {
+        SDL_Log("Mix_LoadWAV failed: %s\n", SDL_GetError());
+        game_quit(game);
+        return 0;
+    }
+
     Uint32 event_type = SDL_RegisterEvents(1);
     if (event_type == (Uint32) - 1) {
         SDL_Log("SDL_RegisterEvents failed: %s\n", SDL_GetError());
@@ -233,6 +256,9 @@ game_init(GAME* game, const char *title, const RESOLUTION *res) {
 }
 
 void game_quit(GAME* game) {
+    if (game->click_sound != NULL) {
+        Mix_FreeChunk(game->click_sound);
+    }
     if (game->renderer != NULL) {
         SDL_DestroyRenderer(game->renderer);
     }

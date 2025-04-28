@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "SDL3_mixer/SDL_mixer.h"
 #include "menu.h"
 #include "font.h"
 #include "card.h"
@@ -36,6 +37,7 @@ typedef struct _GAME{
     FONT            *font;
     SDL_Texture     *background_texture;
     SDL_Texture     *menu_texture;
+    Mix_Chunk       *click_sound;
     DECK            *deck;
     FIELD           field;
     CURSOR          *cursor;

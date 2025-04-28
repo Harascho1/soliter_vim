@@ -1,4 +1,5 @@
 #include "SDL3/SDL_events.h"
+#include "SDL3/SDL_init.h"
 #include "SDL3/SDL_oldnames.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "game.h"
@@ -52,6 +53,12 @@ sld_init() {
     }
 
     status = SDL_Init(SDL_INIT_VIDEO);
+    if (status == 0) {
+        SDL_Log("SDL_Init failed: %s\n", SDL_GetError());
+        return status;
+    }
+
+    status = SDL_InitSubSystem(SDL_INIT_AUDIO);
     if (status == 0) {
         SDL_Log("SDL_Init failed: %s\n", SDL_GetError());
         return status;
