@@ -1,5 +1,9 @@
+#include "main_menu.h"
 #include "SDL3/SDL_events.h"
+#include "SDL3_mixer/SDL_mixer.h"
+#include "font.h"
 #include "game.h"
+#include "sound.h"
 #include "texture.h"
 #include "my_timer.h"
 
@@ -7,6 +11,32 @@ static const char *title = "SoVIMter";
 static SDL_Color white_color = {255, 255, 255, 255};
 static SDL_Color title_color = {23, 150, 52, 255};
 static SDL_Color green_color = {120, 255, 120, 255};
+
+int
+lazy_load_main_menu(GAME *game) {
+    int size;
+    size = game->field.title_font;
+    game_title = get_texture_from_text(game->font, game->renderer, title, size, &title_color);
+    if (game_title == NULL) {
+        SDL_Log("game_title cannot be initiazlied...");
+        return 0;
+    }
+    for (int i = 0; i < 4; i++) {
+        menu_items[i] = get_texture_from_text(game->font, game->renderer, title, size, &title_color);
+        if (menu_items[i] == NULL) {
+            SDL_Log("menu_items[%d] cannot be initiazlied...", i);
+            return 0;
+        }
+    }
+    for (int i = 0; i < 4; i++) {
+        hover_menu_items[i] = get_texture_from_text(game->font, game->renderer, title, size, &title_color);
+        if (hover_menu_items[i] == NULL) {
+            SDL_Log("hover_menu_items[%d] cannot be initiazlied...", i);
+            return 0;
+        }
+    }
+    return 1;
+}
 
 int
 main_menu_event_handler(GAME *game, const SDL_Event *event) {
@@ -28,6 +58,8 @@ main_menu_event_handler(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_RETURN:
             case SDLK_SPACE:
+                play_sound(game->soundboard, 0);
+                SDL_Delay(200);
                 switch (game->main_menu->items[game->main_menu->selected_item].type) {
                     case menu_item_type_play:
                         run_a_game(game);
@@ -69,7 +101,6 @@ main_menu_update(GAME* game) {
 int
 main_menu_render(GAME* game) {
     int status;
-        
     if (game == NULL) {
         SDL_Log("game is NULL\n");
         return 0;
@@ -90,7 +121,7 @@ main_menu_render(GAME* game) {
     }
 
     status = SDL_RenderClear(game->renderer);
-   if (status == 0) {
+    if (status == 0) {
         SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
         return 0;
     }

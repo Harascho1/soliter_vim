@@ -6,6 +6,7 @@
 #include "font.h"
 #include "card.h"
 #include "cursor.h"
+#include "sound.h"
 #include "texture.h"
 #include "my_timer.h"
 #include "field.h"
@@ -37,7 +38,7 @@ typedef struct _GAME{
     FONT            *font;
     SDL_Texture     *background_texture;
     SDL_Texture     *menu_texture;
-    Mix_Chunk       *click_sound;
+    SOUNDBOARD      *soundboard;
     DECK            *deck;
     FIELD           field;
     CURSOR          *cursor;
