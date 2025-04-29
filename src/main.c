@@ -1,8 +1,10 @@
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
+#include "SDL3/SDL_log.h"
 #include "SDL3/SDL_oldnames.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "game.h"
+#include "main_menu.h"
 
 static GAME_STATE g_current_game_state = game_state_main_menu;
 
@@ -99,6 +101,8 @@ int main() {
 
     SDL_Event event;
     int last_frame_time = 0;
+
+    g_game_scenes[0]->lazy_load(&game);
     while (1) {
         if (SDL_WaitEvent(&event)) {
             if (event.type == SDL_EVENT_PRIVATE0) {
@@ -106,9 +110,15 @@ int main() {
                 continue;
             }
             if (event.type == SDL_EVENT_QUIT) {
+                g_game_scenes[g_current_game_state]->lazy_destroy();
+                SDL_Log("Obrisao sam main_menu\n");
                 break;
             } else if (event.type == g_change_scene_event_type) {
+
+                g_game_scenes[g_current_game_state]->lazy_destroy();
+                SDL_Log("Obrisao sam main_menu\n");
                 g_current_game_state = event.user.code;
+                g_game_scenes[g_current_game_state]->lazy_load(&game);
                 g_game_scenes[g_current_game_state]->update(&game);
                 g_game_scenes[g_current_game_state]->render(&game);
             }

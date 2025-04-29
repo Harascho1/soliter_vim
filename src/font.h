@@ -14,5 +14,6 @@ int set_font_size(FONT *font, int size);
 int render_text(FONT *font, SDL_Renderer *render, const char *text, int size, SDL_Point *point, SDL_Color *color);
 int render_wrapped_text(FONT *font, SDL_Renderer *render, const char *text, int size, SDL_Point *point, SDL_Color *color);
 SDL_Texture* get_texture_from_text(FONT *font, SDL_Renderer *render, const char* text, int size, SDL_Color *color);
+int render_text_(SDL_Renderer *render, SDL_Texture *texture, SDL_Point *point);
 
 #endif // FONT_H

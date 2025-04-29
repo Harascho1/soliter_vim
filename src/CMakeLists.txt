@@ -6,6 +6,7 @@ set(HEADER_FILES
     ${CMAKE_SOURCE_DIR}/src/sound.h
     ${CMAKE_SOURCE_DIR}/src/field.h
     ${CMAKE_SOURCE_DIR}/src/menu.h
+    ${CMAKE_SOURCE_DIR}/src/main_menu.h
     ${CMAKE_SOURCE_DIR}/src/config.h
     ${CMAKE_SOURCE_DIR}/src/cursor.h
     ${CMAKE_SOURCE_DIR}/src/font.h

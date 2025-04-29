@@ -234,7 +234,6 @@ setting_render(GAME *game) {
         SDL_Log("background is NULL\n");
         return 0;
     }
-
     status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
     if (status == 0) {
         SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
@@ -256,8 +255,12 @@ setting_render(GAME *game) {
     return status;
 }
 
+
+
 SCENE setting_scene = {
     .handle_events = setting_event_handler,
     .update = setting_update,
-    .render = setting_render 
+    .render = setting_render,
+    .lazy_load = NULL,
+    .lazy_destroy = NULL,
 };

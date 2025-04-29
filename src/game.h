@@ -53,11 +53,15 @@ typedef struct _RESOULUTION {
 typedef int (*scene_handle_events_t)(GAME* game, const SDL_Event *event);
 typedef int (*scene_update_t)(GAME *game);
 typedef int (*scene_render_t)(GAME *game);
+typedef int (*lazy_load_t)(GAME *game);
+typedef void (*lazy_destroy_t)();
 
 typedef struct _SCENE {
     scene_handle_events_t handle_events;
     scene_update_t update;
     scene_render_t render;
+    lazy_load_t lazy_load;
+    lazy_destroy_t lazy_destroy;
 } SCENE;
 
 extern SCENE main_menu_scene;
