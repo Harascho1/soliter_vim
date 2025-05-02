@@ -3,9 +3,21 @@
 
 #include "SDL3/SDL_audio.h"
 #include "SDL3_mixer/SDL_mixer.h"
+
+enum {
+    click_sound = 0,
+    select_card_sound,
+    draw_card_sound,
+    blip_select_sound,
+    sort_card_sound,
+    place_card_sound,
+    move_sound
+};
+
 typedef struct _SOUNDBOARD {
     Mix_Chunk **sounds;
     int lenght;
+    int count;
     SDL_AudioDeviceID devid;
     pthread_t thread;
 } SOUNDBOARD;

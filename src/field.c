@@ -2,6 +2,11 @@
 
 int
 load_field(FIELD *field, int screen_width, int screen_height, FONT *font) {
+    SDL_Log(
+        "width: %d & height: %d",
+        screen_width,
+        screen_height
+    );
     field->screen_height = screen_height;
     field->screen_width = screen_width;
 

@@ -1,7 +1,10 @@
 #include "gameplay.h"
+#include "SDL3/SDL_log.h"
 #include "card.h"
+#include "cursor.h"
 #include "game.h"
-#include "texture.h"
+#include "my_timer.h"
+#include "sound.h"
 #include <pthread.h>
 
 char buffer[10] = "";
@@ -76,7 +79,6 @@ reveal_card_below(GAME *game) {
         if (last_card_visible == 0) {
             card = find_card(game->deck, i, j);
             card->visible = visible;
-            return 1;
         } 
     }
 
@@ -182,6 +184,7 @@ place_a_card(GAME *game) {
 
     if (same_card_selected(card, *s_card) == 1 && num_of_selected_cards == 1) {
         if (same_card_selected(card, game->deck->deck_card)) {
+            play_sound(game->soundboard, draw_card_sound);
             CARD *next_card = draw_next_card(game->deck);
             if (next_card == NULL) {
             }
@@ -191,6 +194,9 @@ place_a_card(GAME *game) {
 
         }
         game_update = sort_a_card(*s_card, game->deck);
+        if (game_update == 1) {
+            play_sound(game->soundboard, sort_card_sound);
+        }
 
         CARD *top_card = view_top_card_in_queue(game->deck->new_cards);
         if (same_card_selected(*s_card, top_card) && game_update == 1) {
@@ -225,7 +231,7 @@ place_a_card(GAME *game) {
         deselect_all_cards(game->deck);
         return 0;
     }
-
+    play_sound(game->soundboard, place_card_sound);
     int col_of_cursor = game->cursor->pos->col;
     int row_of_cursor = game->cursor->pos->row;
     int x_card_pos = card->frame->x;
@@ -269,6 +275,7 @@ select_a_card(GAME *game) {
             draw_next_card(game->deck);
             return 1;
         }
+        play_sound(game->soundboard, blip_select_sound);
         return 0;
     }
     if (same_card_selected(card, game->deck->deck_card)) {
@@ -319,6 +326,105 @@ change_cursor_frame(GAME *game) {
 }
 
 int
+auto_sortable(CARD *card, CARD** sorted_cards) {
+
+    int card_suit = card->suit;
+
+    if (card->value == 1) return 1;
+
+    if (card->value == 2) {
+        CARD *card_same_suit = NULL;
+        for (int i = 0; i < 4; ++i) {
+            if (sorted_cards[i] == NULL) {
+                continue;
+            }
+            if (card_suit == sorted_cards[i]->suit) {
+                card_same_suit = sorted_cards[i];
+                break;
+            }
+        }
+        if (card_same_suit == NULL) {
+            return 0;
+        }
+        if (card_same_suit->value == 1) {
+            return 1;
+        }
+    }
+
+    //potentional buggy
+    if (card->value >= 3 && card->value < 14) {
+        CARD *card_other_suit[2];
+        int other_suits = (card_suit + 2) % 4;
+        if (card_suit % 2 == 1) {
+            other_suits--;
+        }
+        SDL_Log("card suit is %d", card_suit);
+        SDL_Log("other suit is %d", other_suits);
+        int count = 0;
+        for (int i = 0; i < 4; ++i) {
+            SDL_Log("prolazim %d-ti put\n", i);
+            if (sorted_cards[i] == NULL) {
+                continue;
+            }
+            SDL_Log("nije NULL\n");
+
+            SDL_Log("%d-ti suit\n", sorted_cards[i]->suit);
+            if ((other_suits == sorted_cards[i]->suit) ||
+                (other_suits + 1 == sorted_cards[i]->suit)) {
+                SDL_Log("Proso if statement\n");
+                card_other_suit[count++] = sorted_cards[i];
+            }
+        }
+        SDL_Log("count is %d", count);
+        if (count != 2) {
+            return 0;
+        }
+        SDL_Log("card is %d, and suit is %d\n\n\n", card->value, card->suit);
+        for (int i = 0; i < count; ++i) {
+            SDL_Log("card is %d, and suit is %d\n\n\n", card_other_suit[i]->value, card_other_suit[i]->suit);
+            if (card_other_suit[i]->value + 1 != card->value &&
+                card->value > card_other_suit[i]->value) {
+                return 0;
+            }
+        }
+        SDL_Log("Ja sam stigao ovde");
+        return 1;
+    }
+    return 0;
+}
+
+
+int
+auto_solve(GAME *game) {
+    if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
+        return 1;
+    }
+
+    DECK *deck = game->deck;
+    for (int i = 1; i <= number_of_cards_in_row; ++i) {
+        int j = 1;
+        CARD *card;
+        do {
+            card = find_card(deck, i, j);
+            if (card == NULL) {
+                break;
+            }
+            if (find_card(deck, i, j+1)) {
+                ++j;
+                continue;
+            }
+            if (card->visible == visible) {
+                if (auto_sortable(card, deck->sorted_cards)) {
+                    game_update |= sort_a_card(card, deck);
+                }
+            }
+            ++j;
+        } while (card != NULL);
+    }
+    return 1;
+}
+
+int
 go_to_invisible_card(GAME *game, int col) {
     game->cursor->pos->col = col;
     game->cursor->cursor->x = g_invisible_card[col - 1].frame->x - game->field.cursor_padding;
@@ -328,10 +434,15 @@ go_to_invisible_card(GAME *game, int col) {
 
 int
 interact(GAME *game) {
+    int status;
     if (game->cursor->mode % 2 == 0) {
+        play_sound(game->soundboard, select_card_sound);
         select_a_card(game);
     } else if (game->cursor->mode % 2 == 1) {
-        place_a_card(game);
+        status = place_a_card(game);
+        if (status == 0) {
+            play_sound(game->soundboard, blip_select_sound);
+        }
     }
     return 1;
 }
@@ -339,9 +450,8 @@ interact(GAME *game) {
 int
 gameplay_update(GAME* game) {
     int status;
-    if (game->timer->start_timer == 0) {
-        start_timer(game->timer);
-    }
+
+    auto_solve(game);
 
     if (game_update == 1) {
         status = reveal_card_below(game);
@@ -349,9 +459,11 @@ gameplay_update(GAME* game) {
             game_update = 0;
         }
     }
-
+    if (have_number_hover(game->cursor) == 0) {
+        buffer[0] = '\0';
+    }
     int count = 0;
-    for (int i = suit_clubs; i <= suit_spades; i++) {
+    for (int i = 0; i < 4; i++) {
         if (game->deck->sorted_cards[i] == NULL) {
             break;
         }
@@ -362,13 +474,8 @@ gameplay_update(GAME* game) {
 
     if (count == 4) {
         g_game_win = 1;
-        push_user_event(g_change_scene_event_type, game_state_game_over);
+        stop_timer(game->timer);
     }
-
-    if (have_number_hover(game->cursor) == 0) {
-        strcpy(buffer, "");
-    }
-
     if (game->timer->time_elapsed >= 3600) {
         g_game_win = 0;
         push_user_event(g_change_scene_event_type, game_state_game_over);
@@ -377,9 +484,10 @@ gameplay_update(GAME* game) {
     return 1;
 }
 
-
 SCENE gameplay_scene = {
     .handle_events = gamaplay_event_handler,
     .update = gameplay_update,
-    .render = gameplay_render
+    .render = gameplay_render,
+    .lazy_load = gameplay_lazy_load,
+    .lazy_destroy = gameplay_lazy_destroy
 };

@@ -3,10 +3,13 @@ cmake_minimum_required(VERSION 3.20)
 set(ASSETS_PATH ${PROJECT_SOURCE_DIR}/assets)
 
 set(HEADER_FILES
+    ${CMAKE_SOURCE_DIR}/src/textbox.h
     ${CMAKE_SOURCE_DIR}/src/sound.h
     ${CMAKE_SOURCE_DIR}/src/field.h
     ${CMAKE_SOURCE_DIR}/src/menu.h
-    ${CMAKE_SOURCE_DIR}/src/main_menu.h
+    ${CMAKE_SOURCE_DIR}/src/settings.h
+    ${CMAKE_SOURCE_DIR}/src/option_settings.h
+    ${CMAKE_SOURCE_DIR}/src/macro_settings.h
     ${CMAKE_SOURCE_DIR}/src/config.h
     ${CMAKE_SOURCE_DIR}/src/cursor.h
     ${CMAKE_SOURCE_DIR}/src/font.h
@@ -17,6 +20,7 @@ set(HEADER_FILES
 )
 
 file(GLOB_RECURSE soliter_src 
+    ${CMAKE_SOURCE_DIR}/src/textbox.c
     ${CMAKE_SOURCE_DIR}/src/sound.c
     ${CMAKE_SOURCE_DIR}/src/field.c
     ${CMAKE_SOURCE_DIR}/src/option_settings.c
@@ -26,6 +30,7 @@ file(GLOB_RECURSE soliter_src
     ${CMAKE_SOURCE_DIR}/src/cursor.c
     ${CMAKE_SOURCE_DIR}/src/texture.c
     ${CMAKE_SOURCE_DIR}/src/main_menu.c
+    ${CMAKE_SOURCE_DIR}/src/scores.c
     ${CMAKE_SOURCE_DIR}/src/gameplay_event.c
     ${CMAKE_SOURCE_DIR}/src/gameplay_render.c
     ${CMAKE_SOURCE_DIR}/src/gameplay.c

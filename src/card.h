@@ -16,9 +16,9 @@ enum {
 
 typedef enum _SUIT {
     suit_clubs,
+    suit_spades,
     suit_diamonds,
-    suit_hearts,
-    suit_spades
+    suit_hearts
 } SUIT;
 
 typedef enum _VALUE {

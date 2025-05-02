@@ -1,12 +1,173 @@
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_log.h"
+#include "SDL3/SDL_render.h"
 #include "config.h"
 #include "game.h"
+#include "macro_settings.h"
 
 static int selected_index = 0;
 static SDL_Color white_color = {255, 255, 255, 255};
 static SDL_Color green_color = {150, 255, 150, 255};
 static int event_status = 0;
+
+static char* text[14] = {
+    "number 0",
+    "number 1",
+    "number 2",
+    "number 3",
+    "number 4",
+    "number 5",
+    "number 6",
+    "number 7",
+    "number 8",
+    "number 9",
+    "go to normal mode",
+    "select drawn card",
+    "draw next card",
+    "select card/cards"
+};
+
+static const char* press_key = "Press key to bind";
+static char title[] = "Macro";
+
+SDL_Texture *tex_hover_items[14];
+SDL_Texture *tex_items[14];
+SDL_Texture *tex_hover_command_keys[14];
+SDL_Texture *tex_command_keys[14];
+SDL_Texture *tex_title_menu;
+SDL_Texture *tex_pop_out;
+
+int
+lazy_load_config(GAME *game) {
+    for (int i = 0; i < 14; i++) {
+        SDL_DestroyTexture(tex_command_keys[i]);
+        SDL_DestroyTexture(tex_hover_command_keys[i]);
+    }
+
+    int size;
+    for (int i = 0; i < 14; i++) {
+        size = game->field.item_font;
+        tex_command_keys[i] = get_texture_from_text(
+            game->font,
+            game->renderer,
+            commands_keys[i],
+            size,
+            &white_color
+        );
+        if (tex_items[i] == NULL) {
+            SDL_Log("items[%d]  cannot be initiazlied...", i);
+            return 0;
+        }
+        size = game->field.hover_item_font;
+        tex_hover_command_keys[i] = get_texture_from_text(
+            game->font,
+            game->renderer,
+            commands_keys[i],
+            size,
+            &green_color
+        );
+        if (tex_command_keys[i] == NULL) {
+            SDL_Log("tex_command_keys[%d]  cannot be initiazlied...", i);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int
+macro_setting_menu_lazy_load(GAME *game) {
+    int size;
+
+    size = game->field.title_font;
+    tex_title_menu = get_texture_from_text(
+        game->font,
+        game->renderer,
+        title,
+        size,
+        &white_color
+    );
+    if (tex_title_menu == NULL) {
+        SDL_Log("title_menu cannot be initiazlied...");
+        return 0;
+    }
+
+    tex_pop_out = get_texture_from_text(
+        game->font,
+        game->renderer,
+        press_key,
+        size,
+        &white_color
+    );
+    if (tex_pop_out == NULL) {
+        SDL_Log("tex_pop_out cannot be initiazlied...");
+        return 0;
+    }
+
+    size = game->field.item_font;
+    for (int i = 0; i < 14; i++) {
+        tex_items[i] = get_texture_from_text(
+            game->font,
+            game->renderer,
+            text[i],
+            size,
+            &white_color
+        );
+        if (tex_items[i] == NULL) {
+            SDL_Log("items[%d]  cannot be initiazlied...", i);
+            return 0;
+        }
+        tex_command_keys[i] = get_texture_from_text(
+            game->font,
+            game->renderer,
+            commands_keys[i],
+            size,
+            &white_color
+        );
+        if (tex_command_keys[i] == NULL) {
+            SDL_Log("tex_command_keys[%d]  cannot be initiazlied...", i);
+            return 0;
+        }
+    }
+
+    size = game->field.hover_item_font;
+    for (int i = 0; i < 14; i++) {
+        tex_hover_items[i] = get_texture_from_text(
+            game->font,
+            game->renderer,
+            text[i],
+            size,
+            &green_color
+        );
+        if (tex_hover_items[i] == NULL) {
+            SDL_Log("hover_items[%d]  cannot be initiazlied...", i);
+            return 0;
+        }
+        tex_hover_command_keys[i] = get_texture_from_text(
+            game->font,
+            game->renderer,
+            commands_keys[i],
+            size,
+            &green_color
+        );
+        if (tex_hover_command_keys[i] == NULL) {
+            SDL_Log("tex_hover_command_keys[%d]  cannot be initiazlied...", i);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+void
+macro_settings_menu_lazy_destroy() {
+    SDL_DestroyTexture(tex_title_menu);
+    SDL_DestroyTexture(tex_pop_out);
+    for (int i = 0; i < 14; i++) {
+        SDL_DestroyTexture(tex_items[i]);
+        SDL_DestroyTexture(tex_command_keys[i]);
+        SDL_DestroyTexture(tex_hover_items[i]);
+        SDL_DestroyTexture(tex_hover_command_keys[i]);
+    }
+}
 
 int
 macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
@@ -38,6 +199,8 @@ macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_RETURN:
             case SDLK_SPACE:
+                play_sound(game->soundboard, 0);
+                SDL_Delay(100);
                 event_status = 1;
                 break;
             default:
@@ -46,8 +209,6 @@ macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
     }
     return 1;
 }
-
-static const char* press_key = "Press key to bind";
 
 int
 render_press_key_popout(GAME *game) {
@@ -73,42 +234,31 @@ render_press_key_popout(GAME *game) {
     }
 
     status = render_text(
-        game->font,
         game->renderer,
-        press_key,
-        game->field.title_font,
+        tex_pop_out,
         &(SDL_Point) {
             .x = (width - text_width) / 2,
             .y = (height - text_height) / 2
-        },
-        &white_color
+        }
     );
     return status;
 }
 
+static int flag = 0;
 int
 macro_settings_update(GAME *game) {
+    if (event_status == 1) {
+        flag = 1;
+    }
+    if (event_status == 0 && flag == 1) {
+        int status = lazy_load_config(game);
+        if (status == 0) {
+            SDL_Log("lazy_load_config\n");
+            return 0;
+        }
+    }
     return 1;
 }
-
-static char* text[14] = {
-    "switch to normal mode",
-    "selecting drawn card",
-    "number 1",
-    "number 2",
-    "number 3",
-    "num 4",
-    "num 5",
-    "num 6",
-    "num 7",
-    "num 8",
-    "num 9",
-    "num 0",
-    "draw next card",
-    "select card/cards"
-};
-
-static char title[] = "Macro";
 
 int
 macro_settings_render(GAME *game) {
@@ -166,15 +316,12 @@ macro_settings_render(GAME *game) {
     }
 
     status = render_text(
-        game->font,
         game->renderer,
-        title,
-        game->field.title_font,
+        tex_title_menu,
         &(SDL_Point){
             .x = (width - title_width) / 2,
             .y = game->field.screen_padding
-        },
-        &white_color
+        }
     );
     if (status == 0) {
         SDL_Log("render_text error...\n");
@@ -229,31 +376,40 @@ macro_settings_render(GAME *game) {
             commands_y_pos = y_pos;
         }
 
+        SDL_Texture * item;
+
+        if (selected_index == i) {
+            item = tex_hover_items[i];
+        } else {
+            item = tex_items[i];
+        }
+
         status = render_text(
-            game->font,
             game->renderer,
-            text[i],
-            font,
+            item,
             &(SDL_Point) {
                 .x = text_x_pos,
                 .y = commands_y_pos
-            },
-            &white_color
+            }
         );
         if (status == 0) {
             SDL_Log("render_text error...\n");
         }
 
+        SDL_Texture *key;
+        if (selected_index == i) {
+            key = tex_hover_command_keys[i];
+        } else {
+            key = tex_command_keys[i];
+        }
+
         status = render_text(
-            game->font,
             game->renderer,
-            commands_keys[i],
-            font,
+            key,
             &(SDL_Point) {
                 .x = commands_x_pos - text_width / 2,
                 .y = commands_y_pos
-            },
-            color
+            }
         );
         if (status == 0) {
             SDL_Log("render_text error...\n");
@@ -283,5 +439,7 @@ macro_settings_render(GAME *game) {
 SCENE macro_setting_scene = {
     .handle_events = macro_settings_event_hendler,
     .update = macro_settings_update,
-    .render = macro_settings_render
+    .render = macro_settings_render,
+    .lazy_load = macro_setting_menu_lazy_load,
+    .lazy_destroy = macro_settings_menu_lazy_destroy
 };

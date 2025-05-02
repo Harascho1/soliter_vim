@@ -19,6 +19,7 @@ MY_TIMER* create_timer();
 void destroy_timer(MY_TIMER *timer);
 int reset_timer(MY_TIMER *timer);
 int start_timer(MY_TIMER *timer);
+int stop_timer(MY_TIMER *timer);
 void* count_down(void *timer);
 
 #endif

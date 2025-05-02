@@ -1,9 +1,11 @@
-// TODO moze da izabere da li hoce auto_sort da ukljuci
-// TODO da promeni rezoluciju
-// TODO SMANJI MOGUCU MUZIKU
-// TODO mozes da menjas karte
-
+#include "SDL3/SDL_render.h"
 #include "game.h"
+
+static SDL_Color green_color = {150, 255, 150, 255};
+static SDL_Color white_color = {255, 255, 255, 255};
+
+SDL_Texture *tex_settings_menu_items[3];
+SDL_Texture *tex_hover_settings_menu_items[3];
 
 //TODO ubaci u assets direktoriju .txt fajl koji uzima sav ovaj tekst
 static char* normal_mode = "NORMAL mode:\n\nW-A-S-D/ARROWS - moving cursor;\nSPACE/ENTER - selecting and placing a card;\nESC - exiting a game";
@@ -36,6 +38,8 @@ setting_event_handler(GAME *game, const SDL_Event *event) {
         case SDLK_KP_ENTER:
         case SDLK_SPACE:
         case SDLK_RETURN:
+            play_sound(game->soundboard, 0);
+            SDL_Delay(100);
             switch (game->setting_menu->items[game->setting_menu->selected_item].type) {
                 case settings_item_type_options:
                     push_user_event(g_change_scene_event_type, game_state_option);
@@ -88,7 +92,7 @@ render_guide(GAME *game) {
         &(SDL_Color){255, 255, 255, 255}
     );
     if (status == 0) {
-        SDL_Log("render_text error\n");
+        SDL_Log("render_wrapped_text error\n");
         return 0;
     }
 
@@ -167,25 +171,25 @@ render_guide(GAME *game) {
     for (int i = 0; i < game->setting_menu->count; i++) {
         SDL_Color *color = &not_selected_color;
         SDL_Point* point = &not_selected_point;
+        SDL_Texture *item = tex_settings_menu_items[i];
         int font_size = game->field.item_font;
 
         if (i == game->setting_menu->selected_item) {
             color = &selected_color;
             font_size = game->field.hover_item_font;
             point = &selected_point;
+            item = tex_hover_settings_menu_items[i];
         }
 
         status = render_text(
-            game->font,
             game->renderer,
-            game->setting_menu->items[i].text,
-            font_size,
-            point,
-            color
+            item,
+            point
         );
         if (status == 0) {
             SDL_Log("render_text error...\n");
         }
+
         if (i != game->setting_menu->count - 1) {
             status = get_text_size(
                 game->font,
@@ -255,12 +259,53 @@ setting_render(GAME *game) {
     return status;
 }
 
+int
+setting_lazy_load(GAME *game) {
+    int size;
+    size = game->field.item_font;
+    for (int i = 0; i < 3; i++) {
+        tex_settings_menu_items[i] = get_texture_from_text(
+            game->font, 
+            game->renderer, 
+            game->setting_menu->items[i].text, 
+            size, 
+            &white_color
+        );
+        if (tex_settings_menu_items[i] == NULL) {
+            SDL_Log("menu_items[%d] cannot be initiazlied...", i);
+            return 0;
+        }
+    }
+    size = game->field.hover_item_font;
+    for (int i = 0; i < 3; i++) {
+        tex_hover_settings_menu_items[i] = get_texture_from_text(
+            game->font,
+            game->renderer,
+            game->setting_menu->items[i].text,
+            size,
+            &green_color
+        );
+        if (tex_hover_settings_menu_items[i] == NULL) {
+            SDL_Log("menu_items[%d] cannot be initiazlied...", i);
+            return 0;
+        }
+    }
+    return 1;
+}
 
+
+void
+setting_lazy_destroy() {
+    for (int i = 0; i < 3; i++) {
+        SDL_DestroyTexture(tex_settings_menu_items[i]);
+        SDL_DestroyTexture(tex_hover_settings_menu_items[i]);
+    }
+}
 
 SCENE setting_scene = {
     .handle_events = setting_event_handler,
     .update = setting_update,
     .render = setting_render,
-    .lazy_load = NULL,
-    .lazy_destroy = NULL,
+    .lazy_load = setting_lazy_load,
+    .lazy_destroy = setting_lazy_destroy,
 };

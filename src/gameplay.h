@@ -2,9 +2,14 @@
 #define GAMEPLAY_H
 
 #include "game.h"
+#include "textbox.h"
 
 extern char buffer[10];
 
+extern TEXTBOX *textbox;
+
+int gameplay_lazy_load(GAME *game);
+void gameplay_lazy_destroy();
 int change_cursor_frame(GAME *game);
 CARD* top_deck_card(DECK *deck);
 CARD* next_deck_card(DECK *deck);
@@ -26,6 +31,5 @@ int render_commands(GAME *game);
 int render_cursor(GAME *game);
 int sorted_card_render(GAME *game);
 int gameplay_render(GAME* game);
-
 
 #endif

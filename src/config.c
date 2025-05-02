@@ -48,7 +48,6 @@ insert_command(SDL_Keycode command, int index) {
     int size_of_buffer = strlen(buffer);
     commands_keys[index] = (char*)SDL_realloc(commands_keys[index], sizeof(char) * (size_of_buffer + 1));
     strcpy(commands_keys[index], buffer);
-    //SDL_Log("zamenjena komanda je: %s\n", commands_keys[index]);
 
     return 1;
 }
@@ -102,8 +101,7 @@ create_config_file() {
     }
 
     int arr[14] = {
-        SDLK_X,
-        SDLK_TAB,
+        SDLK_0,
         SDLK_1,
         SDLK_2,
         SDLK_3,
@@ -113,7 +111,8 @@ create_config_file() {
         SDLK_7,
         SDLK_8,
         SDLK_9,
-        SDLK_0,
+        SDLK_X,
+        SDLK_TAB,
         SDLK_Q,
         SDLK_SPACE
     };
@@ -197,6 +196,5 @@ load_config() {
             strcpy(options_set[i], "Off");
         }
     }
-    SDL_Log("Prosao sam");
     return config_commands;
 }

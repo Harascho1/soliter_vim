@@ -31,11 +31,10 @@ set_a_flag(CURSOR *cursor, int flag) {
     if (flag == 0) {
         cursor->mode = cursor->mode & ~1;
     } else {
-
         cursor->mode = cursor->mode & ~flag;
     }
     cursor->mode += flag;
-
+    return 1;
 }
 
 int
@@ -49,6 +48,7 @@ have_a_flag(CURSOR *cursor, int flag) {
 int
 delete_hover_flag(CURSOR *cursor) {
     cursor->mode = cursor->mode % CURSOR_HOVER_1;
+    return 1;
 }
 
 int

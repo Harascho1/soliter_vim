@@ -1,4 +1,5 @@
 #include "card.h"
+#include "SDL3/SDL_log.h"
 #include "texture.h"
 
 int
@@ -69,18 +70,20 @@ shuffle_deck(DECK *deck) {
 
 int
 sort_a_card(CARD *card, DECK *deck) {
-    for (int suit = 0; suit <= suit_spades; suit++) {
+    for (int suit = 0; suit < 4; suit++) {
         if (deck->sorted_cards[suit] == NULL && card->value == 1) {
             card->on_field = 1;
             card->pos->col = suit + 4;
             card->pos->row = 0;
             deck->sorted_cards[suit] = card;
+            SDL_Log("sortirao\n");
             return 1;
         }
         if (deck->sorted_cards[suit] == NULL) {
             return 0;
         }
         if (card->suit == deck->sorted_cards[suit]->suit) {
+            SDL_Log("sortirao\n");
             if (deck->sorted_cards[suit]->value + 1 != card->value) {
                 return 0;
             }
@@ -218,7 +221,7 @@ create_deck(SDL_Renderer *renderer) {
     }
     deck->count = 52;
     int i = 0;
-    for (int suit = suit_clubs; suit <= suit_spades; suit++) {
+    for (int suit = suit_clubs; suit <= suit_hearts; suit++) {
         for (int value = value_ace; value <= value_king; value++) {
             deck->cards[i].suit = suit;
             deck->cards[i].value = value;
@@ -283,7 +286,6 @@ char* find_path(CARD *card) {
     char *path;
     path = SDL_malloc(sizeof(char) * 100);
 
-
     if (card->visible == not_visible) {
         if (card->selected == selected) {
             sprintf(path, "assets/cards/back_red_basic.png");
@@ -298,14 +300,14 @@ char* find_path(CARD *card) {
         case suit_clubs:
             strncpy(suit, "clubs", 6);
             break;
+        case suit_spades:
+            strncpy(suit, "spades", 7);
+            break;
         case suit_diamonds:
             strncpy(suit, "diamonds", 9);
             break;
         case suit_hearts:
             strncpy(suit, "hearts", 7);
-            break;
-        case suit_spades:
-            strncpy(suit, "spades", 7);
             break;
         default:
             SDL_Log("Unknown suit");
@@ -335,11 +337,9 @@ char* find_path(CARD *card) {
     if (card->selected == 1) {
         sprintf(path, "assets/cards/%s_%s.png", value, suit);
         return path;
-
     }
 
     sprintf(path, "assets/cards/%s_%s_white.png", value, suit);
-
     return path;
 }
 

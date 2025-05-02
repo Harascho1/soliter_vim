@@ -1,8 +1,6 @@
 #include "main_menu.h"
 #include "SDL3/SDL_events.h"
-#include "SDL3/SDL_oldnames.h"
 #include "SDL3/SDL_render.h"
-#include "SDL3_mixer/SDL_mixer.h"
 #include "font.h"
 #include "game.h"
 #include "sound.h"
@@ -14,18 +12,16 @@ static SDL_Color white_color = {255, 255, 255, 255};
 static SDL_Color title_color = {23, 150, 52, 255};
 static SDL_Color green_color = {120, 255, 120, 255};
 
-SDL_Texture *game_title = NULL;
-SDL_Texture *menu_items[4];
-SDL_Texture *hover_menu_items[4];
+static SDL_Texture *tex_game_title;
+static SDL_Texture *tex_menu_items[4];
+static SDL_Texture *tex_hover_menu_items[4];
 
-void 
+void
 lazy_destroy_main_menu() {
-    SDL_DestroyTexture(game_title);
+    SDL_DestroyTexture(tex_game_title);
     for (int i = 0; i < 4; i++) {
-        SDL_DestroyTexture(menu_items[i]);
-    }
-    for (int i = 0; i < 4; i++) {
-        SDL_DestroyTexture(hover_menu_items[i]);
+        SDL_DestroyTexture(tex_menu_items[i]);
+        SDL_DestroyTexture(tex_hover_menu_items[i]);
     }
 }
 
@@ -33,23 +29,23 @@ int
 lazy_load_main_menu(GAME *game) {
     int size;
     size = game->field.title_font;
-    game_title = get_texture_from_text(game->font, game->renderer, title, size, &title_color);
-    if (game_title == NULL) {
+    tex_game_title = get_texture_from_text(game->font, game->renderer, title, size, &title_color);
+    if (tex_game_title == NULL) {
         SDL_Log("game_title cannot be initiazlied...");
         return 0;
     }
     size = game->field.item_font;
     for (int i = 0; i < 4; i++) {
-        menu_items[i] = get_texture_from_text(game->font, game->renderer, game->main_menu->items[i].text, size, &white_color);
-        if (menu_items[i] == NULL) {
+        tex_menu_items[i] = get_texture_from_text(game->font, game->renderer, game->main_menu->items[i].text, size, &white_color);
+        if (tex_menu_items[i] == NULL) {
             SDL_Log("menu_items[%d] cannot be initiazlied...", i);
             return 0;
         }
     }
     size = game->field.hover_item_font;
     for (int i = 0; i < 4; i++) {
-        hover_menu_items[i] = get_texture_from_text(game->font, game->renderer, game->main_menu->items[i].text, size, &green_color);
-        if (hover_menu_items[i] == NULL) {
+        tex_hover_menu_items[i] = get_texture_from_text(game->font, game->renderer, game->main_menu->items[i].text, size, &green_color);
+        if (tex_hover_menu_items[i] == NULL) {
             SDL_Log("hover_menu_items[%d] cannot be initiazlied...", i);
             return 0;
         }
@@ -78,7 +74,7 @@ main_menu_event_handler(GAME *game, const SDL_Event *event) {
             case SDLK_RETURN:
             case SDLK_SPACE:
                 play_sound(game->soundboard, 0);
-                SDL_Delay(200);
+                SDL_Delay(100);
                 switch (game->main_menu->items[game->main_menu->selected_item].type) {
                     case menu_item_type_play:
                         run_a_game(game);
@@ -88,7 +84,7 @@ main_menu_event_handler(GAME *game, const SDL_Event *event) {
                         push_user_event(g_change_scene_event_type, game_state_setting);
                         break;
                     case menu_item_type_credits:
-                        printf("Looking at credits...\n");
+                        push_user_event(g_change_scene_event_type, game_state_scores);
                         break;
                     case menu_item_type_exit:
                         SDL_Event quit_event;
@@ -190,9 +186,9 @@ main_menu_render(GAME* game) {
         return 0;
     }
 
-    status = render_text_(
+    status = render_text(
         game->renderer,
-        game_title,
+        tex_game_title,
         &(SDL_Point){.x = (width - text_width) / 2, .y = height / 4}
     );
     if (status == 0) {
@@ -247,18 +243,17 @@ main_menu_render(GAME* game) {
             }
             render_coord_y = y_coord;
         }
-
         SDL_Point dst_rect = {
             .x = (width - text_width) / 2,
             .y = render_coord_y
         };
         SDL_Texture *tmp = NULL;
         if (game->main_menu->selected_item == i) {
-            tmp = hover_menu_items[i];
+            tmp = tex_hover_menu_items[i];
         } else {
-            tmp = menu_items[i];
+            tmp = tex_menu_items[i];
         }
-        status = render_text_(
+        status = render_text(
             game->renderer,
             tmp,
             &dst_rect

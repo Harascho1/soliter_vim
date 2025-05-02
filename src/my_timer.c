@@ -1,5 +1,6 @@
 #include "my_timer.h"
 #include "SDL3/SDL_events.h"
+#include <pthread.h>
 
 static int m_fps = 60;
 
@@ -28,6 +29,7 @@ void* count_down(void *atribute) {
         Uint32 now = SDL_GetTicks();
         int m_sec = (now - timer->begin_time)/ 1000;
         if (m_sec > old_sec) {
+            SDL_Log("idalje curka\n");
             old_sec = m_sec;
             timer->time_elapsed = old_sec;
             SDL_Event user;
@@ -39,7 +41,22 @@ void* count_down(void *atribute) {
     return NULL;
 }
 
-int reset_timer(MY_TIMER *timer) {
+int
+stop_timer(MY_TIMER *timer) {
+    if (timer->start_timer == 0) {
+        return 1;
+    }
+    timer->start_timer = 0;
+    pthread_join(timer->thread_clock, NULL);
+    return 1;
+}
+
+int
+reset_timer(MY_TIMER *timer) {
+    timer->time_elapsed = 0;
+    if (timer->start_timer == 0) {
+        return 1;
+    }
     timer->start_timer = 0;
     #ifdef _WIN32
     WaitForSingleObject(timer->thread_clock, INFINITE);
@@ -47,7 +64,6 @@ int reset_timer(MY_TIMER *timer) {
     #else
     pthread_join(timer->thread_clock, NULL);
     #endif
-    timer->time_elapsed = 0;
     return 1;
 }
 

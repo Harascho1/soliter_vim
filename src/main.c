@@ -1,11 +1,9 @@
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_log.h"
-#include "SDL3/SDL_oldnames.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "game.h"
-#include "main_menu.h"
-
+#include <stdbool.h>
 static GAME_STATE g_current_game_state = game_state_main_menu;
 
 #ifdef _WIN32
@@ -20,28 +18,30 @@ static SCENE* g_game_scenes[] = {
     &gameplay_scene,
     &game_over_menu_scene,
     &setting_scene,
+    &scores_scene,
     &macro_setting_scene,
     &option_setting_scene
 };
 
 static int g_scene_fps[] = {
-    60,
-    60,
-    60,
-    60,
-    60,
-    60,
-    60
+    30,
+    30,
+    30,
+    30,
+    30,
+    30,
+    30
 };
 
-static bool
+static int
 is_period_pass(int period, int last_update_time) {
 
     int current_time = SDL_GetTicks();
     if ((current_time - last_update_time) >= period) {
-       return 1;
+        //SDL_Log("fps = %f\n", (float)current_time - last_update_time);
+        return true;
     }
-    return 0;
+    return false;
 }
 
 int
@@ -92,7 +92,7 @@ int main() {
     }
 
     GAME game;
-    status = game_init(&game, "SoVIMter", &(RESOLUTION){600, 600});
+    status = game_init(&game, "SoVIMter", &(RESOLUTION){900, 900});
     if (status == 0) {
         SDL_Log("game_init failed: %s\n", SDL_GetError());
         cleanup();
@@ -102,7 +102,8 @@ int main() {
     SDL_Event event;
     int last_frame_time = 0;
 
-    g_game_scenes[0]->lazy_load(&game);
+    g_game_scenes[g_current_game_state]->lazy_load(&game);
+    g_game_scenes[g_current_game_state]->render(&game);
     while (1) {
         if (SDL_WaitEvent(&event)) {
             if (event.type == SDL_EVENT_PRIVATE0) {
@@ -111,20 +112,18 @@ int main() {
             }
             if (event.type == SDL_EVENT_QUIT) {
                 g_game_scenes[g_current_game_state]->lazy_destroy();
-                SDL_Log("Obrisao sam main_menu\n");
                 break;
             } else if (event.type == g_change_scene_event_type) {
-
                 g_game_scenes[g_current_game_state]->lazy_destroy();
-                SDL_Log("Obrisao sam main_menu\n");
                 g_current_game_state = event.user.code;
+
                 g_game_scenes[g_current_game_state]->lazy_load(&game);
                 g_game_scenes[g_current_game_state]->update(&game);
                 g_game_scenes[g_current_game_state]->render(&game);
             }
         }
         g_game_scenes[g_current_game_state]->handle_events(&game, &event);
-        if (is_period_pass(1000 / g_scene_fps[g_current_game_state], last_frame_time)) {
+        if (is_period_pass(1000 / g_scene_fps[g_current_game_state], last_frame_time) == 1) {
             g_game_scenes[g_current_game_state]->update(&game);
             g_game_scenes[g_current_game_state]->render(&game);
             last_frame_time = SDL_GetTicks();
