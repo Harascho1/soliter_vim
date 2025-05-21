@@ -107,6 +107,12 @@ int main() {
     while (1) {
         if (SDL_WaitEvent(&event)) {
             if (event.type == SDL_EVENT_PRIVATE0) {
+                if (game.timer->time_elapsed >= 3600) {
+                    g_game_scenes[g_current_game_state]->lazy_destroy();
+                    g_current_game_state = game_state_game_over;
+
+                    g_game_scenes[g_current_game_state]->lazy_load(&game);
+                }
                 g_game_scenes[g_current_game_state]->render(&game);
                 continue;
             }

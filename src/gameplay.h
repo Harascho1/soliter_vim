@@ -5,7 +5,6 @@
 #include "textbox.h"
 
 extern char buffer[10];
-
 extern TEXTBOX *textbox;
 
 int gameplay_lazy_load(GAME *game);

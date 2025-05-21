@@ -459,9 +459,11 @@ gameplay_update(GAME* game) {
             game_update = 0;
         }
     }
+
     if (have_number_hover(game->cursor) == 0) {
         buffer[0] = '\0';
     }
+
     int count = 0;
     for (int i = 0; i < 4; i++) {
         if (game->deck->sorted_cards[i] == NULL) {
@@ -475,10 +477,6 @@ gameplay_update(GAME* game) {
     if (count == 4) {
         g_game_win = 1;
         stop_timer(game->timer);
-    }
-    if (game->timer->time_elapsed >= 3600) {
-        g_game_win = 0;
-        push_user_event(g_change_scene_event_type, game_state_game_over);
     }
 
     return 1;

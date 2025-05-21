@@ -1,14 +1,9 @@
-#include "SDL3/SDL_error.h"
-#include "SDL3/SDL_events.h"
 #include "SDL3/SDL_log.h"
-#include "SDL3/SDL_pixels.h"
-#include "SDL3/SDL_render.h"
 #include "font.h"
 #include "game.h"
-#include <stdio.h>
-#include <string.h>
 
 SDL_Texture *tex_top_10_scores[10];
+static int text_width;
 
 int
 scores_lazy_load(GAME *game) {
@@ -54,6 +49,19 @@ scores_lazy_load(GAME *game) {
         prev_pointer += pointer;
     }
     int font_size = game->field.text_font;
+
+    status = get_text_size(
+        game->font, 
+        scores_txt[0], 
+        font_size, 
+        &text_width, 
+        NULL
+    );
+    if (status == 0) {
+        SDL_Log("get_text_size error in lazy load..\n");
+        return 0;
+    }
+
     for (int j = 0; j < i; j++) {
         tex_top_10_scores[j] = get_texture_from_text(
             game->font, 
@@ -115,16 +123,17 @@ scores_render(GAME *game) {
         return 0;
     }
 
-    int text_width, text_height;
+    int text_height;
     status = get_text_size(
         game->font, 
         "normal mode", 
         game->field.text_font, 
-        NULL, &text_height
+        NULL, 
+        &text_height
     );
 
     SDL_Point pt = {
-        .x = game->field.gameplay_screen_padding_width,
+        .x = (game->field.screen_width - text_width) / 2,
         .y = 0 + text_height
     };
 

@@ -16,7 +16,6 @@ normal_select_mode(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch (event->key.key) {
             case SDLK_ESCAPE:
-                save_score(game);
                 push_user_event(g_change_scene_event_type, game_state_game_over);
                 break;
             case SDLK_C:
@@ -366,6 +365,7 @@ text_mode(GAME *game, const SDL_Event *event) {
                 if (have_requaried_num_of_characters(textbox, 4) == 0) {
                     break;
                 }
+                save_score(game, textbox->string);
                 push_user_event(g_change_scene_event_type, game_state_game_over);
                 break;
             case SDLK_BACKSPACE:

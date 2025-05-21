@@ -157,10 +157,34 @@ option_settings_event_hendler(GAME *game, const SDL_Event *event) {
                 break;
             case SDLK_S:
             case SDLK_DOWN:
-                if (selected_index > 15) {
+                if (selected_index >= 2) {
                     break;
                 }
                 selected_index++;
+                break;
+            case SDLK_LEFT:
+            case SDLK_A:
+                if (selected_index != 2) {
+                    break;
+                }
+                if (config_options[selected_index] <= 0) {
+                    break;
+                }
+                event_status = 1;
+                insert_option(--config_options[selected_index], selected_index);
+                play_sound(game->soundboard, 0);
+                break;
+            case SDLK_RIGHT:
+            case SDLK_D:
+                if (selected_index != 2) {
+                    break;
+                }
+                if (config_options[selected_index] >= 100) {
+                    break;
+                }
+                event_status = 1;
+                insert_option(++config_options[selected_index], selected_index);
+                play_sound(game->soundboard, 0);
                 break;
             case SDLK_SPACE:
             case SDLK_RETURN:

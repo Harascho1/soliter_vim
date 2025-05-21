@@ -9,6 +9,7 @@
 #include "field.h"
 #include "sound.h"
 #include "texture.h"
+#include <ctype.h>
 #include <string.h>
 
 const char *main_menu_items[] = {
@@ -272,7 +273,6 @@ game_quit(GAME* game) {
     if (game->soundboard != NULL) {
         destroy_soundboard(game->soundboard);
     }
-    SDL_Log("Kraj\n");
     if (game->renderer != NULL) {
         SDL_DestroyRenderer(game->renderer);
     }
@@ -306,6 +306,7 @@ game_quit(GAME* game) {
     if (game->timer != NULL) {
         destroy_timer(game->timer);
     }
+    SDL_Log("Kraj\n");
 }
 
 void
@@ -399,7 +400,7 @@ int make_string_array(char **array_of_strings, int *i) {
 
 int
 make_array_of_times(char **array_of_strings, int array[], const int i) {
-    const char *seconds = "seconds:";
+    const char *seconds = "name:name seconds:";
     int jmp = strlen(seconds);
     for (int j = 0; j < i; j++) {
         int num_of_digits = 1;
@@ -463,7 +464,7 @@ print_in_bin(char **strings_of_array, int i) {
 }
 
 void
-save_score(GAME *game) {
+save_score(GAME *game, const char *name) {
     //TODO ovo mora da ostane zakomentarisano pre nego sto se pablisuje
     if (g_game_win != 1) {
         return;
@@ -478,7 +479,7 @@ save_score(GAME *game) {
 
     char buff[255];
     int time_in_sec = game->timer->time_elapsed;
-    sprintf(buff, "seconds:%d mode:none time:%s", time_in_sec, time_buff);
+    sprintf(buff, "name:%s seconds:%d mode:none time:%s", name, time_in_sec, time_buff);
     int buff_size = strlen(buff) + 1;
 
     char **saves;

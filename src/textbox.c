@@ -1,6 +1,8 @@
 #include "textbox.h"
 #include "SDL3/SDL_stdinc.h"
+#include <ctype.h>
 #include <string.h>
+#include <uchar.h>
 
 TEXTBOX*
 create_textbox(int n) {
@@ -33,7 +35,12 @@ insert_text(TEXTBOX *textbox, const char *c) {
         return 0;
     }
 
-    strcat(textbox->string, c);
+    if (strcpy(" ", c) == 0) {
+        return 1;
+    }
+
+    char chr = SDL_toupper(*c);
+    strcat(textbox->string, &chr);
     SDL_Log("string je %s\n", textbox->string);
     return 1;
 }

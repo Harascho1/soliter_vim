@@ -1,7 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "SDL3_mixer/SDL_mixer.h"
 #include "menu.h"
 #include "font.h"
 #include "card.h"
@@ -82,7 +81,7 @@ void game_quit(GAME* game);
 int reload_window(GAME *game);
 int load_game_field(DECK *game, FIELD *field);
 void run_a_game(GAME *game);
-void save_score(GAME *game);
+void save_score(GAME *game, const char *name);
 int render_counting_time(GAME *game);
 int push_user_event(Uint32 type, Sint32 code);
 

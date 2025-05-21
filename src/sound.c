@@ -76,6 +76,7 @@ play_sound_on_thread(void *args) {
 
 int
 play_sound(SOUNDBOARD *sb, int index) {
+    Mix_Volume(-1, config_options[2]);
     if (config_options[1] == 0) {
         return 1;
     }

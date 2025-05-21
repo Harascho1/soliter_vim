@@ -15,7 +15,7 @@ static SDL_Color trensparent_green_color = {250, 55, 50, 255};
 
 static const char* modes[4] = {
     "mode:normal",
-    "mode:select",
+    "mode:normal-select",
     "mode:fly",
     "mode:fly-select"
 };
@@ -150,6 +150,7 @@ gameplay_lazy_load(GAME *game) {
 
 void
 gameplay_lazy_destroy() {
+    // TODO mozda treba da se posalje tekst pre nego sto se obrise da bi moglo da se sacuva
     destroy_textbox(textbox);
     for (int i = 0; i < 2; i++) {
         SDL_DestroyTexture(tex_modes[i]);

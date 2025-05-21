@@ -133,7 +133,7 @@ game_over_menu_event_handler(GAME *game, const SDL_Event *event) {
                         push_user_event(g_change_scene_event_type, game_state_gameplay);
                         break;
                     case game_over_item_credits:
-                        SDL_Log("Looking at credits...\n");
+                        push_user_event(g_change_scene_event_type, game_state_scores);
                         break;
                     case game_over_item_type_exit:
                         push_user_event(g_change_scene_event_type, game_state_main_menu);

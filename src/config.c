@@ -16,8 +16,15 @@ insert_option(unsigned int option_value, int index) {
         SDL_Log("config_options is NULL\n");
         return 0;
     }
-    config_options[index] = option_value;
     char buffer[10];
+    if (index == 2) {
+        config_options[index] = option_value;
+        sprintf(buffer, "%d", option_value);
+        strcpy(options_set[index], buffer);
+
+        return 1;
+    }
+    config_options[index] = option_value;
     if (option_value == 1) {
         strcpy(buffer, "On");
     } else {
@@ -170,7 +177,8 @@ load_config() {
     FILE *config_file = fopen("assets/bin/config.bin", "rb");
 
     config_commands = (int*)SDL_malloc(sizeof(int) * 14);
-    fread(config_commands, sizeof(int), 14, config_file);
+    int status;
+    status = fread(config_commands, sizeof(int), 14, config_file);
     fclose(config_file);
 
     for (int i = 0; i < 14; i++) {
@@ -182,7 +190,7 @@ load_config() {
 
     FILE *option_file = fopen("assets/bin/option.bin", "rb");
     config_options = (int*)SDL_malloc(sizeof(int) * 3);
-    fread(config_options, sizeof(int), 3, option_file);
+    status = fread(config_options, sizeof(int), 3, option_file);
     fclose(option_file);
     for (int i = 0; i < 3; i++) {
         options_set[i] = (char*)SDL_malloc(sizeof(char) * 10);
@@ -196,5 +204,6 @@ load_config() {
             strcpy(options_set[i], "Off");
         }
     }
+    SDL_Log("Prosao sam");
     return config_commands;
 }
