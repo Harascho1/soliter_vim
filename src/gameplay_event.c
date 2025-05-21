@@ -380,6 +380,10 @@ text_mode(GAME *game, const SDL_Event *event) {
         }
     } else if (event->type == SDL_EVENT_TEXT_INPUT) {
         SDL_Log("UPAO\n");
+        if (textbox == NULL) {
+            SDL_Log("textbox je NULL\n");
+            return 0;
+        }
         status = insert_text(textbox, event->text.text);
         if (status == 0) {
             SDL_Log("insert_text error...\n");

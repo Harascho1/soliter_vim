@@ -8,6 +8,10 @@
 #include "my_timer.h"
 
 static const char *title = "SoVIMter";
+static const char *game_modes[] = {
+    "normal",
+    "fly"
+};
 static SDL_Color white_color = {255, 255, 255, 255};
 static SDL_Color title_color = {23, 150, 52, 255};
 static SDL_Color green_color = {120, 255, 120, 255};
@@ -15,6 +19,8 @@ static SDL_Color green_color = {120, 255, 120, 255};
 static SDL_Texture *tex_game_title;
 static SDL_Texture *tex_menu_items[4];
 static SDL_Texture *tex_hover_menu_items[4];
+static SDL_Texture *tex_game_mode[2];
+static SDL_Texture *tex_hover_game_mode[2];
 
 void
 lazy_destroy_main_menu() {
@@ -22,6 +28,10 @@ lazy_destroy_main_menu() {
     for (int i = 0; i < 4; i++) {
         SDL_DestroyTexture(tex_menu_items[i]);
         SDL_DestroyTexture(tex_hover_menu_items[i]);
+    }
+    for (int i = 0; i < 2; i++) {
+        SDL_DestroyTexture(tex_game_mode[i]);
+        SDL_DestroyTexture(tex_hover_game_mode[i]);
     }
 }
 
@@ -42,6 +52,13 @@ lazy_load_main_menu(GAME *game) {
             return 0;
         }
     }
+    for (int i = 0; i < 2; i++) {
+        tex_game_mode[i] = get_texture_from_text(game->font, game->renderer, game->main_menu->items[i].text, size, &white_color);
+        if (tex_game_mode[i] == NULL) {
+            SDL_Log("tex_game_mode[%d] cannot be initiazlied...", i);
+            return 0;
+        }
+    }
     size = game->field.hover_item_font;
     for (int i = 0; i < 4; i++) {
         tex_hover_menu_items[i] = get_texture_from_text(game->font, game->renderer, game->main_menu->items[i].text, size, &green_color);
@@ -50,8 +67,17 @@ lazy_load_main_menu(GAME *game) {
             return 0;
         }
     }
+    for (int i = 0; i < 2; i++) {
+        tex_hover_game_mode[i] = get_texture_from_text(game->font, game->renderer, game->main_menu->items[i].text, size, &green_color);
+        if (tex_hover_game_mode[i] == NULL) {
+            SDL_Log("tex_hover_game_mode[%d] cannot be initiazlied...", i);
+            return 0;
+        }
+    }
     return 1;
 }
+
+
 
 int
 main_menu_event_handler(GAME *game, const SDL_Event *event) {
@@ -94,9 +120,6 @@ main_menu_event_handler(GAME *game, const SDL_Event *event) {
                     default:
                         break;
                 }
-                break;
-            case SDLK_ESCAPE:
-                push_user_event(SDL_EVENT_QUIT, 0);
                 break;
             default:
                 break;

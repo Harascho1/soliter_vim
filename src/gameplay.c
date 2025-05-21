@@ -63,7 +63,6 @@ draw_next_card(DECK *deck) {
 
 int
 reveal_card_below(GAME *game) {
-
     for (int i = 1; i <= number_of_cards_in_row; i++) {
         int j = 1;
         CARD *card;

@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "SDL3/SDL_stdinc.h"
 #include "menu.h"
 #include "font.h"
 #include "card.h"
@@ -11,6 +12,7 @@
 #include "field.h"
 
 extern Uint32 g_change_scene_event_type;
+extern Uint8 game_c;
 
 typedef enum {
     game_state_main_menu = 0,

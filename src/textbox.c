@@ -1,4 +1,5 @@
 #include "textbox.h"
+#include "SDL3/SDL_log.h"
 #include "SDL3/SDL_stdinc.h"
 #include <ctype.h>
 #include <string.h>
@@ -35,13 +36,18 @@ insert_text(TEXTBOX *textbox, const char *c) {
         return 0;
     }
 
-    if (strcpy(" ", c) == 0) {
+    SDL_Log("error 2\n");
+    if (*c == ' ') {
         return 1;
     }
 
+    SDL_Log("error 3\n");
     char chr = SDL_toupper(*c);
+    SDL_Log("error 4\n");
     strcat(textbox->string, &chr);
+    SDL_Log("error 5\n");
     SDL_Log("string je %s\n", textbox->string);
+    SDL_Log("error 6\n");
     return 1;
 }
 
