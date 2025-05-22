@@ -20,3 +20,4 @@
     1. [ ] i u kojim modovima su postignuti
 9. [X] fajl u kome ce da se beleze najbolje postignuto vreme
     1. [X] bice bin fajl u assest/bin/time.bin
+10. [X] da se doda npr upit ukoliko u Gameplay sceni kliknes esc ono da li si sure yes no?

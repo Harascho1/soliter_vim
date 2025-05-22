@@ -420,6 +420,9 @@ auto_solve(GAME *game) {
             ++j;
         } while (card != NULL);
     }
+    if (game_update != 0) {
+        play_sound(game->soundboard, sort_card_sound);
+    }
     return 1;
 }
 

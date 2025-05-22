@@ -135,9 +135,7 @@ int main() {
             last_frame_time = SDL_GetTicks();
         }
     }
-
     game_quit(&game);
     cleanup();
-
     return 0;
 }
