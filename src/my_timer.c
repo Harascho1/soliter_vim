@@ -1,6 +1,5 @@
 #include "my_timer.h"
 #include "SDL3/SDL_events.h"
-#include <pthread.h>
 
 static int m_fps = 60;
 
@@ -8,7 +7,6 @@ MY_TIMER* create_timer() {
     MY_TIMER *timer = SDL_malloc(sizeof(MY_TIMER));
     timer->begin_time = 0;
     timer->thread_clock;
-    timer->thread_render_clock;
     timer->time_elapsed = 0;
     timer->start_timer = 0;
     return timer;
@@ -46,8 +44,13 @@ stop_timer(MY_TIMER *timer) {
     if (timer->start_timer == 0) {
         return 1;
     }
-    timer->start_timer = 0;
+    timer->start_timer = 0;    
+#ifdef _WIN32
+    WaitForSingleObject(timer->thread_clock, INFINITE);
+    CloseHandle(timer->thread_clock);
+#else
     pthread_join(timer->thread_clock, NULL);
+#endif
     return 1;
 }
 

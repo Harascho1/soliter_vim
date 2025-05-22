@@ -5,7 +5,6 @@
 #include "SDL3/SDL_stdinc.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "config.h"
-#include <pthread.h>
 
 const int QUEUE_SOUNDS = 3;
 const int num_of_sounds = 7;
@@ -85,7 +84,7 @@ play_sound(SOUNDBOARD *sb, int index) {
         return 0;
     }
     if (sb->count > 0) {
-        pthread_join(sb->thread, NULL);
+        //pthread_join(sb->thread, NULL);
         sb->count--;
     }
     if (index < 0 || index > sb->lenght - 1) {

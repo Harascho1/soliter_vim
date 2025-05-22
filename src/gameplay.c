@@ -5,7 +5,6 @@
 #include "game.h"
 #include "my_timer.h"
 #include "sound.h"
-#include <pthread.h>
 
 char buffer[10] = "";
 

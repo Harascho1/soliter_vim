@@ -19,7 +19,6 @@ typedef struct _SOUNDBOARD {
     int lenght;
     int count;
     SDL_AudioDeviceID devid;
-    pthread_t thread;
 } SOUNDBOARD;
 
 SOUNDBOARD* create_soundboard(SDL_AudioDeviceID devid);

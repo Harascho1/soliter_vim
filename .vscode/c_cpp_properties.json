@@ -1,13 +1,13 @@
 {
     "configurations": [
         {
-            "name": "Linux",
+            "name": "Windows",
             "includePath": [
                 "${workspaceFolder}/**"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/gcc",
-            "intelliSenseMode": "linux-gcc-x64",
+            "compilerPath": "/usr/bin/cl.exe",
+            "intelliSenseMode": "windows-msvc-x64",
             "forcedInclude": ["${workspaceFolder}/pch/pch.h"]
 
         }
