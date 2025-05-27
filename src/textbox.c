@@ -36,18 +36,13 @@ insert_text(TEXTBOX *textbox, const char *c) {
         return 0;
     }
 
-    SDL_Log("error 2\n");
     if (*c == ' ') {
         return 1;
     }
 
-    SDL_Log("error 3\n");
-    char chr = SDL_toupper(*c);
-    SDL_Log("error 4\n");
-    strcat(textbox->string, &chr);
-    SDL_Log("error 5\n");
-    SDL_Log("string je %s\n", textbox->string);
-    SDL_Log("error 6\n");
+    char chr = (char)SDL_toupper(*c);
+    textbox->string[strlen(textbox->string)] = chr;
+    textbox->string[strlen(textbox->string) + 1] = 0;
     return 1;
 }
 
