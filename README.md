@@ -1,7 +1,7 @@
 #### Get Git modules:
 
 ```sh
-git module update --init --recursive --depth 1
+git submodule update --init --recursive --depth 1
 ```
 
 #### To build run 'run.sh'
