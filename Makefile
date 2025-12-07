@@ -11,4 +11,5 @@ compile:
 	cmake --build build -j$(nproc)
 
 run:
-	./output/soVIMter
+	cd output && ./soVIMter && cd ..
+	
