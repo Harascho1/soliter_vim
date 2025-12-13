@@ -3,94 +3,93 @@
 
 #include "field.h"
 
-enum {
-    not_visible = 0,
-    visible
-};
+#define STACK_SIZE 30
 
-enum {
-    not_selected = 0,
-    selected
-};
+enum { not_visible = 0, visible };
 
+enum { not_selected = 0, selected };
 
-typedef enum _SUIT {
-    suit_clubs,
-    suit_spades,
-    suit_diamonds,
-    suit_hearts
-} SUIT;
+typedef enum _SUIT { suit_clubs, suit_spades, suit_diamonds, suit_hearts } SUIT;
 
 typedef enum _VALUE {
-    value_ace = 1,
-    value_2,
-    value_3,
-    value_4,
-    value_5,
-    value_6,
-    value_7,
-    value_8,
-    value_9,
-    value_10,
-    value_jack,
-    value_queen,
-    value_king
+  value_ace = 1,
+  value_2,
+  value_3,
+  value_4,
+  value_5,
+  value_6,
+  value_7,
+  value_8,
+  value_9,
+  value_10,
+  value_jack,
+  value_queen,
+  value_king
 } VALUE;
 
 typedef struct _POSITION {
-    int row;
-    int col;
+  int row;
+  int col;
 } POSITION;
 
 typedef struct _CARD {
-    VALUE value;
-    SUIT suit;
-    int visible;
-    int selected;
-    SDL_FPoint *frame;
-    POSITION *pos;
-    int on_field;
+  VALUE value;
+  SUIT suit;
+  int visible;
+  int selected;
+  SDL_FPoint *frame;
+  POSITION *pos;
+  int on_field;
 } CARD;
 
+typedef struct _CARD_STACK {
+  int count;
+  CARD *array[STACK_SIZE];
+} CARD_STACK;
 
-typedef struct _CARD_QUEUE {
-    int p;
-    int q;
-    int max_items;
-    int count;
-    CARD **queue;
-} CARD_QUEUE;
+CARD *pop(CARD_STACK *stack);
+// CARD *pop_top(CARD_STACK *stack);
+bool push(CARD_STACK *stack, CARD *card);
+bool is_empty(CARD_STACK *stack);
+bool is_full(CARD_STACK *stack);
 
-CARD* pop(CARD_QUEUE *queue);
-CARD* pop_top(CARD_QUEUE *queue);
-int push(CARD_QUEUE *queue, CARD *card);
-int is_queue_full(CARD_QUEUE *queue);
-int is_queue_empty(CARD_QUEUE *queue);
-CARD* view_top_card_in_queue(CARD_QUEUE *queue);
-int pop_all(CARD_QUEUE *queue);
+CARD *top_card(CARD_STACK *queue);
+void pop_all(CARD_STACK *queue);
 
 typedef struct _DECK {
-    CARD cards[52];
-    int count;
-    CARD_QUEUE *new_cards;
-    CARD *deck_card;
-    CARD *sorted_cards[4];
-    SDL_Texture *empty_sorted_card;
+  // NOTE: whole deck
+  CARD cards[52];
+  // NOTE: number of cards in deck
+  int count;
+  // NOTE: cards that are drown from deck
+  CARD_STACK drawn_cards;
+  // NOTE: top card in deck
+  CARD *deck_card;
+  // NOTE: sorted small decks
+  CARD *sorted_cards[4];
+  // NOTE: texture for empty small deck
+  SDL_Texture *empty_sorted_card;
 
 } DECK;
 
 extern CARD g_invisible_card[7];
 
-DECK* create_deck(SDL_Renderer *renderer);
+DECK *create_deck(SDL_Renderer *renderer);
 void destroy_deck(DECK *deck);
 
-int render_card(FIELD *field, SDL_Renderer *renderer, CARD *card, SDL_FPoint *point);
+int render_card(FIELD *field, SDL_Renderer *renderer, CARD *card,
+                SDL_FPoint *point);
 void deselect_all_cards(DECK *deck);
-CARD* find_card(DECK *deck, int col, int row);
+
+/*
+  NOTE: returns CARD pointer if find in deck for inserted col and row. Returns
+  NULL if dont find
+*/
+CARD *find_card(DECK *deck, int col, int row);
 int can_card_be_placed(CARD *card_below, CARD *card_above);
-int sort_a_card(CARD *card, DECK* deck);
+int sort_a_card(CARD *card, DECK *deck);
 int select_card_below(CARD *card, DECK *deck);
 int same_card_selected(CARD *card1, CARD *card2);
 int have_more_cards(DECK *deck);
 
-#endif //CARD_H
+#endif // CARD_H

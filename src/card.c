@@ -1,6 +1,8 @@
 #include "card.h"
 #include "SDL3/SDL_log.h"
+#include "gameplay.h"
 #include "texture.h"
+#include <string.h>
 
 int same_card_selected(CARD *card1, CARD *card2) { return card1 == card2; }
 
@@ -12,15 +14,18 @@ void deselect_all_cards(DECK *deck) {
 
 CARD *find_card(DECK *deck, int col, int row) {
   if (col == 1 && row == 0) {
+    // NOTE: Deck card can be NULL.
     return deck->deck_card;
   }
 
   if (col == 2 && row == 0) {
-    return view_top_card_in_queue(deck->new_cards);
+    // NOTE: This card can be NULL
+    return top_card(&deck->drawn_cards);
   }
 
   for (int i = 0; i < 52; i++) {
     if (deck->cards[i].pos->col == col && deck->cards[i].pos->row == row) {
+      // NOTE: This card can be NULL
       return &deck->cards[i];
     }
   }
@@ -88,83 +93,40 @@ int sort_a_card(CARD *card, DECK *deck) {
   return 0;
 }
 
-int pop_all(CARD_QUEUE *queue) {
-  queue->p = 0;
-  queue->q = 0;
-  for (int i = 0; i < queue->max_items; i++) {
-    if (queue->queue[i] == NULL) {
-      continue;
-    }
-    if (queue->queue[i]->on_field == 0) {
-      queue->queue[i]->visible = not_visible;
-    }
-    queue->queue[i] = NULL;
+void pop_all(CARD_STACK *stack) {
+  for (int i = 0; i < stack->count; i++) {
+    // NOTE: return cards to deck face down
+    stack->array[i]->visible = not_visible;
   }
-  queue->count = 0;
-  return 1;
+  memset(stack->array, 0, STACK_SIZE);
+  stack->count = 0;
 }
 
-int is_queue_empty(CARD_QUEUE *queue) { return queue->count == 0; }
+bool is_empty(CARD_STACK *stack) { return stack->count == 0; }
 
-int is_queue_full(CARD_QUEUE *queue) {
-  return queue->count == queue->max_items;
-}
+bool is_full(CARD_STACK *stack) { return stack->count == STACK_SIZE; }
 
-int push(CARD_QUEUE *queue, CARD *card) {
-  if (is_queue_full(queue)) {
-    pop(queue);
+bool push(CARD_STACK *stack, CARD *card) {
+  if (is_full(stack)) {
+    return false;
   }
-
-  queue->queue[queue->p++] = card;
+  stack->array[stack->count++] = card;
   card->visible = visible;
-
-  if (queue->p == queue->max_items) {
-    queue->p = 0;
-  }
-
-  queue->count++;
-  return 1;
+  return true;
 }
 
-CARD *pop(CARD_QUEUE *queue) {
-  if (is_queue_empty(queue)) {
+CARD *pop(CARD_STACK *stack) {
+  if (is_empty(stack)) {
     return NULL;
   }
-  int old_q = queue->q;
-  queue->q++;
-  if (queue->q == queue->max_items) {
-    queue->q = 0;
-  }
-  queue->count--;
-  queue->queue[old_q]->visible = not_visible;
-  return queue->queue[old_q];
+  return stack->array[--stack->count];
 }
 
-CARD *view_top_card_in_queue(CARD_QUEUE *queue) {
-  if (queue->count == 0) {
+CARD *top_card(CARD_STACK *stack) {
+  if (is_empty(stack)) {
     return NULL;
   }
-  int tmp;
-  if (queue->p == 0) {
-    tmp = queue->max_items - 1;
-  } else {
-    tmp = queue->p - 1;
-  }
-  return queue->queue[tmp];
-}
-
-CARD *pop_top(CARD_QUEUE *queue) {
-  if (queue->count == 0) {
-    return NULL;
-  }
-  queue->count--;
-  if (queue->p == 0) {
-    queue->p = queue->max_items - 1;
-  } else {
-    queue->p--;
-  }
-  queue->queue[queue->p] = NULL;
-  return NULL;
+  return stack->array[stack->count - 1];
 }
 
 int can_card_be_placed(CARD *card_below, CARD *card_above) {
@@ -183,15 +145,7 @@ int can_card_be_placed(CARD *card_below, CARD *card_above) {
   return 0;
 }
 
-CARD_QUEUE *create_card_queue(int max_items) {
-  CARD_QUEUE *queue = SDL_malloc(sizeof(CARD_QUEUE));
-  queue->max_items = max_items;
-  queue->p = 0;
-  queue->q = 0;
-  queue->count = 0;
-  queue->queue = (CARD **)SDL_malloc(sizeof(CARD *) * max_items);
-  return queue;
-}
+void create_card_stack(CARD_STACK *stack) { stack->count = 0; }
 
 DECK *create_deck(SDL_Renderer *renderer) {
   DECK *deck = NULL;
@@ -215,9 +169,8 @@ DECK *create_deck(SDL_Renderer *renderer) {
   }
   shuffle_deck(deck);
   deck->count = 28;
-  deck->new_cards = create_card_queue(3);
+  create_card_stack(&deck->drawn_cards);
   deck->deck_card = &deck->cards[deck->count];
-  int status;
 
   deck->empty_sorted_card = create_texture_from_image(
       renderer, "assets/cards/total_blank_front_white.png");
@@ -225,6 +178,7 @@ DECK *create_deck(SDL_Renderer *renderer) {
     SDL_Log("create_texture_from_image error\n");
     return NULL;
   }
+
   return deck;
 }
 
@@ -257,7 +211,6 @@ void destroy_deck(DECK *deck) {
     for (int i = 0; i < 52; i++) {
       destroy_card(&deck->cards[i]);
     }
-    SDL_free(deck->new_cards);
     SDL_free(deck);
   }
 }
