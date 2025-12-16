@@ -14,4 +14,3 @@ run:
 	cd output && ./soVIMter && cd ..
 
 fast-run-debug: build-debbug compile run
-	@echo "run debbug version"

@@ -17,12 +17,14 @@ set(HEADER_FILES
     ${CMAKE_SOURCE_DIR}/src/texture.h
     ${CMAKE_SOURCE_DIR}/src/card.h
     ${CMAKE_SOURCE_DIR}/src/my_timer.h
+    ${CMAKE_SOURCE_DIR}/src/render.h
 )
 
 file(GLOB_RECURSE soliter_src 
     ${CMAKE_SOURCE_DIR}/src/textbox.c
     ${CMAKE_SOURCE_DIR}/src/sound.c
     ${CMAKE_SOURCE_DIR}/src/field.c
+    ${CMAKE_SOURCE_DIR}/src/render.c
     ${CMAKE_SOURCE_DIR}/src/option_settings.c
     ${CMAKE_SOURCE_DIR}/src/macro_settings.c
     ${CMAKE_SOURCE_DIR}/src/config.c

@@ -5,6 +5,7 @@
 #include "game.h"
 #include "my_timer.h"
 #include "sound.h"
+#include <wchar.h>
 
 char buffer[10] = "";
 
@@ -99,18 +100,19 @@ int selected_card(DECK *deck, CARD **selected_cards) {
   return count;
 }
 
-int place_king(CARD **card, int num, CURSOR *cursor, FIELD *field) {
+bool place_king(CARD **card, int num, CURSOR *cursor, FIELD *field) {
+  SDL_Log("Usao sam u place king");
   int cursor_col = cursor->pos->col;
   int cursor_row = cursor->pos->row;
   int x_coord, y_coord;
 
-  if (cursor_row == 0 && cursor_col == 0) {
+  if (cursor_row == 0) {
     SDL_Log("Ne moze");
     return false;
   }
 
   if ((*card)->value != 13) {
-    return 0;
+    return false;
   }
 
   for (int i = 0; i < number_of_cards_in_row; i++) {
@@ -140,7 +142,7 @@ int place_king(CARD **card, int num, CURSOR *cursor, FIELD *field) {
     y_coord += field->card_padding_height;
   }
 
-  return 1;
+  return true;
 }
 
 int place_a_card(GAME *game) {
@@ -150,8 +152,9 @@ int place_a_card(GAME *game) {
   CARD *s_card[14];
   int num_of_selected_cards;
   num_of_selected_cards = selected_card(game->deck, s_card);
-
-  SDL_Log("row: %d and col: %d\n", (*s_card)->pos->row, (*s_card)->pos->row);
+  if (card != NULL) {
+    SDL_Log("row: %d and col: %d\n", card->pos->row, card->pos->row);
+  }
 
   if (num_of_selected_cards == 0) {
     return 0;
@@ -159,7 +162,7 @@ int place_a_card(GAME *game) {
 
   if (card == NULL) {
     if (place_king(s_card, num_of_selected_cards, game->cursor, &game->field) ==
-        0) {
+        false) {
       game_update = 0;
       deselect_all_cards(game->deck);
       set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
