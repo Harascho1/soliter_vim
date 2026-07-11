@@ -4,38 +4,38 @@
 #include "SDL3/SDL_stdinc.h"
 
 int *config_commands = NULL;
-int *config_options = NULL;
+unsigned int *config_options = NULL;
 char *commands_keys[14];
 char *options_set[3];
 
-int insert_option(unsigned int option_value, int index) {
+int insert_option(const unsigned int command, const int idx) {
   if (config_options == NULL) {
     SDL_Log("config_options is NULL\n");
     return 0;
   }
   char buffer[10];
-  if (index == 2) {
-    config_options[index] = option_value;
-    sprintf(buffer, "%d", option_value);
-    strcpy(options_set[index], buffer);
+  if (idx == 2) {
+    config_options[idx] = command;
+    sprintf(buffer, "%d", command);
+    strcpy(options_set[idx], buffer);
 
     return 1;
   }
-  config_options[index] = option_value;
-  if (option_value == 1) {
+  config_options[idx] = command;
+  if (command == 1) {
     strcpy(buffer, "On");
   } else {
     strcpy(buffer, "Off");
   }
   int size_of_buffer = strlen(buffer) + 1;
-  options_set[index] = (char *)SDL_realloc(options_set[index],
+  options_set[idx] = (char *)SDL_realloc(options_set[idx],
                                            sizeof(char) * (size_of_buffer + 1));
-  strcpy(options_set[index], buffer);
+  strcpy(options_set[idx], buffer);
   // SDL_Log("zamenjena komanda je: %s\n", options_set[index]);
   return 1;
 }
 
-int insert_command(SDL_Keycode command, int index) {
+int insert_command(SDL_Keycode command, int idx) {
   if (config_commands == NULL) {
     SDL_Log("config_commands is NULL");
     return 0;
@@ -47,12 +47,12 @@ int insert_command(SDL_Keycode command, int index) {
     }
   }
 
-  config_commands[index] = command;
+  config_commands[idx] = command;
   const char *buffer = SDL_GetKeyName(command);
   int size_of_buffer = strlen(buffer);
-  commands_keys[index] = (char *)SDL_realloc(
-      commands_keys[index], sizeof(char) * (size_of_buffer + 1));
-  strcpy(commands_keys[index], buffer);
+  commands_keys[idx] = (char *)SDL_realloc(
+      commands_keys[idx], sizeof(char) * (size_of_buffer + 1));
+  strcpy(commands_keys[idx], buffer);
 
   return 1;
 }

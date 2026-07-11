@@ -19,14 +19,14 @@ static const char* paths_to_sounds[] = {
 };
 
 SOUNDBOARD*
-create_soundboard(SDL_AudioDeviceID devid) {
+create_soundboard(MIX_Mixer *mixer) {
     SOUNDBOARD *sb = (SOUNDBOARD*)SDL_malloc(sizeof(SOUNDBOARD));
     sb->lenght = num_of_sounds;
-    sb->devid = devid;
+    sb->mixer = mixer;
     sb->count = 0;
-    sb->sounds = (Mix_Chunk**)SDL_malloc(sizeof(Mix_Chunk*) * sb->lenght);
+    sb->sounds = (MIX_Audio**)SDL_malloc(sizeof(MIX_Audio*) * sb->lenght);
     for (int i = 0; i < num_of_sounds; ++i) {
-        sb->sounds[i] = Mix_LoadWAV(paths_to_sounds[i]);
+        sb->sounds[i] = MIX_LoadAudio(mixer, paths_to_sounds[i], true);
         if (sb->sounds[i] == NULL) {
             SDL_Log("sb->sounds[%d] je NULL i evo greske %s\n", i, SDL_GetError());
             return NULL;
@@ -45,7 +45,7 @@ destroy_soundboard(SOUNDBOARD *sb) {
     } 
     if (sb->sounds != NULL) {
         for (int i = 0; i < sb->lenght; i++) {
-            Mix_FreeChunk(sb->sounds[i]);
+            MIX_DestroyAudio(sb->sounds[i]);
         }
         SDL_free(sb->sounds);
     }
@@ -53,21 +53,20 @@ destroy_soundboard(SOUNDBOARD *sb) {
 }
 
 typedef struct _packet {
-    SDL_AudioDeviceID devid;
-    Mix_Chunk *sound;
+    MIX_Mixer *mixer;
+    MIX_Audio *sound;
 } packet;
 
 void*
 play_sound_on_thread(void *args) {
     packet *tmp = (packet *) args;
-    Mix_Chunk *sound = (Mix_Chunk*)tmp->sound;
+    MIX_Audio *sound = (MIX_Audio*)tmp->sound;
     if (sound == NULL) {
         SDL_Log("tmp is NULL\n");
         return NULL;
     }
-    int status = Mix_PlayChannel(-1, sound, 0);
-    if (status == -1) {
-        SDL_Log("Mix_PlayChannel error: %s\n", SDL_GetError());
+    if (!MIX_PlayAudio(tmp->mixer, sound)) {
+        SDL_Log("MIX_PlayAudio error: %s\n", SDL_GetError());
         return NULL;
     }
     return (void*)sound;
@@ -75,7 +74,7 @@ play_sound_on_thread(void *args) {
 
 int
 play_sound(SOUNDBOARD *sb, int index) {
-    Mix_Volume(-1, config_options[2]);
+    MIX_SetMixerGain(sb->mixer, config_options[2] / 128.0f);
     if (config_options[1] == 0) {
         return 1;
     }
@@ -94,7 +93,7 @@ play_sound(SOUNDBOARD *sb, int index) {
     if (sb->count >= QUEUE_SOUNDS) {
         return 1;
     }
-    packet pckg = {sb->devid, sb->sounds[index]};
+    packet pckg = {sb->mixer, sb->sounds[index]};
     void* tmp = play_sound_on_thread((void*) &pckg);
     //pthread_create(&sb->thread, NULL, play_sound_on_thread, (void*)(&pckg));
     sb->count++;

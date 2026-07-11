@@ -4,7 +4,7 @@
 #include "texture.h"
 #include <string.h>
 
-int same_card_selected(CARD *card1, CARD *card2) { return card1 == card2; }
+bool same_card_selected(const CARD *card1, const CARD *card2) { return card1 == card2; }
 
 void deselect_all_cards(DECK *deck) {
   for (int i = 0; i < 52; i++) {
@@ -12,7 +12,7 @@ void deselect_all_cards(DECK *deck) {
   }
 }
 
-CARD *find_card(DECK *deck, int col, int row) {
+CARD *find_card(const DECK *deck, int col, int row) {
   if (col == 1 && row == 0) {
     // NOTE: Deck card can be NULL.
     return deck->deck_card;
@@ -32,7 +32,7 @@ CARD *find_card(DECK *deck, int col, int row) {
   return NULL;
 }
 
-int select_card_below(CARD *card, DECK *deck) {
+int select_card_below(const CARD *card, const DECK *deck) {
   if (card == NULL) {
     return 0;
   }
@@ -122,14 +122,17 @@ CARD *pop(CARD_STACK *stack) {
   return stack->array[--stack->count];
 }
 
-CARD *top_card(CARD_STACK *stack) {
+CARD *top_card(const CARD_STACK *stack) {
+  if (stack == NULL) {
+    return NULL;
+  }
   if (is_empty(stack)) {
     return NULL;
   }
   return stack->array[stack->count - 1];
 }
 
-int can_card_be_placed(CARD *card_below, CARD *card_above) {
+bool can_card_be_placed(const CARD* card_below, const CARD* card_above) {
   if (card_below->value + 1 != card_above->value) {
     return 0;
   }
@@ -189,7 +192,7 @@ void destroy_card(CARD *card) {
   }
 }
 
-int have_more_cards(DECK *deck) {
+bool have_more_cards(const DECK* deck) {
   if (deck->deck_card != NULL) {
     return 1;
   }

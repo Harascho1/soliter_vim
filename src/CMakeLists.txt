@@ -18,6 +18,7 @@ set(HEADER_FILES
     ${CMAKE_SOURCE_DIR}/src/card.h
     ${CMAKE_SOURCE_DIR}/src/my_timer.h
     ${CMAKE_SOURCE_DIR}/src/render.h
+        stack.h
 )
 
 file(GLOB_RECURSE soliter_src 
@@ -58,45 +59,38 @@ if (WIN32)
 endif()
 
 
+# EXPORT_BUILD=ON  -> distributable build into <repo>/output
+# EXPORT_BUILD=OFF -> normal dev build, binary stays in the CMake build dir
+#                     (cmake-build-debug/, cmake-build-release/, build/, ...)
+option(EXPORT_BUILD "Build the distributable release into output/" OFF)
+
+if(EXPORT_BUILD)
+    set(RUNTIME_DIR "${CMAKE_SOURCE_DIR}/output")
+else()
+    set(RUNTIME_DIR "${CMAKE_BINARY_DIR}")
+endif()
+
 set_target_properties(${PROJECT_NAME}
     PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY            "${CMAKE_SOURCE_DIR}/output"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG      "${CMAKE_SOURCE_DIR}/output"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE    "${CMAKE_SOURCE_DIR}/output")
+    RUNTIME_OUTPUT_DIRECTORY            "${RUNTIME_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG      "${RUNTIME_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE    "${RUNTIME_DIR}")
 
 set(ASSETS_PATH ${CMAKE_SOURCE_DIR}/assets)
 
 find_package(Threads REQUIRED)
-target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads SDL3_mixer::SDL3_mixer SDL3_ttf::SDL3_ttf SDL3_image::SDL3_image SDL3::SDL3)
+find_package(SDL3 CONFIG REQUIRED)
+find_package(SDL3_ttf CONFIG REQUIRED)
+find_package(SDL3_image CONFIG REQUIRED)
+find_package(SDL3_mixer CONFIG REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR}/sdl/SDL/include)
-include_directories(${CMAKE_SOURCE_DIR}/sdl/SDL_ttf/include)
-include_directories(${CMAKE_SOURCE_DIR}/sdl/SDL_image/include)
-include_directories(${CMAKE_SOURCE_DIR}/sdl/SDL_mixer/include)
+target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads SDL3_mixer::SDL3_mixer SDL3_ttf::SDL3_ttf SDL3_image::SDL3_image SDL3::SDL3)
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/pch/pch.h)
 
-if (LINUX) 
-    SET(SDL_MIXER_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_mixer/libSDL3_mixer.so.0")
-    SET(SDL_IMAGE_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_image/libSDL3_image.so.0")
-    SET(SDL_TTF_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_ttf/libSDL3_ttf.so.0")
-    SET(SDL_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL/libSDL3.so.0")
-else()
-    SET(SDL_MIXER_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_mixer/Release/SDL3_mixer.dll")
-    SET(SDL_IMAGE_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_image/Release/SDL3_image.dll")
-    SET(SDL_TTF_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL_ttf/Release/SDL3_ttf.dll")
-    SET(SDL_SHARED_PATH "${CMAKE_BINARY_DIR}/sdl/SDL/Release/SDL3.dll")
-endif()
-
+# Copy assets next to the actual binary, wherever it lands, so relative
+# asset paths work both in dev build dirs and in the exported output/.
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/output"
-    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_MIXER_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/output"
-    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_IMAGE_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/output"
-    COMMAND ${CMAKE_COMMAND} -E copy "${SDL_TTF_SHARED_PATH}" "${CMAKE_SOURCE_DIR}/output"
-    COMMENT "Copying shared libraries")
-
-add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${ASSETS_PATH}" "${CMAKE_SOURCE_DIR}/output/assets"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${ASSETS_PATH}" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets"
     COMMENT "Copying assets")

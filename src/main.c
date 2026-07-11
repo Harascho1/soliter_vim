@@ -57,13 +57,18 @@ int sld_init() {
     return status;
   }
 
+  if (!MIX_Init()) {
+    SDL_Log("MIX_Init failed: %s\n", SDL_GetError());
+    return 0;
+  }
+
   return status;
 }
 
 void cleanup() {
   SDL_QuitSubSystem(SDL_INIT_EVENTS);
   TTF_Quit();
-  Mix_Quit();
+  MIX_Quit();
   SDL_Quit();
 }
 

@@ -1,0 +1,22 @@
+{
+  "name": "sovimter",
+  "version": "0.1.0",
+  "dependencies": [
+    {
+      "name": "sdl3",
+      "default-features": false,
+      "features": [
+        "wayland",
+        "x11"
+      ]
+    },
+    "sdl3-ttf",
+    {
+      "name": "sdl3-image",
+      "features": [
+        "png"
+      ]
+    },
+    "sdl3-mixer"
+  ]
+}

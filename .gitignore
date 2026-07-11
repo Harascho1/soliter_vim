@@ -1,11 +1,15 @@
-build/
-output/
-
+/build/
+/build-export/
+/output/
+cmake-build-*/
+vcpkg_installed/
+/.claude
 
 .cache/
 
-
 .vs/
 .vscode/
+.idea/
+
 compile_commands.json@
 compile_commands.json

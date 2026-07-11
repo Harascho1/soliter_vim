@@ -15,13 +15,13 @@ enum {
 };
 
 typedef struct _SOUNDBOARD {
-    Mix_Chunk **sounds;
+    MIX_Audio **sounds;
     int lenght;
     int count;
-    SDL_AudioDeviceID devid;
+    MIX_Mixer *mixer;
 } SOUNDBOARD;
 
-SOUNDBOARD* create_soundboard(SDL_AudioDeviceID devid);
+SOUNDBOARD* create_soundboard(MIX_Mixer *mixer);
 void destroy_soundboard(SOUNDBOARD *sb);
 
 int play_sound(SOUNDBOARD *soundboard, int index);

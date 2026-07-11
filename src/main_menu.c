@@ -67,44 +67,12 @@ int lazy_load_main_menu(GAME *game) {
   }
   size = game->field.hover_item_font;
   for (int i = 0; i < 4; i++) {
-
-    int font_size;
-    int selected_height;
-    int render_coord_y;
-    int status;
-    int width = game->field.screen_width;
-    int height = game->field.screen_height;
-    int text_width, text_height;
-    int y_coord = height / 2 + game->field.title_padding;
-    if (i == game->main_menu->selected_item) {
-      font_size = game->field.hover_item_font;
-      status = get_text_size(game->font, game->main_menu->items[i].text,
-                             font_size, &text_width, &selected_height);
-      if (status == 0) {
-        SDL_Log("get_text_size failed...\n");
-        return 0;
-      }
-      render_coord_y = y_coord + (text_height - selected_height) / 2;
-    } else {
-      font_size = game->field.item_font;
-      status = get_text_size(game->font, game->main_menu->items[i].text,
-                             font_size, &text_width, &text_height);
-      if (status == 0) {
-        SDL_Log("get_text_size failed...\n");
-        return 0;
-      }
-      render_coord_y = y_coord;
-
-      SDL_FRect colision_box = {(float)(width - text_width) / 2, (float)y_coord,
-                                (float)text_width, (float)text_height};
-
-      tex_hover_menu_items[i] = get_texture_from_text(
-          game->font, game->renderer, game->main_menu->items[i].text, size,
-          &green_color);
-      if (tex_hover_menu_items[i] == NULL) {
-        SDL_Log("hover_menu_items[%d] cannot be initiazlied...", i);
-        return 0;
-      }
+    tex_hover_menu_items[i] = get_texture_from_text(
+        game->font, game->renderer, game->main_menu->items[i].text, size,
+        &green_color);
+    if (tex_hover_menu_items[i] == NULL) {
+      SDL_Log("hover_menu_items[%d] cannot be initiazlied...", i);
+      return 0;
     }
   }
   for (int i = 0; i < 2; i++) {

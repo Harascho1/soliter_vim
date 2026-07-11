@@ -40,6 +40,7 @@ typedef struct _GAME{
     FONT            *font;
     SDL_Texture     *background_texture;
     SDL_Texture     *menu_texture;
+    MIX_Mixer       *mixer;
     SOUNDBOARD      *soundboard;
     DECK            *deck;
     FIELD           field;
