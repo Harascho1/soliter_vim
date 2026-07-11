@@ -53,7 +53,7 @@ bool push(CARD_STACK *stack, CARD *card);
 bool is_empty(CARD_STACK *stack);
 bool is_full(CARD_STACK *stack);
 
-CARD *top_card(CARD_STACK *queue);
+CARD *top_card(const CARD_STACK *stack);
 void pop_all(CARD_STACK *queue);
 
 typedef struct _DECK {
@@ -85,11 +85,11 @@ void deselect_all_cards(DECK *deck);
   NOTE: returns CARD pointer if find in deck for inserted col and row. Returns
   NULL if dont find
 */
-CARD *find_card(DECK *deck, int col, int row);
-int can_card_be_placed(CARD *card_below, CARD *card_above);
+CARD *find_card(const DECK *deck, int col, int row);
+bool can_card_be_placed(const CARD* card_below, const CARD* card_above);
 int sort_a_card(CARD *card, DECK *deck);
-int select_card_below(CARD *card, DECK *deck);
-int same_card_selected(CARD *card1, CARD *card2);
-int have_more_cards(DECK *deck);
+int select_card_below(const CARD *card, const DECK *deck);
+bool same_card_selected(const CARD* card1, const CARD* card2);
+bool have_more_cards(const DECK* deck);
 
 #endif // CARD_H

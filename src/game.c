@@ -104,6 +104,9 @@ int reload_window(GAME *game) {
 int game_init(GAME *game, const char *title, const RESOLUTION *res) {
   int status = 0;
 
+  game->mixer = NULL;
+  game->soundboard = NULL;
+
   SDL_AudioDeviceID devid;
   SDL_AudioSpec spec;
   SDL_memset(&spec, 0, sizeof(spec));
@@ -118,14 +121,14 @@ int game_init(GAME *game, const char *title, const RESOLUTION *res) {
     return status;
   }
 
-  status = Mix_OpenAudio(devid, &spec);
-  if (status == 0) {
-    SDL_Log("Mix_OpenAudio failed: %s\n", SDL_GetError());
+  game->mixer = MIX_CreateMixerDevice(devid, &spec);
+  if (game->mixer == NULL) {
+    SDL_Log("MIX_CreateMixerDevice failed: %s\n", SDL_GetError());
     game_quit(game);
-    return status;
+    return 0;
   }
 
-  game->soundboard = create_soundboard(devid);
+  game->soundboard = create_soundboard(game->mixer);
   if (game->soundboard == NULL) {
     SDL_Log("create_soundboard error\n");
     game_quit(game);
@@ -239,9 +242,11 @@ int game_init(GAME *game, const char *title, const RESOLUTION *res) {
 }
 
 void game_quit(GAME *game) {
-  Mix_CloseAudio();
   if (game->soundboard != NULL) {
     destroy_soundboard(game->soundboard);
+  }
+  if (game->mixer != NULL) {
+    MIX_DestroyMixer(game->mixer);
   }
   if (game->renderer != NULL) {
     SDL_DestroyRenderer(game->renderer);
