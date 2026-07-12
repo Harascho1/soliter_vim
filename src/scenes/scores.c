@@ -1,5 +1,5 @@
-#include "../font.h"
 #include "../game.h"
+#include "../res/font.h"
 #include "SDL3/SDL_log.h"
 
 SDL_Texture *tex_top_10_scores[10];

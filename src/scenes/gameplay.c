@@ -3,7 +3,7 @@
 #include "../cursor.h"
 #include "../game.h"
 #include "../my_timer.h"
-#include "../sound.h"
+#include "../res/sound.h"
 #include "SDL3/SDL_log.h"
 
 char buffer[10] = "";

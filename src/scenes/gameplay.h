@@ -2,7 +2,7 @@
 #define GAMEPLAY_H
 
 #include "../game.h"
-#include "../textbox.h"
+#include "../res/textbox.h"
 
 extern char buffer[10];
 extern TEXTBOX *textbox;

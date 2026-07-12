@@ -1,13 +1,13 @@
-#include "../config.h"
 #include "../cursor.h"
 #include "../game.h"
-#include "gameplay.h"
-#include "../sound.h"
-#include "../textbox.h"
+#include "../res/config.h"
+#include "../res/sound.h"
+#include "../res/textbox.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_keyboard.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_log.h"
+#include "gameplay.h"
 
 static char *text_box_text = "";
 

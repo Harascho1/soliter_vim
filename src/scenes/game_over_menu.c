@@ -1,7 +1,7 @@
 #include "game_over_menu.h"
 #include "../game.h"
 #include "../my_timer.h"
-#include "../texture.h"
+#include "../res/texture.h"
 
 static const char *title[2] = {"GAME OVER", "YOU W0N"};
 
@@ -167,16 +167,6 @@ bool game_over_menu_render(GAME *game) {
   if (game->renderer == NULL) {
     SDL_Log("game->renderer is NULL\n");
     return 0;
-  }
-
-  if (game->background_texture == NULL) {
-    SDL_Log("g_background_texture is NULL\n");
-    game->background_texture =
-        create_texture_from_image(game->renderer, "assets/background.png");
-    if (game->background_texture == NULL) {
-      SDL_Log("Background texture is NULL\n");
-      return 0;
-    }
   }
 
   int status = SDL_RenderClear(game->renderer);

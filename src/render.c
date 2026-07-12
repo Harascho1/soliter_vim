@@ -1,26 +1,15 @@
 #include "render.h"
-#include "texture.h"
 #include "SDL3/SDL_log.h"
 #include "game.h"
+#include "res/texture.h"
 
 bool render_background(GAME *game) {
-  bool status;
   if (game->renderer == NULL) {
     SDL_Log("game->renderer is NULL\n");
     return 0;
   }
 
-  if (game->background_texture == NULL) {
-    SDL_Log("g_background_texture is NULL\n");
-    game->background_texture =
-        create_texture_from_image(game->renderer, "assets/background.png");
-    if (game->background_texture == NULL) {
-      SDL_Log("Background texture is NULL\n");
-      return 0;
-    }
-  }
-
-  status = SDL_RenderClear(game->renderer);
+  bool status = SDL_RenderClear(game->renderer);
   if (status == 0) {
     SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
     return 0;

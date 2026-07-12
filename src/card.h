@@ -1,7 +1,7 @@
 #ifndef CARD_H
 #define CARD_H
 
-#include "field.h"
+#include "res/field.h"
 
 #define STACK_SIZE 30
 

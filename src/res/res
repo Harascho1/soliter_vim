@@ -1,0 +1,19 @@
+width: 900 & height: 900
+card_padding_width: 30
+card_padding_height: 25
+screen_padding: 20
+gameplay_screen_padding_width: 10
+square_screen_padding_width: 0
+gameplay_screen_padding_height: 20
+card_width: 100
+card_height: 100
+cursor_padding: 7
+name_textbox_width: 880
+name_textbox_height: 125
+title_font: 90
+title_padding: 45
+item_font: 45
+item_padding: 22
+hover_item_font: 60
+text_font: 36
+text_padding: 18

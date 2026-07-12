@@ -6,7 +6,7 @@
 #include <uchar.h>
 
 TEXTBOX*
-create_textbox(int n) {
+create_textbox(const int n) {
     TEXTBOX *textbox = (TEXTBOX*)SDL_malloc(sizeof(TEXTBOX));
 
     textbox->max_caracters = n;

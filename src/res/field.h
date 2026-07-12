@@ -3,7 +3,7 @@
 
 #include "font.h"
 
-typedef struct _FIELD {
+typedef struct {
     int screen_width;
     int screen_height;
     int screen_padding;
@@ -30,7 +30,7 @@ typedef struct _FIELD {
     int title_padding;
     int item_padding;
     int text_padding;
-}FIELD;
+} FIELD;
 
 int load_field(FIELD *field, int screen_width, int screen_height, FONT *font);
 

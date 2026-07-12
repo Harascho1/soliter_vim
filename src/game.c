@@ -5,10 +5,10 @@
 #include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_video.h"
 #include "SDL3_mixer/SDL_mixer.h"
-#include "config.h"
-#include "field.h"
-#include "sound.h"
-#include "texture.h"
+#include "res/config.h"
+#include "res/field.h"
+#include "res/sound.h"
+#include "res/texture.h"
 #include <ctype.h>
 #include <string.h>
 
@@ -67,9 +67,9 @@ bool load_game_field(DECK *deck, const FIELD *field)
   return 1;
 }
 
-int fullscree_mode(GAME *game) {
+int fullscree_mode(const GAME *game) {
   SDL_DisplayID id;
-  int status = SDL_SetWindowFullscreen(game->window, config_options[0]);
+  const int status = SDL_SetWindowFullscreen(game->window, config_options[0]);
   if (status == 0) {
     SDL_Log("SDL_SetWindowFullscreen error %s", SDL_GetError());
     return status;
@@ -188,7 +188,7 @@ int game_init(GAME *game, const char *title, const RESOLUTION *res) {
   }
 
   game->background_texture =
-      create_texture_from_image(game->renderer, "assets/table.png");
+      create_texture_from_image(game->renderer, "assets/background.png");
   if (game->background_texture == NULL) {
     SDL_Log("Background texture is NULL\n");
     game_quit(game);
@@ -332,6 +332,7 @@ int make_string_array(char **array_of_strings, int *i) {
   if (saves_files_bin == NULL) {
     return 1;
   }
+
   char ptr;
   int index = 0;
   int prev_index = index;
@@ -341,13 +342,15 @@ int make_string_array(char **array_of_strings, int *i) {
   }
 
   while (*i < 10 && ptr != EOF) {
-    // printf("ptr = %d, ", ptr);
     if (ptr == '\0') {
+      /*
+      * In the first iteration this will be 1
+     */
       const int n_size = index - prev_index + 1;
-      // printf("n_size = %d\n", n_size);
       if (n_size == 1) {
         break;
       }
+
       fseek(saves_files_bin, prev_index, SEEK_SET);
       status = (int)fread(array_of_strings[(*i)++], sizeof(char), n_size,
                      saves_files_bin);
@@ -408,8 +411,10 @@ int get_new_insert_index(const int *array, int *i, const unsigned int num) {
   return -1;
 }
 
-int make_new_array_of_strings(char **strings_of_array, int i, char *new_string,
-                              int new_insert_index) {
+// TODO:
+int make_new_array_of_strings(char **strings_of_array, const int i,
+                              const char *new_string,
+                              const int new_insert_index) {
   char tmp[255];
   int j = new_insert_index;
   strcpy(tmp, strings_of_array[j]);

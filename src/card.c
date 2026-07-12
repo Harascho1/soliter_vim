@@ -1,7 +1,7 @@
 #include "card.h"
 #include "SDL3/SDL_log.h"
+#include "res/texture.h"
 #include "scenes/gameplay.h"
-#include "texture.h"
 #include <string.h>
 
 bool same_card_selected(const CARD *card1, const CARD *card2) {

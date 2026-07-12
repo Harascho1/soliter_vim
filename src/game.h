@@ -4,11 +4,11 @@
 #include "SDL3/SDL_stdinc.h"
 #include "card.h"
 #include "cursor.h"
-#include "field.h"
-#include "font.h"
 #include "menu.h"
 #include "my_timer.h"
-#include "sound.h"
+#include "res/field.h"
+#include "res/font.h"
+#include "res/sound.h"
 
 extern Uint32 g_change_scene_event_type;
 extern Uint8 game_c;

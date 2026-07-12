@@ -5,41 +5,42 @@ set(ASSETS_PATH ${PROJECT_SOURCE_DIR}/assets)
 set(HEADER_FILES
     card.h
     clickable_element.h
-    config.h
+    res/config.h
     cursor.h
-    field.h
-    font.h
+    res/field.h
+    res/font.h
     game.h
     menu.h
     my_timer.h
     render.h
-    sound.h
+    res/sound.h
     stack.h
-    textbox.h
-    texture.h
+    res/textbox.h
+    res/texture.h
     scenes/game_over_menu.h
     scenes/gameplay.h
     scenes/macro_settings.h
     scenes/main_menu.h
     scenes/option_settings.h
     scenes/settings.h
+    res/res.h
 )
 
 set(SOURCE_FILES
     card.c
     clickable_element.c
-    config.c
+    res/config.c
     cursor.c
-    field.c
-    font.c
+    res/field.c
+    res/font.c
     game.c
     main.c
     menu.c
     my_timer.c
     render.c
-    sound.c
-    textbox.c
-    texture.c
+    res/sound.c
+    res/textbox.c
+    res/texture.c
     scenes/game_over_menu.c
     scenes/gameplay.c
     scenes/gameplay_event.c
@@ -49,6 +50,7 @@ set(SOURCE_FILES
     scenes/option_settings.c
     scenes/scores.c
     scenes/settings.c
+    res/res.c
 )
 
 if (WIN32)

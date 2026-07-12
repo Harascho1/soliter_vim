@@ -31,11 +31,11 @@ void destroy_font(FONT *font) {
 
 bool set_font_size(FONT *font, const int size) {
   if (font == NULL) {
-    return 0;
+    return false;
   }
   TTF_SetFontSize(font->font, (float)size);
   font->size = size;
-  return 1;
+  return true;
 }
 
 int get_text_size(FONT *font, const char *text, int size, int *width,

@@ -1,13 +1,13 @@
 #include "../card.h"
 #include "../cursor.h"
-#include "../font.h"
 #include "../game.h"
-#include "gameplay.h"
-#include "../textbox.h"
-#include "../texture.h"
+#include "../res/font.h"
+#include "../res/textbox.h"
+#include "../res/texture.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
+#include "gameplay.h"
 #include <string.h>
 
 static SDL_Color white_color = {255, 255, 255, 255};
@@ -390,16 +390,6 @@ bool gameplay_render(GAME *game) {
   if (game->renderer == NULL) {
     SDL_Log("game->renderer is NULL\n");
     return 0;
-  }
-
-  if (game->background_texture == NULL) {
-    SDL_Log("g_background_texture is NULL\n");
-    game->background_texture =
-        create_texture_from_image(game->renderer, "assets/background.png");
-    if (game->background_texture == NULL) {
-      SDL_Log("Background texture is NULL\n");
-      return 0;
-    }
   }
 
   int status =

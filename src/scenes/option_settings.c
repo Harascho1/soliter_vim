@@ -1,7 +1,7 @@
 #include "option_settings.h"
-#include "../config.h"
 #include "../game.h"
-#include "../texture.h"
+#include "../res/config.h"
+#include "../res/texture.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_render.h"
 
@@ -199,15 +199,6 @@ option_settings_render(GAME *game) {
     if (status == 0) {
         SDL_Log("SDL_GetWindowSizeInPixels error: %s\n", SDL_GetError());
         return status;
-    }
-
-    if (game->background_texture == NULL) {
-        SDL_Log("g_background_texture is NULL\n");
-        game->background_texture = create_texture_from_image(game->renderer, "assets/background.png");
-        if (game->background_texture == NULL) {
-            SDL_Log("Background texture is NULL\n");
-            return 0;
-        }
     }
 
     status = SDL_RenderClear(game->renderer);

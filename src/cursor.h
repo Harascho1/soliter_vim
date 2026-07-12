@@ -2,7 +2,7 @@
 #define CURSOR_H
 
 #include "card.h"
-#include "field.h"
+#include "res/field.h"
 
 #define CURSOR_NORMAL_MODE 0x0
 #define CURSOR_SELECT_MODE 0x1
