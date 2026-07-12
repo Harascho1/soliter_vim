@@ -2,6 +2,7 @@
 #include "../game.h"
 #include "../res/config.h"
 #include "../res/texture.h"
+#include "../res/res.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_render.h"
 
@@ -20,7 +21,7 @@ bool lazy_load_option(const GAME* game) {
 
   int size;
   for (int i = 0; i < 3; i++) {
-    size = game->field.item_font;
+    size = fonts.item_font;
     tex_opt->tex_options_set[i] = get_texture_from_text(
       game->font, game->renderer, options_set[i], size, &white_color
     );
@@ -28,7 +29,7 @@ bool lazy_load_option(const GAME* game) {
       SDL_Log("items[%d]  cannot be initiazlied...", i);
       return 0;
     }
-    size = game->field.hover_item_font;
+    size = fonts.item_hover_font;
     tex_opt->tex_hover_options_set[i] = get_texture_from_text(
       game->font, game->renderer, options_set[i], size, &green_color
     );
@@ -45,7 +46,7 @@ bool option_setting_lazy_load(const GAME* game) {
 
   tex_opt = (TEX_OPTIONS_SETTINGS*)SDL_malloc(sizeof(TEX_OPTIONS_SETTINGS));
 
-  size = game->field.title_font;
+  size = fonts.title_font;
   tex_opt->tex_title_menu =
     get_texture_from_text(game->font, game->renderer, title, size, &white_color);
   if (tex_opt->tex_title_menu == NULL) {
@@ -53,7 +54,7 @@ bool option_setting_lazy_load(const GAME* game) {
     return 0;
   }
 
-  size = game->field.item_font;
+  size = fonts.item_font;
   for (int i = 0; i < 3; i++) {
     tex_opt->tex_items[i] =
       get_texture_from_text(game->font, game->renderer, text[i], size, &white_color);
@@ -70,7 +71,7 @@ bool option_setting_lazy_load(const GAME* game) {
     }
   }
 
-  size = game->field.hover_item_font;
+  size = fonts.item_hover_font;
   for (int i = 0; i < 3; i++) {
     tex_opt->tex_hover_items[i] =
       get_texture_from_text(game->font, game->renderer, text[i], size, &green_color);
@@ -210,7 +211,7 @@ bool option_settings_render(GAME* game) {
 
   int title_width, title_height;
   status =
-    get_text_size(game->font, title, game->field.title_font, &title_width, &title_height);
+    get_text_size(game->font, title, fonts.title_font, &title_width, &title_height);
   if (status == 0) {
     SDL_Log("get_text_size error...\n");
     return 0;
@@ -218,7 +219,7 @@ bool option_settings_render(GAME* game) {
 
   status = render_text(
     game->renderer, tex_opt->tex_title_menu,
-    &(SDL_Point){.x = (width - title_width) / 2, .y = game->field.screen_padding}
+    &(SDL_Point){.x = (width - title_width) / 2, .y = screen_dimens.padding}
   );
   if (status == 0) {
     SDL_Log("render_text error...\n");
@@ -227,36 +228,36 @@ bool option_settings_render(GAME* game) {
 
   int text_width, text_height;
   status =
-    get_text_size(game->font, "shift", game->field.item_font, &text_width, &text_height);
+    get_text_size(game->font, "shift", fonts.item_font, &text_width, &text_height);
   if (status == 0) {
     SDL_Log("get_text_size error...\n");
     return 0;
   }
 
-  int y_pos = (title_height + game->field.screen_padding);
-  int text_x_pos = game->field.screen_padding;
+  int y_pos = (title_height + screen_dimens.padding);
+  int text_x_pos = screen_dimens.padding;
   int commands_x_pos = width - text_width;
-  int font = game->field.item_font;
+  int font = fonts.item_font;
   for (int i = 0; i < 3; i++) {
     SDL_Color* color;
-    int font = game->field.item_font;
+    int font = fonts.item_font;
     int commands_y_pos;
 
     int commands_selected_height;
     if (selected_index == i) {
       status = get_text_size(
-        game->font, options_set[i], game->field.hover_item_font, &text_width,
+        game->font, options_set[i], fonts.item_hover_font, &text_width,
         &commands_selected_height
       );
       color = &green_color;
-      font = game->field.hover_item_font;
+      font = fonts.item_hover_font;
       commands_y_pos = y_pos + (text_height - commands_selected_height) / 2;
     } else {
       status = get_text_size(
-        game->font, options_set[i], game->field.item_font, &text_width, NULL
+        game->font, options_set[i], fonts.item_font, &text_width, NULL
       );
       color = &white_color;
-      font = game->field.item_font;
+      font = fonts.item_font;
       commands_y_pos = y_pos;
     }
 
@@ -289,7 +290,7 @@ bool option_settings_render(GAME* game) {
       SDL_Log("render_text error...\n");
     }
 
-    y_pos += text_height + game->field.item_padding;
+    y_pos += text_height + fonts.item_padding;
   }
 
   status = SDL_RenderPresent(game->renderer);

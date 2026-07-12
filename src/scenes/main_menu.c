@@ -38,14 +38,14 @@ void action() {
 }
 
 bool lazy_load_main_menu(const GAME* game) {
-  int size = game->field.title_font;
+  int size = fonts.title_font;
   tex_game_title =
     get_texture_from_text(game->font, game->renderer, title, size, &title_color);
   if (tex_game_title == NULL) {
     SDL_Log("game_title cannot be initiazlied...");
     return 0;
   }
-  size = game->field.item_font;
+  size = fonts.item_font;
   for (int i = 0; i < 4; i++) {
     tex_menu_items[i] = get_texture_from_text(
       game->font, game->renderer, game->main_menu->items[i].text, size, &white_color
@@ -64,7 +64,7 @@ bool lazy_load_main_menu(const GAME* game) {
       return 0;
     }
   }
-  size = game->field.hover_item_font;
+  size = fonts.item_hover_font;
   for (int i = 0; i < 4; i++) {
     tex_hover_menu_items[i] = get_texture_from_text(
       game->font, game->renderer, game->main_menu->items[i].text, size, &green_color
@@ -171,7 +171,7 @@ bool main_menu_render(GAME* game) {
   int height = resolution.height;
   int text_width, text_height;
   status =
-    get_text_size(game->font, title, game->field.title_font, &text_width, &text_height);
+    get_text_size(game->font, title, fonts.title_font, &text_width, &text_height);
   if (status == 0) {
     SDL_Log("get_text_size failed...\n");
     return 0;
@@ -187,20 +187,20 @@ bool main_menu_render(GAME* game) {
   }
 
   status = get_text_size(
-    game->font, game->main_menu->items[0].text, game->field.item_font, NULL, &text_height
+    game->font, game->main_menu->items[0].text, fonts.item_font, NULL, &text_height
   );
   if (status == 0) {
     SDL_Log("get_text_size failed...\n");
     return 0;
   }
 
-  int y_coord = height / 2 + game->field.title_padding;
+  int y_coord = height / 2 + fonts.title_padding;
   for (int i = 0; i < game->main_menu->count; i++) {
     int font_size;
     int selected_height;
     int render_coord_y;
     if (i == game->main_menu->selected_item) {
-      font_size = game->field.hover_item_font;
+      font_size = fonts.item_hover_font;
       status = get_text_size(
         game->font, game->main_menu->items[i].text, font_size, &text_width,
         &selected_height
@@ -211,7 +211,7 @@ bool main_menu_render(GAME* game) {
       }
       render_coord_y = y_coord + (text_height - selected_height) / 2;
     } else {
-      font_size = game->field.item_font;
+      font_size = fonts.item_font;
       status = get_text_size(
         game->font, game->main_menu->items[i].text, font_size, &text_width, &text_height
       );
@@ -234,7 +234,7 @@ bool main_menu_render(GAME* game) {
       return 0;
     }
 
-    y_coord += text_height + game->field.item_padding;
+    y_coord += text_height + fonts.item_padding;
   }
 
   status = SDL_RenderPresent(game->renderer);

@@ -30,8 +30,8 @@ bool load_game_field(DECK* deck, const FIELD* field) {
   int x_coord = game_dimens.padding_width;
 
   for (int i = 0; i < number_of_cards_in_row; ++i) {
-    int y_coord = game_dimens.padding_height + field->card_padding_height +
-                  field->card_height;
+    int y_coord = game_dimens.padding_height + card_dimens.height_padding +
+                  card_dimens.height;
     g_invisible_card[i].frame = SDL_malloc(sizeof(SDL_FPoint));
     g_invisible_card[i].pos = SDL_malloc(sizeof(POSITION));
     g_invisible_card[i].pos->row = 1;
@@ -49,10 +49,10 @@ bool load_game_field(DECK* deck, const FIELD* field) {
       deck->cards[count].pos->row = j + 1;
       deck->cards[count].on_field = 1;
 
-      y_coord += field->card_padding_height;
+      y_coord += card_dimens.height_padding;
       count++;
     }
-    x_coord += field->card_padding_width + field->card_width;
+    x_coord += card_dimens.width_padding + card_dimens.width;
   }
   for (; count < 52; count++) {
     deck->cards[count].frame->x = game_dimens.padding_width;
@@ -144,7 +144,7 @@ int game_init(GAME* game, const char* title) {
     SDL_Log("SDL_GetWindowSizeInPixels failed: %s\n", SDL_GetError());
   }
 
-  status = load_field(&game->field, w, h, game->font);
+  status = load_field(w, h, game->font);
   if (status == 0) {
     SDL_Log("load_field error...\n");
     game_quit(game);
@@ -172,7 +172,7 @@ int game_init(GAME* game, const char* title) {
     return status;
   }
 
-  game->setting_menu = create_menu(texts.items.game_over, texts.items.count_settings);
+  game->setting_menu = create_menu(texts.items.settings, texts.items.count_settings);
   if (game->setting_menu == NULL) {
     SDL_Log("menu_init failed.\n");
     game_quit(game);
@@ -272,7 +272,7 @@ int reload_window(GAME* game) {
     SDL_Log("SDL_GetWindowSizeInPixels failed: %s\n", SDL_GetError());
   }
 
-  status = load_field(&game->field, screen_width, screen_height, game->font);
+  status = load_field(screen_width, screen_height, game->font);
   if (status == false) {
     SDL_Log("load_field error...\n");
     game_quit(game);

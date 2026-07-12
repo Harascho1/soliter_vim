@@ -2,6 +2,7 @@
 #include "../game.h"
 #include "../res/config.h"
 #include "../res/texture.h"
+#include "../res/res.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_render.h"
@@ -34,7 +35,7 @@ bool lazy_load_config(const GAME* game) {
   }
 
   for (int i = 0; i < 14; i++) {
-    int size = game->field.item_font;
+    int size = fonts.item_font;
     tex_command_keys[i] = get_texture_from_text(
       game->font, game->renderer, commands_keys[i], size, &white_color
     );
@@ -42,7 +43,7 @@ bool lazy_load_config(const GAME* game) {
       SDL_Log("items[%d]  cannot be initiazlied...", i);
       return 0;
     }
-    size = game->field.hover_item_font;
+    size = fonts.item_hover_font;
     tex_hover_command_keys[i] = get_texture_from_text(
       game->font, game->renderer, commands_keys[i], size, &green_color
     );
@@ -56,7 +57,7 @@ bool lazy_load_config(const GAME* game) {
 
 bool macro_setting_menu_lazy_load(const GAME* game) {
 
-  int size = game->field.title_font;
+  int size = fonts.title_font;
   tex_title_menu =
     get_texture_from_text(game->font, game->renderer, title, size, &white_color);
   if (tex_title_menu == NULL) {
@@ -71,7 +72,7 @@ bool macro_setting_menu_lazy_load(const GAME* game) {
     return false;
   }
 
-  size = game->field.item_font;
+  size = fonts.item_font;
   for (int i = 0; i < 14; i++) {
     tex_items[i] =
       get_texture_from_text(game->font, game->renderer, text[i], size, &white_color);
@@ -88,7 +89,7 @@ bool macro_setting_menu_lazy_load(const GAME* game) {
     }
   }
 
-  size = game->field.hover_item_font;
+  size = fonts.item_hover_font;
   for (int i = 0; i < 14; i++) {
     tex_hover_items[i] =
       get_texture_from_text(game->font, game->renderer, text[i], size, &green_color);
@@ -168,7 +169,7 @@ int render_press_key_popout(const GAME* game) {
   int text_width, text_height;
   status = get_text_size(
     game->font, press_key,
-    game->field.title_font, // ? nzm da li je font okej?
+    fonts.title_font, // ? nzm da li je font okej?
     &text_width, &text_height
   );
   if (status == 0) {
@@ -231,7 +232,7 @@ bool macro_settings_render(GAME* game) {
 
   int title_width, title_height;
   status =
-    get_text_size(game->font, title, game->field.title_font, &title_width, &title_height);
+    get_text_size(game->font, title, fonts.title_font, &title_width, &title_height);
   if (status == 0) {
     SDL_Log("get_text_size error...\n");
     return 0;
@@ -239,7 +240,7 @@ bool macro_settings_render(GAME* game) {
 
   status = render_text(
     game->renderer, tex_title_menu,
-    &(SDL_Point){.x = (width - title_width) / 2, .y = game->field.screen_padding}
+    &(SDL_Point){.x = (width - title_width) / 2, .y = screen_dimens.padding}
   );
   if (status == 0) {
     SDL_Log("render_text error...\n");
@@ -251,37 +252,37 @@ bool macro_settings_render(GAME* game) {
     game->font,
     "ht shift", // right indent for smth long like: right
                 // shift, right ctrl, left ctrl...
-    game->field.item_font, &text_width, &text_height
+    fonts.item_font, &text_width, &text_height
   );
   if (status == 0) {
     SDL_Log("get_text_size error...\n");
     return 0;
   }
 
-  int y_pos = (title_height + game->field.screen_padding);
-  int text_x_pos = game->field.screen_padding;
+  int y_pos = (title_height + screen_dimens.padding);
+  int text_x_pos = screen_dimens.padding;
   int commands_x_pos = width - text_width;
-  int font = game->field.item_font;
+  int font = fonts.item_font;
   for (int i = 0; i < 14; i++) {
     SDL_Color* color;
-    int font = game->field.item_font;
+    int font = fonts.item_font;
     int commands_y_pos;
 
     int commands_selected_height;
     if (selected_index == i) {
       status = get_text_size(
-        game->font, commands_keys[i], game->field.hover_item_font, &text_width,
+        game->font, commands_keys[i], fonts.item_hover_font, &text_width,
         &commands_selected_height
       );
       color = &green_color;
-      font = game->field.hover_item_font;
+      font = fonts.item_hover_font;
       commands_y_pos = y_pos + (text_height - commands_selected_height) / 2;
     } else {
       status = get_text_size(
-        game->font, commands_keys[i], game->field.item_font, &text_width, NULL
+        game->font, commands_keys[i], fonts.item_font, &text_width, NULL
       );
       color = &white_color;
-      font = game->field.item_font;
+      font = fonts.item_font;
       commands_y_pos = y_pos;
     }
 
@@ -315,7 +316,7 @@ bool macro_settings_render(GAME* game) {
       SDL_Log("render_text error...\n");
     }
 
-    y_pos += text_height + game->field.text_padding / 2;
+    y_pos += text_height + fonts.text_padding / 2;
   }
 
   if (event_status == 1) {

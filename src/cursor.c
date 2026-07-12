@@ -10,10 +10,10 @@ CURSOR* create_cursor(FIELD* field, int col, int row) {
 
   cursor->cursor = SDL_malloc(sizeof(SDL_FRect));
   cursor->cursor->x = game_dimens.padding_width - cursor_dimens.padding;
-  cursor->cursor->y = game_dimens.padding_height + field->card_padding_height +
-                      field->card_height - field->cursor_padding;
-  cursor->cursor->w = field->card_width + field->cursor_padding * 2;
-  cursor->cursor->h = field->card_height + field->cursor_padding * 2;
+  cursor->cursor->y = game_dimens.padding_height + card_dimens.height_padding +
+                      card_dimens.height - cursor_dimens.padding;
+  cursor->cursor->w = card_dimens.width + cursor_dimens.padding * 2;
+  cursor->cursor->h = card_dimens.height + cursor_dimens.padding * 2;
 
   cursor->mode = 0;
   return cursor;

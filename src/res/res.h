@@ -1,10 +1,7 @@
-//
-// Created by luka on 7/12/26.
-//
-
 #ifndef SOVIMTER_RES_H
 #define SOVIMTER_RES_H
 #include <SDL3/SDL_pixels.h>
+#include "font.h"
 
 typedef struct {
   SDL_Color white;
@@ -124,17 +121,19 @@ extern DEFAULT_SCREEN_DIMENS screen_dimens;
 
 typedef struct {
   int title_font;
-  int title_width;
-  int title_height;
-  int title_padding;
+  float title_width;
+  float title_height;
+  float title_padding;
 
   int item_font;
-  int item_padding;
+  float item_padding;
   int item_hover_font;
 
   int text_font;
-  int text_padding;
+  float text_padding;
 } FONT_DIMENS;
 extern FONT_DIMENS fonts;
 
-#endif // SOVIMTER_RES_H
+bool load_field(int screen_width, int screen_height, FONT* font);
+
+#endif

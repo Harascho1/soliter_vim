@@ -1,4 +1,5 @@
 #include "../game.h"
+#include "../res/res.h"
 #include "SDL3/SDL_render.h"
 
 static SDL_Color green_color = {150, 255, 150, 255};
@@ -75,16 +76,16 @@ bool render_guide(GAME* game) {
   int status;
 
   int text_width, text_height;
-  status = set_font_size(game->font, game->field.text_font);
+  status = set_font_size(game->font, fonts.text_font);
   if (status == 0) {
     SDL_Log("get_text_size error\n");
     return 0;
   }
   status = render_wrapped_text(
-    game->font, game->renderer, normal_mode, game->field.text_font,
+    game->font, game->renderer, normal_mode, fonts.text_font,
     &(SDL_Point){
-      .x = game->field.screen_padding,
-      .y = game->field.title_padding,
+      .x = screen_dimens.padding,
+      .y = fonts.title_padding,
     },
     &(SDL_Color){255, 255, 255, 255}
   );
@@ -94,9 +95,9 @@ bool render_guide(GAME* game) {
   }
 
   status = render_wrapped_text(
-    game->font, game->renderer, universal_rule, game->field.text_font,
-    &(SDL_Point){.x = game->field.screen_padding,
-                 .y = height / 1.5 + game->field.title_padding},
+    game->font, game->renderer, universal_rule, fonts.text_font,
+    &(SDL_Point){.x = screen_dimens.padding,
+                 .y = height / 1.5 + fonts.title_padding},
     &(SDL_Color){255, 255, 255, 255}
   );
   if (status == 0) {
@@ -105,9 +106,9 @@ bool render_guide(GAME* game) {
   }
 
   status = render_wrapped_text(
-    game->font, game->renderer, fly_mode, game->field.text_font,
-    &(SDL_Point){.x = game->field.screen_padding,
-                 .y = height / 4 + game->field.text_padding},
+    game->font, game->renderer, fly_mode, fonts.text_font,
+    &(SDL_Point){.x = screen_dimens.padding,
+                 .y = height / 4 + fonts.text_padding},
     &(SDL_Color){255, 255, 255, 255}
   );
   if (status == 0) {
@@ -116,7 +117,7 @@ bool render_guide(GAME* game) {
   }
 
   status = get_text_size(
-    game->font, game->setting_menu->items[0].text, game->field.item_font, &text_width,
+    game->font, game->setting_menu->items[0].text, fonts.item_font, &text_width,
     &text_height
   );
   if (status == 0) {
@@ -126,7 +127,7 @@ bool render_guide(GAME* game) {
 
   int selected_text_width, selected_text_height;
   status = get_text_size(
-    game->font, game->setting_menu->items[0].text, game->field.hover_item_font,
+    game->font, game->setting_menu->items[0].text, fonts.item_hover_font,
     &selected_text_width, &selected_text_height
   );
   if (status == 0) {
@@ -137,9 +138,9 @@ bool render_guide(GAME* game) {
   SDL_Color selected_color = {150, 255, 150, 255};
   SDL_Color not_selected_color = {255, 255, 255, 255};
 
-  int not_selected_width = game->field.screen_padding;
-  int selected_width = game->field.screen_padding;
-  int y_pos = height - text_height - game->field.screen_padding * 2;
+  int not_selected_width = screen_dimens.padding;
+  int selected_width = screen_dimens.padding;
+  int y_pos = height - text_height - screen_dimens.padding * 2;
 
   SDL_Point not_selected_point = (SDL_Point){.x = not_selected_width, .y = y_pos};
   SDL_Point selected_point = (SDL_Point){.x = selected_width, .y = y_pos};
@@ -147,11 +148,11 @@ bool render_guide(GAME* game) {
     SDL_Color* color = &not_selected_color;
     SDL_Point* point = &not_selected_point;
     SDL_Texture* item = tex_settings_menu_items[i];
-    int font_size = game->field.item_font;
+    int font_size = fonts.item_font;
 
     if (i == game->setting_menu->selected_item) {
       color = &selected_color;
-      font_size = game->field.hover_item_font;
+      font_size = fonts.item_hover_font;
       point = &selected_point;
       item = tex_hover_settings_menu_items[i];
     }
@@ -163,7 +164,7 @@ bool render_guide(GAME* game) {
 
     if (i != game->setting_menu->count - 1) {
       status = get_text_size(
-        game->font, game->setting_menu->items[i + 1].text, game->field.item_font,
+        game->font, game->setting_menu->items[i + 1].text, fonts.item_font,
         &text_width, &text_height
       );
       if (status == 0) {
@@ -171,7 +172,7 @@ bool render_guide(GAME* game) {
         return 0;
       }
       status = get_text_size(
-        game->font, game->setting_menu->items[i + 1].text, game->field.hover_item_font,
+        game->font, game->setting_menu->items[i + 1].text, fonts.item_hover_font,
         &selected_text_width, &selected_text_height
       );
       if (status == 0) {
@@ -179,8 +180,8 @@ bool render_guide(GAME* game) {
         return 0;
       }
     }
-    not_selected_width += (width - text_width) / 2 - game->field.screen_padding;
-    selected_width += (width - selected_text_width) / 2 - game->field.screen_padding;
+    not_selected_width += (width - text_width) / 2 - screen_dimens.padding;
+    selected_width += (width - selected_text_width) / 2 - screen_dimens.padding;
     not_selected_point.x = not_selected_width;
     selected_point.x = selected_width;
   }
@@ -224,7 +225,7 @@ bool setting_render(GAME* game) {
 
 bool setting_lazy_load(const GAME* game) {
   int size;
-  size = game->field.item_font;
+  size = fonts.item_font;
   for (int i = 0; i < 3; i++) {
     tex_settings_menu_items[i] = get_texture_from_text(
       game->font, game->renderer, game->setting_menu->items[i].text, size, &white_color
@@ -234,7 +235,7 @@ bool setting_lazy_load(const GAME* game) {
       return 0;
     }
   }
-  size = game->field.hover_item_font;
+  size = fonts.item_hover_font;
   for (int i = 0; i < 3; i++) {
     tex_hover_settings_menu_items[i] = get_texture_from_text(
       game->font, game->renderer, game->setting_menu->items[i].text, size, &green_color

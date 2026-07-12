@@ -7,7 +7,6 @@ set(HEADER_FILES
     clickable_element.h
     res/config.h
     cursor.h
-    res/field.h
     res/font.h
     game.h
     menu.h
@@ -31,7 +30,7 @@ set(SOURCE_FILES
     clickable_element.c
     res/config.c
     cursor.c
-    res/field.c
+    res/load_field.c
     res/font.c
     game.c
     main.c

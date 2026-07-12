@@ -1,6 +1,7 @@
 #include "card.h"
 #include "SDL3/SDL_log.h"
 #include "res/texture.h"
+#include "res/res.h"
 #include "scenes/gameplay.h"
 #include <string.h>
 
@@ -305,7 +306,7 @@ bool render_card(
 
   const int status = SDL_RenderTexture(
     renderer, texture, NULL,
-    &(SDL_FRect){point->x, point->y, (float)field->card_width, (float)field->card_height}
+    &(SDL_FRect){point->x, point->y, card_dimens.width, card_dimens.height}
   );
 
   if (status == 0) {

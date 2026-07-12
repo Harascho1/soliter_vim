@@ -133,11 +133,11 @@ bool place_king(CARD** card, const int num, const CURSOR* cursor, const FIELD* f
     card[i]->pos->col = cursor_col;
     card[i]->pos->row = cursor_row + 1;
     card[i]->frame->x = x_coord;
-    card[i]->frame->y = y_coord + (float)field->card_padding_height;
+    card[i]->frame->y = y_coord + (float)card_dimens.height_padding;
     card[i]->on_field = 1;
 
     cursor_row++;
-    y_coord += (float)field->card_padding_height;
+    y_coord += (float)card_dimens.height_padding;
   }
 
   return true;
@@ -237,11 +237,11 @@ int place_a_card(const GAME* game) {
     s_card[i]->pos->col = col_of_cursor;
     s_card[i]->pos->row = row_of_cursor + 1;
     s_card[i]->frame->x = x_card_pos;
-    s_card[i]->frame->y = y_card_pos + game->field.card_padding_height;
+    s_card[i]->frame->y = y_card_pos + card_dimens.height_padding;
     s_card[i]->on_field = 1;
 
     row_of_cursor++;
-    y_card_pos += game->field.card_padding_height;
+    y_card_pos += card_dimens.height_padding;
   }
 
   set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
@@ -417,9 +417,9 @@ int auto_solve(const GAME* game) {
 int go_to_invisible_card(GAME* game, int col) {
   game->cursor->pos->col = col;
   game->cursor->cursor->x =
-    g_invisible_card[col - 1].frame->x - game->field.cursor_padding;
+    g_invisible_card[col - 1].frame->x - cursor_dimens.padding;
   game->cursor->cursor->y =
-    g_invisible_card[col - 1].frame->y - game->field.cursor_padding;
+    g_invisible_card[col - 1].frame->y - cursor_dimens.padding;
   return 1;
 }
 

@@ -48,7 +48,7 @@ bool scores_lazy_load(const GAME* game) {
     SDL_Log("dobar je kod\n");
     prev_pointer += pointer;
   }
-  int font_size = game->field.text_font;
+  int font_size = fonts.text_font;
 
   status = get_text_size(game->font, scores_txt[0], font_size, &text_width, NULL);
   if (status == 0) {
@@ -105,7 +105,7 @@ bool scores_render(GAME* game) {
 
   int text_height;
   status =
-    get_text_size(game->font, "normal mode", game->field.text_font, NULL, &text_height);
+    get_text_size(game->font, "normal mode", fonts.text_font, NULL, &text_height);
   if (status == false) {
     return status;
   }
@@ -117,7 +117,7 @@ bool scores_render(GAME* game) {
       break;
     }
     status = render_text(game->renderer, tex_top_10_scores[i], &pt);
-    pt.y += game->field.text_padding + text_height;
+    pt.y += fonts.text_padding + text_height;
   }
 
   status = SDL_RenderPresent(game->renderer);

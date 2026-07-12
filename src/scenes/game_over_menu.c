@@ -28,7 +28,7 @@ bool game_over_menu_lazy_load(const GAME* game) {
     reset_timer(game->timer);
   }
 
-  int font_size = game->field.text_font;
+  int font_size = fonts.text_font;
   char buff[10];
   sprintf(buff, "time: %d", game->timer->time_elapsed);
   tex_time =
@@ -38,7 +38,7 @@ bool game_over_menu_lazy_load(const GAME* game) {
     return 0;
   }
 
-  font_size = game->field.title_font;
+  font_size = fonts.title_font;
   for (int i = 0; i < 2; i++) {
     tex_game_result[i] = get_texture_from_text(
       game->font, game->renderer, title[i], font_size, &title_color
@@ -49,7 +49,7 @@ bool game_over_menu_lazy_load(const GAME* game) {
     }
   }
 
-  font_size = game->field.item_font;
+  font_size = fonts.item_font;
   for (int i = 0; i < 3; i++) {
     tex_game_over_items[i] = get_texture_from_text(
       game->font, game->renderer, game->game_over_menu->items[i].text, font_size,
@@ -61,7 +61,7 @@ bool game_over_menu_lazy_load(const GAME* game) {
     }
   }
 
-  font_size = game->field.hover_item_font;
+  font_size = fonts.item_hover_font;
   for (int i = 0; i < 3; i++) {
     tex_hover_game_over_items[i] = get_texture_from_text(
       game->font, game->renderer, game->game_over_menu->items[i].text, font_size,
@@ -147,7 +147,7 @@ bool render_time(const GAME* game) {
   }
 
   status = get_text_size(
-    game->font, win_in_seconds, game->field.text_font, &text_width, &text_height
+    game->font, win_in_seconds, fonts.text_font, &text_width, &text_height
   );
   if (status == 0) {
     SDL_Log("get_text_size error ...\n");
@@ -156,7 +156,7 @@ bool render_time(const GAME* game) {
 
   status = render_text(
     game->renderer, tex_time,
-    &(SDL_Point){.x = (width - text_width) / 2, .y = game->field.title_padding}
+    &(SDL_Point){.x = (width - text_width) / 2, .y = fonts.title_padding}
   );
   if (status == 0) {
     SDL_Log("render_text error ...\n");
@@ -200,8 +200,8 @@ bool game_over_menu_render(GAME* game) {
     }
   }
 
-  SDL_FRect* rect = &(SDL_FRect){
-    .x = game->field.square_screen_padding_width,
+  const SDL_FRect* rect = &(SDL_FRect){
+    .x = 0,
     .y = 0,
     .w = resolution.height,
     .h = resolution.height,
@@ -221,7 +221,7 @@ bool game_over_menu_render(GAME* game) {
   status = render_time(game);
 
   status = get_text_size(
-    game->font, title[g_game_win], game->field.title_font, &text_width, &text_height
+    game->font, title[g_game_win], fonts.title_font, &text_width, &text_height
   );
   if (status == 0) {
     SDL_Log("get_text_size failed...\n");
@@ -238,7 +238,7 @@ bool game_over_menu_render(GAME* game) {
   }
 
   status = get_text_size(
-    game->font, game->game_over_menu->items[0].text, game->field.item_font, NULL,
+    game->font, game->game_over_menu->items[0].text, fonts.item_font, NULL,
     &text_height
   );
   if (status == 0) {
@@ -246,7 +246,7 @@ bool game_over_menu_render(GAME* game) {
     return 0;
   }
 
-  int y_coord = height / 2 + game->field.title_padding;
+  int y_coord = height / 2 + fonts.title_padding;
 
   for (int i = 0; i < game->game_over_menu->count; i++) {
 
@@ -256,7 +256,7 @@ bool game_over_menu_render(GAME* game) {
     int render_coord_y;
     if (i == game->game_over_menu->selected_item) {
       color = &green_color;
-      font_size = game->field.hover_item_font;
+      font_size = fonts.item_hover_font;
       status = get_text_size(
         game->font, game->game_over_menu->items[i].text, font_size, &text_width,
         &selected_height
@@ -268,7 +268,7 @@ bool game_over_menu_render(GAME* game) {
       render_coord_y = y_coord + (text_height - selected_height) / 2;
     } else {
       color = &white_color;
-      font_size = game->field.item_font;
+      font_size = fonts.item_font;
       status = get_text_size(
         game->font, game->game_over_menu->items[i].text, font_size, &text_width,
         &text_height
@@ -295,7 +295,7 @@ bool game_over_menu_render(GAME* game) {
       return 0;
     }
 
-    y_coord += text_height + game->field.item_padding;
+    y_coord += text_height + fonts.item_padding;
   }
 
   status = SDL_RenderPresent(game->renderer);
