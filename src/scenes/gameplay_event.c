@@ -9,9 +9,9 @@
 #include "SDL3/SDL_log.h"
 #include "gameplay.h"
 
-static char *text_box_text = "";
+static char* text_box_text = "";
 
-int normal_select_mode(GAME *game, const SDL_Event *event) {
+int normal_select_mode(GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_KEY_DOWN) {
     switch (event->key.key) {
     case SDLK_ESCAPE:
@@ -116,7 +116,7 @@ int convert_controls(unsigned int key) {
   return -1;
 }
 
-int fly_mode(GAME *game, const SDL_Event *event) {
+int fly_mode(GAME* game, const SDL_Event* event) {
   int status;
   if (event->type == SDL_EVENT_KEY_DOWN) {
     int tmp;
@@ -316,7 +316,7 @@ int fly_mode(GAME *game, const SDL_Event *event) {
       break;
     case 12:
       play_sound(game->soundboard, draw_card_sound);
-      CARD *card = draw_next_card(game->deck);
+      CARD* card = draw_next_card(game->deck);
       if (card == NULL) {
         SDL_Log("RECI MI\n");
       }
@@ -349,7 +349,7 @@ int fly_mode(GAME *game, const SDL_Event *event) {
   return 1;
 }
 
-int text_mode(GAME *game, const SDL_Event *event) {
+int text_mode(GAME* game, const SDL_Event* event) {
   int status;
   if (event->type == SDL_EVENT_KEY_DOWN) {
     switch (event->key.key) {
@@ -385,7 +385,7 @@ int text_mode(GAME *game, const SDL_Event *event) {
   return 1;
 }
 
-bool gameplay_event_handler(GAME *game, const SDL_Event *event) {
+bool gameplay_event_handler(GAME* game, const SDL_Event* event) {
   if (g_game_win == 1) {
     SDL_StartTextInput(game->window);
     text_mode(game, event);

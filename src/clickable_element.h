@@ -11,8 +11,7 @@ typedef struct _CLICKABLE_ELEMENT {
   // TODO: maybe add hover variable
 } CLICKABLE_ELEMENT;
 
-CLICKABLE_ELEMENT *create_clickable_element(SDL_FRect box,
-                                            action_callback function);
-void destroy_clickable_element(CLICKABLE_ELEMENT *element);
+CLICKABLE_ELEMENT* create_clickable_element(SDL_FRect box, action_callback function);
+void destroy_clickable_element(CLICKABLE_ELEMENT* element);
 
 #endif

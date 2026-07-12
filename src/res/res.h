@@ -24,16 +24,26 @@ typedef struct {
   const char* scores;
 } TITLES;
 
+typedef struct {
+  const char* main_menu[4];
+  const uint32_t count_main_menu;
+  const char* game_over[3];
+  const uint32_t count_game_over;
+  const char* settings[3];
+  const uint32_t count_settings;
+} ITEMS;
 
 typedef struct {
   TITLES titles;
+  ITEMS items;
 } TEXT;
-extern const TEXT text;
+extern const TEXT texts;
 
 typedef struct {
   const char* background;
   const char* logo;
   const char* face_down_card;
+  const char* selected_face_down_card;
   const char* empty_field;
   const char* cursor;
   // TODO: maybe add array of all 52 cards
@@ -45,20 +55,21 @@ typedef struct {
   const char* option;
 } BIN_PATH;
 
-typedef struct {
-  const char* click;
-  const char* select_click;
-  const char* draw_card;
-  const char* blip_sound;
-  const char* sort_sound;
-  const char* place_card_sound;
-  const char* move_sound;
-} SOUND_PATH;
+// typedef struct {
+//   const char* click;
+//   const char* select_click;
+//   const char* draw_card;
+//   const char* blip_sound;
+//   const char* sort_sound;
+//   const char* place_card_sound;
+//   const char* move_sound;
+// } SOUND_PATH;
 
 typedef struct {
   IMAGE_PATH images;
-  SOUND_PATH sounds;
+  const char* sounds[7];
   BIN_PATH bins;
+  const char* font;
 } PATHS;
 extern const PATHS paths;
 

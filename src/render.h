@@ -4,8 +4,8 @@
 #include "game.h"
 
 // Render background
-bool render_background(GAME *game);
+bool render_background(GAME* game);
 // Render game logo
-bool render_logo(GAME *game);
+bool render_logo(GAME* game);
 
 #endif

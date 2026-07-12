@@ -4,17 +4,17 @@
 #include "scenes/gameplay.h"
 #include <string.h>
 
-bool same_card_selected(const CARD *card1, const CARD *card2) {
+bool same_card_selected(const CARD* card1, const CARD* card2) {
   return card1 == card2;
 }
 
-void deselect_all_cards(DECK *deck) {
+void deselect_all_cards(DECK* deck) {
   for (int i = 0; i < 52; i++) {
     deck->cards[i].selected = 0;
   }
 }
 
-CARD *find_card(const DECK *deck, int col, int row) {
+CARD* find_card(const DECK* deck, int col, int row) {
   if (col == 1 && row == 0) {
     // NOTE: Deck card can be NULL.
     return deck->deck_card;
@@ -29,20 +29,20 @@ CARD *find_card(const DECK *deck, int col, int row) {
     if (deck->cards[i].pos->col == col && deck->cards[i].pos->row == row) {
       // NOTE: This card can be null
       // TODO: need to make function that explicitly return `CARD*` from stack
-      return (CARD *)&deck->cards[i];
+      return (CARD*)&deck->cards[i];
     }
   }
   return NULL;
 }
 
-int select_card_below(const CARD *card, const DECK *deck) {
+int select_card_below(const CARD* card, const DECK* deck) {
   if (card == NULL) {
     return 0;
   }
   if (card->visible == not_visible) {
     return 0;
   }
-  CARD *tmp_card = find_card(deck, card->pos->col, card->pos->row + 1);
+  CARD* tmp_card = find_card(deck, card->pos->col, card->pos->row + 1);
   if (tmp_card == NULL) {
     return 1;
   }
@@ -50,7 +50,7 @@ int select_card_below(const CARD *card, const DECK *deck) {
   return 1 + select_card_below(tmp_card, deck);
 }
 
-void shuffle_deck(DECK *deck) {
+void shuffle_deck(DECK* deck) {
   if (deck == NULL) {
     SDL_Log("Deck is NULL and therefore cannot be shuffled");
     return;
@@ -67,7 +67,7 @@ void shuffle_deck(DECK *deck) {
   }
 }
 
-int sort_a_card(CARD *card, DECK *deck) {
+int sort_a_card(CARD* card, DECK* deck) {
   for (int suit = 0; suit < 4; suit++) {
     if (deck->sorted_cards[suit] == NULL && card->value == 1) {
       card->on_field = 1;
@@ -94,7 +94,7 @@ int sort_a_card(CARD *card, DECK *deck) {
   return 0;
 }
 
-void pop_all(CARD_STACK *stack) {
+void pop_all(CARD_STACK* stack) {
   for (int i = 0; i < stack->count; i++) {
     // NOTE: return cards to the deck face down
     stack->array[i]->visible = not_visible;
@@ -103,11 +103,15 @@ void pop_all(CARD_STACK *stack) {
   stack->count = 0;
 }
 
-bool is_empty(const CARD_STACK *stack) { return stack->count == 0; }
+bool is_empty(const CARD_STACK* stack) {
+  return stack->count == 0;
+}
 
-bool is_full(const CARD_STACK *stack) { return stack->count == STACK_SIZE; }
+bool is_full(const CARD_STACK* stack) {
+  return stack->count == STACK_SIZE;
+}
 
-bool push(CARD_STACK *stack, CARD *card) {
+bool push(CARD_STACK* stack, CARD* card) {
   if (is_full(stack)) {
     return false;
   }
@@ -116,14 +120,14 @@ bool push(CARD_STACK *stack, CARD *card) {
   return true;
 }
 
-CARD *pop(CARD_STACK *stack) {
+CARD* pop(CARD_STACK* stack) {
   if (is_empty(stack)) {
     return NULL;
   }
   return stack->array[--stack->count];
 }
 
-CARD *top_card(const CARD_STACK *stack) {
+CARD* top_card(const CARD_STACK* stack) {
   if (stack == NULL) {
     return NULL;
   }
@@ -133,7 +137,7 @@ CARD *top_card(const CARD_STACK *stack) {
   return stack->array[stack->count - 1];
 }
 
-bool can_card_be_placed(const CARD *card_below, const CARD *card_above) {
+bool can_card_be_placed(const CARD* card_below, const CARD* card_above) {
   if (card_below->value + 1 != card_above->value) {
     return false;
   }
@@ -148,10 +152,12 @@ bool can_card_be_placed(const CARD *card_below, const CARD *card_above) {
   return true;
 }
 
-void create_card_stack(CARD_STACK *stack) { stack->count = 0; }
+void create_card_stack(CARD_STACK* stack) {
+  stack->count = 0;
+}
 
-DECK *create_deck(SDL_Renderer *renderer) {
-  DECK *deck = NULL;
+DECK* create_deck(SDL_Renderer* renderer) {
+  DECK* deck = NULL;
   deck = SDL_malloc(sizeof(DECK));
   if (deck == NULL) {
     return deck;
@@ -175,8 +181,8 @@ DECK *create_deck(SDL_Renderer *renderer) {
   create_card_stack(&deck->drawn_cards);
   deck->deck_card = &deck->cards[deck->count];
 
-  deck->empty_sorted_card = create_texture_from_image(
-      renderer, "assets/cards/total_blank_front_white.png");
+  deck->empty_sorted_card =
+    create_texture_from_image(renderer, "assets/cards/total_blank_front_white.png");
   if (deck->empty_sorted_card == NULL) {
     SDL_Log("create_texture_from_image error\n");
     return NULL;
@@ -185,14 +191,14 @@ DECK *create_deck(SDL_Renderer *renderer) {
   return deck;
 }
 
-void destroy_card(const CARD *card) {
+void destroy_card(const CARD* card) {
   if (card != NULL) {
     SDL_free(card->frame);
     SDL_free(card->pos);
   }
 }
 
-bool have_more_cards(const DECK *deck) {
+bool have_more_cards(const DECK* deck) {
   if (deck->deck_card != NULL) {
     return true;
   }
@@ -208,7 +214,7 @@ bool have_more_cards(const DECK *deck) {
   return true;
 }
 
-void destroy_deck(DECK *deck) {
+void destroy_deck(DECK* deck) {
   if (deck != NULL) {
     SDL_DestroyTexture(deck->empty_sorted_card);
     for (int i = 0; i < 52; i++) {
@@ -218,8 +224,8 @@ void destroy_deck(DECK *deck) {
   }
 }
 
-char *find_path(const CARD *card) {
-  char *path = SDL_malloc(sizeof(char) * 100);
+char* find_path(const CARD* card) {
+  char* path = SDL_malloc(sizeof(char) * 100);
 
   if (card->visible == not_visible) {
     if (card->selected == selected) {
@@ -277,29 +283,30 @@ char *find_path(const CARD *card) {
   return path;
 }
 
-bool render_card(const FIELD *field, SDL_Renderer *renderer, const CARD *card,
-                 const SDL_FPoint *point) {
+bool render_card(
+  const FIELD* field, SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* point
+) {
   if (renderer == NULL || card == NULL) {
     SDL_Log("renderer or card are NULL in render_card fun...\n");
     return 0;
   }
 
-  char *path = find_path(card);
+  char* path = find_path(card);
   if (path == NULL) {
     SDL_Log("path is NULL in render_card fun...\n");
     return 0;
   }
 
-  SDL_Texture *texture = create_texture_from_image(renderer, path);
+  SDL_Texture* texture = create_texture_from_image(renderer, path);
   if (texture == NULL) {
     SDL_Log("texture is NULL in render_card fun...\n");
     return 0;
   }
 
-  int status = SDL_RenderTexture(renderer, texture, NULL,
-                                 &(SDL_FRect){point->x, point->y,
-                                              (float)field->card_width,
-                                              (float)field->card_height});
+  const int status = SDL_RenderTexture(
+    renderer, texture, NULL,
+    &(SDL_FRect){point->x, point->y, (float)field->card_width, (float)field->card_height}
+  );
 
   if (status == 0) {
     SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());

@@ -55,15 +55,15 @@ set(SOURCE_FILES
 
 if (WIN32)
     add_executable(${PROJECT_NAME} WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_PATH}/icon.rc)
-else()
+else ()
     add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
-endif()
+endif ()
 
 if (WIN32)
     set_target_properties(${PROJECT_NAME} PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
-endif()
+endif ()
 
 
 # EXPORT_BUILD=ON  -> distributable build into <repo>/output
@@ -71,17 +71,17 @@ endif()
 #                     (cmake-build-debug/, cmake-build-release/, build/, ...)
 option(EXPORT_BUILD "Build the distributable release into output/" OFF)
 
-if(EXPORT_BUILD)
+if (EXPORT_BUILD)
     set(RUNTIME_DIR "${CMAKE_SOURCE_DIR}/output")
-else()
+else ()
     set(RUNTIME_DIR "${CMAKE_BINARY_DIR}")
-endif()
+endif ()
 
 set_target_properties(${PROJECT_NAME}
     PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY            "${RUNTIME_DIR}"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG      "${RUNTIME_DIR}"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE    "${RUNTIME_DIR}")
+    RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${RUNTIME_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${RUNTIME_DIR}")
 
 set(ASSETS_PATH ${CMAKE_SOURCE_DIR}/assets)
 

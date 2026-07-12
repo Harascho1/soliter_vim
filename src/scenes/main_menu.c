@@ -9,17 +9,16 @@
 #include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
 
-static const char *title = "SoVIMter";
-static const char *game_modes[] = {"normal", "fly"};
+static const char* title = "SoVIMter";
 static SDL_Color white_color = {255, 255, 255, 255};
 static SDL_Color title_color = {23, 150, 52, 255};
 static SDL_Color green_color = {120, 255, 120, 255};
 
-static SDL_Texture *tex_game_title;
-static SDL_Texture *tex_menu_items[4];
-static SDL_Texture *tex_hover_menu_items[4];
-static SDL_Texture *tex_game_mode[2];
-static SDL_Texture *tex_hover_game_mode[2];
+static SDL_Texture* tex_game_title;
+static SDL_Texture* tex_menu_items[4];
+static SDL_Texture* tex_hover_menu_items[4];
+static SDL_Texture* tex_game_mode[2];
+static SDL_Texture* tex_hover_game_mode[2];
 
 void lazy_destroy_main_menu() {
   SDL_DestroyTexture(tex_game_title);
@@ -33,31 +32,32 @@ void lazy_destroy_main_menu() {
   }
 }
 
-void action() { SDL_Log("Print"); }
+void action() {
+  SDL_Log("Print");
+}
 
-bool lazy_load_main_menu(const GAME *game) {
-  int size;
-  size = game->field.title_font;
-  tex_game_title = get_texture_from_text(game->font, game->renderer, title,
-                                         size, &title_color);
+bool lazy_load_main_menu(const GAME* game) {
+  int size = game->field.title_font;
+  tex_game_title =
+    get_texture_from_text(game->font, game->renderer, title, size, &title_color);
   if (tex_game_title == NULL) {
     SDL_Log("game_title cannot be initiazlied...");
     return 0;
   }
   size = game->field.item_font;
   for (int i = 0; i < 4; i++) {
-    tex_menu_items[i] = get_texture_from_text(game->font, game->renderer,
-                                              game->main_menu->items[i].text,
-                                              size, &white_color);
+    tex_menu_items[i] = get_texture_from_text(
+      game->font, game->renderer, game->main_menu->items[i].text, size, &white_color
+    );
     if (tex_menu_items[i] == NULL) {
       SDL_Log("menu_items[%d] cannot be initiazlied...", i);
       return 0;
     }
   }
   for (int i = 0; i < 2; i++) {
-    tex_game_mode[i] = get_texture_from_text(game->font, game->renderer,
-                                             game->main_menu->items[i].text,
-                                             size, &white_color);
+    tex_game_mode[i] = get_texture_from_text(
+      game->font, game->renderer, game->main_menu->items[i].text, size, &white_color
+    );
     if (tex_game_mode[i] == NULL) {
       SDL_Log("tex_game_mode[%d] cannot be initiazlied...", i);
       return 0;
@@ -66,8 +66,8 @@ bool lazy_load_main_menu(const GAME *game) {
   size = game->field.hover_item_font;
   for (int i = 0; i < 4; i++) {
     tex_hover_menu_items[i] = get_texture_from_text(
-        game->font, game->renderer, game->main_menu->items[i].text, size,
-        &green_color);
+      game->font, game->renderer, game->main_menu->items[i].text, size, &green_color
+    );
     if (tex_hover_menu_items[i] == NULL) {
       SDL_Log("hover_menu_items[%d] cannot be initiazlied...", i);
       return 0;
@@ -75,8 +75,8 @@ bool lazy_load_main_menu(const GAME *game) {
   }
   for (int i = 0; i < 2; i++) {
     tex_hover_game_mode[i] = get_texture_from_text(
-        game->font, game->renderer, game->main_menu->items[i].text, size,
-        &green_color);
+      game->font, game->renderer, game->main_menu->items[i].text, size, &green_color
+    );
     if (tex_hover_game_mode[i] == NULL) {
       SDL_Log("tex_hover_game_mode[%d] cannot be initiazlied...", i);
       return 0;
@@ -85,7 +85,7 @@ bool lazy_load_main_menu(const GAME *game) {
   return 1;
 }
 
-bool main_menu_event_handler(GAME *game, const SDL_Event *event) {
+bool main_menu_event_handler(GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_MOUSE_MOTION) {
   }
   if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
@@ -141,14 +141,14 @@ bool main_menu_event_handler(GAME *game, const SDL_Event *event) {
   return 1;
 }
 
-bool main_menu_update(const GAME *game) {
+bool main_menu_update(const GAME* game) {
   if (game->timer->start_timer == 1) {
     reset_timer(game->timer);
   }
   return 1;
 }
 
-bool main_menu_render(GAME *game) {
+bool main_menu_render(GAME* game) {
   int status;
   if (game == NULL) {
     SDL_Log("game is NULL\n");
@@ -169,23 +169,25 @@ bool main_menu_render(GAME *game) {
   int width = game->field.screen_width;
   int height = game->field.screen_height;
   int text_width, text_height;
-  status = get_text_size(game->font, title, game->field.title_font, &text_width,
-                         &text_height);
+  status =
+    get_text_size(game->font, title, game->field.title_font, &text_width, &text_height);
   if (status == 0) {
     SDL_Log("get_text_size failed...\n");
     return 0;
   }
 
-  status =
-      render_text(game->renderer, tex_game_title,
-                  &(SDL_Point){.x = (width - text_width) / 2, .y = height / 4});
+  status = render_text(
+    game->renderer, tex_game_title,
+    &(SDL_Point){.x = (width - text_width) / 2, .y = height / 4}
+  );
   if (status == 0) {
     SDL_Log("render_text_ failed...\n");
     return 0;
   }
 
-  status = get_text_size(game->font, game->main_menu->items[0].text,
-                         game->field.item_font, NULL, &text_height);
+  status = get_text_size(
+    game->font, game->main_menu->items[0].text, game->field.item_font, NULL, &text_height
+  );
   if (status == 0) {
     SDL_Log("get_text_size failed...\n");
     return 0;
@@ -198,8 +200,10 @@ bool main_menu_render(GAME *game) {
     int render_coord_y;
     if (i == game->main_menu->selected_item) {
       font_size = game->field.hover_item_font;
-      status = get_text_size(game->font, game->main_menu->items[i].text,
-                             font_size, &text_width, &selected_height);
+      status = get_text_size(
+        game->font, game->main_menu->items[i].text, font_size, &text_width,
+        &selected_height
+      );
       if (status == 0) {
         SDL_Log("get_text_size failed...\n");
         return 0;
@@ -207,8 +211,9 @@ bool main_menu_render(GAME *game) {
       render_coord_y = y_coord + (text_height - selected_height) / 2;
     } else {
       font_size = game->field.item_font;
-      status = get_text_size(game->font, game->main_menu->items[i].text,
-                             font_size, &text_width, &text_height);
+      status = get_text_size(
+        game->font, game->main_menu->items[i].text, font_size, &text_width, &text_height
+      );
       if (status == 0) {
         SDL_Log("get_text_size failed...\n");
         return 0;
@@ -216,7 +221,7 @@ bool main_menu_render(GAME *game) {
       render_coord_y = y_coord;
     }
     SDL_Point dst_rect = {.x = (width - text_width) / 2, .y = render_coord_y};
-    SDL_Texture *tmp = NULL;
+    SDL_Texture* tmp = NULL;
     if (game->main_menu->selected_item == i) {
       tmp = tex_hover_menu_items[i];
     } else {
@@ -241,8 +246,10 @@ bool main_menu_render(GAME *game) {
   return 1;
 }
 
-SCENE main_menu_scene = {.handle_events = main_menu_event_handler,
-                         .update = main_menu_update,
-                         .render = main_menu_render,
-                         .lazy_load = lazy_load_main_menu,
-                         .lazy_destroy = lazy_destroy_main_menu};
+SCENE main_menu_scene = {
+  .handle_events = main_menu_event_handler,
+  .update = main_menu_update,
+  .render = main_menu_render,
+  .lazy_load = lazy_load_main_menu,
+  .lazy_destroy = lazy_destroy_main_menu
+};

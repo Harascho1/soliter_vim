@@ -7,10 +7,10 @@
 #define CURSOR_NORMAL_MODE 0x0
 #define CURSOR_SELECT_MODE 0x1
 #define CURSOR_FLY_MODE 0X2
-//#define CURSOR_HOVER_H 0x10
-//#define CURSOR_HOVER_J 0x20
-//#define CURSOR_HOVER_K 0x30
-//#define CURSOR_HOVER_L 0x40
+// #define CURSOR_HOVER_H 0x10
+// #define CURSOR_HOVER_J 0x20
+// #define CURSOR_HOVER_K 0x30
+// #define CURSOR_HOVER_L 0x40
 #define CURSOR_HOVER_1 0x100
 #define CURSOR_HOVER_2 0x200
 #define CURSOR_HOVER_3 0x300
@@ -23,17 +23,17 @@
 #define CURSOR_HOVER_10 0x1000
 
 typedef struct _CURSOR {
-    SDL_FRect *cursor;
-    POSITION *pos;
-    int mode;
+  SDL_FRect* cursor;
+  POSITION* pos;
+  int mode;
 } CURSOR;
 
-CURSOR* create_cursor(FIELD *field, int col, int row);
-void destroy_cursor(CURSOR *cursor);
+CURSOR* create_cursor(FIELD* field, int col, int row);
+void destroy_cursor(CURSOR* cursor);
 
-int have_a_flag(CURSOR *cursor, int flag);
-int delete_hover_flag(CURSOR *cursor);
-int have_number_hover(CURSOR *cursor);
-int set_a_flag(CURSOR *cursor, int flag);
+int have_a_flag(CURSOR* cursor, int flag);
+int delete_hover_flag(CURSOR* cursor);
+int have_number_hover(CURSOR* cursor);
+int set_a_flag(CURSOR* cursor, int flag);
 
 #endif

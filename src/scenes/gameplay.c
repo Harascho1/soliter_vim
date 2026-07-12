@@ -8,7 +8,7 @@
 
 char buffer[10] = "";
 
-CARD *top_deck_card(DECK *deck) {
+CARD* top_deck_card(DECK* deck) {
   if (deck->deck_card == NULL) {
     return NULL;
   }
@@ -24,7 +24,7 @@ CARD *top_deck_card(DECK *deck) {
   return NULL;
 }
 
-CARD *next_deck_card(DECK *deck) {
+CARD* next_deck_card(DECK* deck) {
   if (deck->count >= 52) {
     deck->count = -1;
     return NULL;
@@ -41,11 +41,11 @@ CARD *next_deck_card(DECK *deck) {
   return NULL;
 }
 
-CARD *draw_next_card(DECK *deck) {
+CARD* draw_next_card(DECK* deck) {
   if (have_more_cards(deck) == 0) {
     return NULL;
   }
-  CARD *next_new_card = top_deck_card(deck);
+  CARD* next_new_card = top_deck_card(deck);
 
   if (next_new_card != NULL) {
     next_new_card->visible = visible;
@@ -57,10 +57,10 @@ CARD *draw_next_card(DECK *deck) {
   return next_new_card;
 }
 
-int reveal_card_below(const GAME *game) {
+int reveal_card_below(const GAME* game) {
   for (int i = 1; i <= number_of_cards_in_row; i++) {
     int j = 1;
-    CARD *card;
+    CARD* card;
     int last_card_visible = 0;
     while ((card = find_card(game->deck, i, j)) != NULL) {
       last_card_visible = card->visible;
@@ -79,7 +79,7 @@ int reveal_card_below(const GAME *game) {
   return 1;
 }
 
-int selected_card(DECK *deck, CARD **selected_cards) {
+int selected_card(DECK* deck, CARD** selected_cards) {
   int count = 0;
   for (int i = 0; i < 52; i++) {
     if (deck->cards[i].selected == selected) {
@@ -89,7 +89,7 @@ int selected_card(DECK *deck, CARD **selected_cards) {
   for (int i = 0; i < count - 1; i++) {
     for (int j = i + 1; j < count; j++) {
       if (selected_cards[j]->value > selected_cards[i]->value) {
-        CARD *tmp = selected_cards[j];
+        CARD* tmp = selected_cards[j];
         selected_cards[j] = selected_cards[i];
         selected_cards[i] = tmp;
       }
@@ -98,8 +98,7 @@ int selected_card(DECK *deck, CARD **selected_cards) {
   return count;
 }
 
-bool place_king(CARD **card, const int num, const CURSOR *cursor,
-                const FIELD *field) {
+bool place_king(CARD** card, const int num, const CURSOR* cursor, const FIELD* field) {
   const int cursor_col = cursor->pos->col;
   int cursor_row = cursor->pos->row;
   float x_coord, y_coord;
@@ -143,11 +142,10 @@ bool place_king(CARD **card, const int num, const CURSOR *cursor,
   return true;
 }
 
-int place_a_card(const GAME *game) {
-  CARD *card =
-      find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
+int place_a_card(const GAME* game) {
+  CARD* card = find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
 
-  CARD *s_card[14];
+  CARD* s_card[14];
   const int num_of_selected_cards = selected_card(game->deck, s_card);
   if (card != NULL) {
     SDL_Log("row: %d and col: %d\n", card->pos->row, card->pos->row);
@@ -158,8 +156,7 @@ int place_a_card(const GAME *game) {
   }
 
   if (card == NULL) {
-    if (place_king(s_card, num_of_selected_cards, game->cursor, &game->field) ==
-        false) {
+    if (place_king(s_card, num_of_selected_cards, game->cursor, &game->field) == false) {
       game_update = 0;
       deselect_all_cards(game->deck);
       set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
@@ -184,7 +181,7 @@ int place_a_card(const GAME *game) {
   if (same_card_selected(card, *s_card) == 1 && num_of_selected_cards == 1) {
     if (same_card_selected(card, game->deck->deck_card)) {
       play_sound(game->soundboard, draw_card_sound);
-      CARD *next_card = draw_next_card(game->deck);
+      CARD* next_card = draw_next_card(game->deck);
       if (next_card == NULL) {
       }
       deselect_all_cards(game->deck);
@@ -196,7 +193,7 @@ int place_a_card(const GAME *game) {
       play_sound(game->soundboard, sort_card_sound);
     }
 
-    CARD *top_card_ptr = top_card(&game->deck->drawn_cards);
+    CARD* top_card_ptr = top_card(&game->deck->drawn_cards);
     if (same_card_selected(*s_card, top_card_ptr) && game_update == 1) {
       pop(&game->deck->drawn_cards);
     }
@@ -248,7 +245,7 @@ int place_a_card(const GAME *game) {
 
   set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
 
-  CARD *new_card = top_card(&game->deck->drawn_cards);
+  CARD* new_card = top_card(&game->deck->drawn_cards);
   if (same_card_selected(*s_card, new_card)) {
     pop(&game->deck->drawn_cards);
     deselect_all_cards(game->deck);
@@ -261,8 +258,8 @@ int place_a_card(const GAME *game) {
   return 1;
 }
 
-int select_a_card(GAME *game) {
-  CARD *card;
+int select_a_card(GAME* game) {
+  CARD* card;
   card = find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
   if (card == NULL) {
     if (game->cursor->pos->row == 0 && game->cursor->pos->col == 1) {
@@ -294,18 +291,16 @@ int select_a_card(GAME *game) {
   return 1;
 }
 
-void change_cursor_frame(const GAME *game) {
-  const CARD *card =
-      find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
+void change_cursor_frame(const GAME* game) {
+  const CARD* card =
+    find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
 
   // * deck_card
   if (card == NULL && game->cursor->pos->row == 0) {
     game->cursor->cursor->x =
-        (float)(game->field.gameplay_screen_padding_width -
-                game->field.cursor_padding);
+      (float)(game->field.gameplay_screen_padding_width - game->field.cursor_padding);
     game->cursor->cursor->y =
-        (float)(game->field.gameplay_screen_padding_height -
-                game->field.cursor_padding);
+      (float)(game->field.gameplay_screen_padding_height - game->field.cursor_padding);
     return;
   }
 
@@ -319,21 +314,20 @@ void change_cursor_frame(const GAME *game) {
     const float right_indent = g_invisible_card[1].frame->x;
     game->cursor->cursor->x = right_indent - (float)game->field.cursor_padding;
     game->cursor->cursor->y =
-        (float)(game->field.gameplay_screen_padding_height -
-                game->field.cursor_padding);
+      (float)(game->field.gameplay_screen_padding_height - game->field.cursor_padding);
   } else {
     game->cursor->cursor->x = card->frame->x - (float)game->field.cursor_padding;
     game->cursor->cursor->y = card->frame->y - (float)game->field.cursor_padding;
   }
 }
 
-int auto_sortable(const CARD *card, CARD **sorted_cards) {
+int auto_sortable(const CARD* card, CARD** sorted_cards) {
   const int card_suit = card->suit;
   if (card->value == 1)
     return 1;
 
   if (card->value == 2) {
-    const CARD *card_same_suit = NULL;
+    const CARD* card_same_suit = NULL;
     for (int i = 0; i < 4; ++i) {
       if (sorted_cards[i] == NULL) {
         continue;
@@ -353,7 +347,7 @@ int auto_sortable(const CARD *card, CARD **sorted_cards) {
 
   // potential bug
   if (card->value >= 3 && card->value < 14) {
-    CARD *card_other_suit[2];
+    CARD* card_other_suit[2];
     int other_suits = (card_suit + 2) % 4;
     if (card_suit % 2 == 1) {
       other_suits--;
@@ -376,8 +370,10 @@ int auto_sortable(const CARD *card, CARD **sorted_cards) {
     }
     SDL_Log("card is %d, and suit is %d\n\n\n", card->value, card->suit);
     for (int i = 0; i < count; ++i) {
-      SDL_Log("card is %d, and suit is %d\n\n\n", card_other_suit[i]->value,
-              card_other_suit[i]->suit);
+      SDL_Log(
+        "card is %d, and suit is %d\n\n\n", card_other_suit[i]->value,
+        card_other_suit[i]->suit
+      );
       if (card_other_suit[i]->value + 1 != card->value &&
           card->value > card_other_suit[i]->value) {
         return 0;
@@ -388,15 +384,15 @@ int auto_sortable(const CARD *card, CARD **sorted_cards) {
   return 0;
 }
 
-int auto_solve(const GAME *game) {
+int auto_solve(const GAME* game) {
   if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
     return 1;
   }
 
-  DECK *deck = game->deck;
+  DECK* deck = game->deck;
   for (int i = 1; i <= number_of_cards_in_row; ++i) {
     int j = 1;
-    CARD *card;
+    CARD* card;
     do {
       card = find_card(deck, i, j);
       if (card == NULL) {
@@ -420,16 +416,16 @@ int auto_solve(const GAME *game) {
   return 1;
 }
 
-int go_to_invisible_card(GAME *game, int col) {
+int go_to_invisible_card(GAME* game, int col) {
   game->cursor->pos->col = col;
   game->cursor->cursor->x =
-      g_invisible_card[col - 1].frame->x - game->field.cursor_padding;
+    g_invisible_card[col - 1].frame->x - game->field.cursor_padding;
   game->cursor->cursor->y =
-      g_invisible_card[col - 1].frame->y - game->field.cursor_padding;
+    g_invisible_card[col - 1].frame->y - game->field.cursor_padding;
   return 1;
 }
 
-int interact(GAME *game) {
+int interact(GAME* game) {
   int status;
   if (game->cursor->mode % 2 == 0) {
     play_sound(game->soundboard, select_card_sound);
@@ -443,7 +439,7 @@ int interact(GAME *game) {
   return 1;
 }
 
-bool gameplay_update(const GAME *game) {
+bool gameplay_update(const GAME* game) {
   int status;
 
   auto_solve(game);
@@ -477,8 +473,10 @@ bool gameplay_update(const GAME *game) {
   return 1;
 }
 
-SCENE gameplay_scene = {.handle_events = gameplay_event_handler,
-                        .update = gameplay_update,
-                        .render = gameplay_render,
-                        .lazy_load = gameplay_lazy_load,
-                        .lazy_destroy = gameplay_lazy_destroy};
+SCENE gameplay_scene = {
+  .handle_events = gameplay_event_handler,
+  .update = gameplay_update,
+  .render = gameplay_render,
+  .lazy_load = gameplay_lazy_load,
+  .lazy_destroy = gameplay_lazy_destroy
+};
