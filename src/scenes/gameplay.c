@@ -3,6 +3,7 @@
 #include "../cursor.h"
 #include "../game.h"
 #include "../my_timer.h"
+#include "../res/res.h"
 #include "../res/sound.h"
 #include "SDL3/SDL_log.h"
 
@@ -297,10 +298,8 @@ void change_cursor_frame(const GAME* game) {
 
   // * deck_card
   if (card == NULL && game->cursor->pos->row == 0) {
-    game->cursor->cursor->x =
-      (float)(game->field.gameplay_screen_padding_width - game->field.cursor_padding);
-    game->cursor->cursor->y =
-      (float)(game->field.gameplay_screen_padding_height - game->field.cursor_padding);
+    game->cursor->cursor->x = game_dimens.padding_width - cursor_dimens.padding;
+    game->cursor->cursor->y = game_dimens.padding_height - cursor_dimens.padding;
     return;
   }
 
@@ -312,12 +311,11 @@ void change_cursor_frame(const GAME* game) {
   // other scenarios
   if (same_card_selected(card, top_card(&game->deck->drawn_cards)) == 1) {
     const float right_indent = g_invisible_card[1].frame->x;
-    game->cursor->cursor->x = right_indent - (float)game->field.cursor_padding;
-    game->cursor->cursor->y =
-      (float)(game->field.gameplay_screen_padding_height - game->field.cursor_padding);
+    game->cursor->cursor->x = right_indent - cursor_dimens.padding;
+    game->cursor->cursor->y = game_dimens.padding_height - cursor_dimens.padding;
   } else {
-    game->cursor->cursor->x = card->frame->x - (float)game->field.cursor_padding;
-    game->cursor->cursor->y = card->frame->y - (float)game->field.cursor_padding;
+    game->cursor->cursor->x = card->frame->x - cursor_dimens.padding;
+    game->cursor->cursor->y = card->frame->y - cursor_dimens.padding;
   }
 }
 

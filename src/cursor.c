@@ -1,5 +1,7 @@
 #include "cursor.h"
 
+#include "res/res.h"
+
 CURSOR* create_cursor(FIELD* field, int col, int row) {
   CURSOR* cursor = SDL_malloc(sizeof(CURSOR));
   cursor->pos = SDL_malloc(sizeof(POSITION));
@@ -7,8 +9,8 @@ CURSOR* create_cursor(FIELD* field, int col, int row) {
   cursor->pos->row = row;
 
   cursor->cursor = SDL_malloc(sizeof(SDL_FRect));
-  cursor->cursor->x = field->gameplay_screen_padding_width - field->cursor_padding;
-  cursor->cursor->y = field->gameplay_screen_padding_height + field->card_padding_height +
+  cursor->cursor->x = game_dimens.padding_width - cursor_dimens.padding;
+  cursor->cursor->y = game_dimens.padding_height + field->card_padding_height +
                       field->card_height - field->cursor_padding;
   cursor->cursor->w = field->card_width + field->cursor_padding * 2;
   cursor->cursor->h = field->card_height + field->cursor_padding * 2;

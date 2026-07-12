@@ -2,12 +2,14 @@
 #include "../cursor.h"
 #include "../game.h"
 #include "../res/font.h"
+#include "../res/res.h"
 #include "../res/textbox.h"
 #include "../res/texture.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
 #include "gameplay.h"
+
 #include <string.h>
 
 static SDL_Color white_color = {255, 255, 255, 255};
@@ -53,24 +55,20 @@ bool gameplay_lazy_load(const GAME* game) {
     }
   }
 
-  int status;
-  int height_indent, width_indent;
+  const float height = screen_dimens.padding;
 
-  int width = game->field.screen_width;
-  int height = game->field.screen_height;
+  const float rect_width = textbox_dimens.width;
+  const float rect_height = textbox_dimens.height;
 
-  int rect_width = game->field.name_textbox_width;
-  int rect_height = game->field.name_textbox_height;
-
-  height_indent = (height - rect_height) / 2;
-  width_indent = game->field.gameplay_screen_padding_width;
+  const float height_indent = (height - rect_height) / 2;
+  const float width_indent = game_dimens.padding_width;
 
   SDL_FRect rect = {
     .x = width_indent, .y = height_indent, .w = rect_width, .h = rect_height
   };
 
   SDL_Surface* surface =
-    SDL_CreateSurface(rect_width, rect_height, SDL_PIXELFORMAT_RGBA32);
+    SDL_CreateSurface((int)rect_width, (int)rect_height, SDL_PIXELFORMAT_RGBA32);
   if (surface == NULL) {
     SDL_Log("SDL_CreateSurface error: %s\n", SDL_GetError());
     return 0;
@@ -84,9 +82,9 @@ bool gameplay_lazy_load(const GAME* game) {
     return 0;
   }
 
-  Uint32 color = SDL_MapRGBA(format_details, NULL, 255, 255, 255, 255);
+  const Uint32 color = SDL_MapRGBA(format_details, NULL, 255, 255, 255, 255);
 
-  status = SDL_FillSurfaceRect(surface, NULL, color);
+  int status = SDL_FillSurfaceRect(surface, NULL, color);
   if (status == 0) {
     SDL_DestroySurface(surface);
     SDL_Log("SDL_FillSurfaceRect error: %s\n", SDL_GetError());
@@ -102,7 +100,7 @@ bool gameplay_lazy_load(const GAME* game) {
 
   SDL_DestroySurface(surface);
 
-  surface = SDL_CreateSurface(rect_width, rect_height, SDL_PIXELFORMAT_RGBA32);
+  surface = SDL_CreateSurface((int)rect_width, (int)rect_height, SDL_PIXELFORMAT_RGBA32);
   if (surface == NULL) {
     SDL_Log("SDL_CreateSurface error: %s\n", SDL_GetError());
     return 0;
@@ -115,7 +113,7 @@ bool gameplay_lazy_load(const GAME* game) {
   //     return 0;
   // }
 
-  Uint32 transparent_color = SDL_MapRGBA(format_details, NULL, 255, 255, 255, 25);
+  const Uint32 transparent_color = SDL_MapRGBA(format_details, NULL, 255, 255, 255, 25);
 
   status = SDL_FillSurfaceRect(surface, NULL, transparent_color);
   if (status == 0) {
@@ -169,8 +167,8 @@ bool render_commands(GAME* game) {
   }
 
   int width, height;
-  width = game->field.screen_width;
-  height = game->field.screen_height;
+  width = resolution.width;
+  height = resolution.height;
 
   tex_small_buffer = get_texture_from_text(
     game->font, game->renderer, buffer, game->field.text_font, &white_color
@@ -217,16 +215,18 @@ bool render_cursor(GAME* game) {
 
 int sorted_card_render(GAME* game) {
   int status;
-  int padding_width = 3 * (game->field.card_width + game->field.card_padding_width) +
-                      game->field.gameplay_screen_padding_width;
+  float padding_width =
+    (3.0F * (card_dimens.width + card_dimens.width_padding)) + game_dimens.padding_width;
   for (int suit = 0; suit < 4; suit++) {
     if (game->deck->sorted_cards[suit] == NULL) {
       status = SDL_RenderTexture(
         game->renderer, game->deck->empty_sorted_card, NULL,
-        &(SDL_FRect){.x = padding_width,
-                     .y = game->field.gameplay_screen_padding_height,
-                     .w = game->field.card_width,
-                     .h = game->field.card_height}
+        &(SDL_FRect){
+          .x = padding_width,
+          .y = game_dimens.padding_height,
+          .w = game->field.card_width,
+          .h = game->field.card_height,
+        }
       );
       if (status == 0) {
         SDL_Log("SDL_RenderTexture error %s\n", SDL_GetError());
@@ -248,14 +248,14 @@ int sorted_card_render(GAME* game) {
   return status;
 }
 
-int render_name_textbox(GAME* game) {
+int render_name_textbox(const GAME* game) {
 
   if (g_game_win == 0) {
     return 1;
   }
 
-  const int width = game->field.screen_width;
-  const int height = game->field.screen_height;
+  const int width = resolution.width;
+  const int height = resolution.height;
 
   int text_width, text_height;
   int status =
@@ -283,8 +283,11 @@ int render_name_textbox(GAME* game) {
     &(SDL_Point){.x = (width - text_width) / 2,
                  .y = height_indent - game->field.title_padding}
   );
+  if (status == false) {
+    SDL_Log("render_text error: %s\n", SDL_GetError());
+  }
 
-  SDL_FRect rect = {
+  const SDL_FRect rect = {
     .x = width_indent, .y = height_indent, .w = rect_width, .h = rect_height
   };
 
@@ -298,8 +301,7 @@ int render_name_textbox(GAME* game) {
     return 1;
   }
 
-  SDL_Texture* tex_text_in_textbox;
-  tex_text_in_textbox = get_texture_from_text(
+  SDL_Texture* tex_text_in_textbox = get_texture_from_text(
     game->font, game->renderer, textbox->string, game->field.title_font,
     &trensparent_green_color
   );
@@ -321,29 +323,24 @@ int render_name_textbox(GAME* game) {
   return 1;
 }
 
-bool render_fly_notaions(GAME* game) {
+bool render_fly_notaions(const GAME* game) {
   if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
     return 1;
   }
-  int status;
-  int height_indent, width_indent;
+  const float height_indent = game_dimens.padding_height + game->field.card_height +
+                      game->field.card_padding_height +
+                      2 * game->field.card_padding_height;
+  const float width_indent = game_dimens.padding_width;
 
-  int width = game->field.screen_width;
-  int height = game->field.screen_height;
-
-  height_indent = game->field.gameplay_screen_padding_height + game->field.card_height +
-                  game->field.card_padding_height + 2 * game->field.card_padding_height;
-  width_indent = game->field.gameplay_screen_padding_width;
-
-  int rect_width = width - 2 * game->field.gameplay_screen_padding_width;
-  int rect_height = game->field.card_padding_height;
+  const float rect_width = resolution.width - (2 * game_dimens.padding_width);
+  const float rect_height = game->field.card_padding_height;
 
   SDL_FRect frect = {
     .x = width_indent, .y = height_indent, .w = rect_width, .h = rect_height
   };
 
   for (int i = 0; i < 4; i++) {
-    status = SDL_RenderTexture(game->renderer, tex_fly_notaions, NULL, &frect);
+    const int status = SDL_RenderTexture(game->renderer, tex_fly_notaions, NULL, &frect);
     if (status == 0) {
       SDL_DestroyTexture(tex_fly_notaions);
       SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
@@ -355,10 +352,10 @@ bool render_fly_notaions(GAME* game) {
   return 1;
 }
 
-bool render_counting_time(GAME* game) {
+bool render_counting_time(const GAME* game) {
   // Rendering timer in seconds
-  const int width = game->field.screen_width;
-  const int height = game->field.screen_height;
+  const int width = resolution.width;
+  const int height = resolution.height;
 
   char timer[20];
   int text_width, text_height;
@@ -420,7 +417,7 @@ bool gameplay_render(GAME* game) {
     return 0;
   }
 
-  const int height = game->field.screen_height;
+  const int height = resolution.height;
 
   // *RENDERING SORTED_CARDS
   status = sorted_card_render(game);
@@ -433,8 +430,7 @@ bool gameplay_render(GAME* game) {
   if (game->deck->deck_card != NULL) {
     status = render_card(
       &game->field, game->renderer, game->deck->deck_card,
-      &(SDL_FPoint){.x = game->field.gameplay_screen_padding_width,
-                    .y = game->field.gameplay_screen_padding_height}
+      &(SDL_FPoint){.x = game_dimens.padding_width, .y = game_dimens.padding_height}
     );
     if (status == 0) {
       SDL_Log("render card error...\n");
@@ -453,9 +449,9 @@ bool gameplay_render(GAME* game) {
   if (card != NULL) {
     status = render_card(
       &game->field, game->renderer, card,
-      &(SDL_FPoint){.x = game->field.gameplay_screen_padding_width +
-                         game->field.card_padding_width + game->field.card_width,
-                    .y = game->field.gameplay_screen_padding_height}
+      &(SDL_FPoint){.x = game_dimens.padding_width + game->field.card_padding_width +
+                         game->field.card_width,
+                    .y = game_dimens.padding_height}
     );
     if (status == 0) {
       SDL_Log("render card error...\n");

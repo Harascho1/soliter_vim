@@ -4,6 +4,7 @@
 #include "../render.h"
 #include "../res/font.h"
 #include "../res/sound.h"
+#include "../res/res.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_rect.h"
@@ -166,8 +167,8 @@ bool main_menu_render(GAME* game) {
   if (render_logo(game) == false)
     return 0;
 
-  int width = game->field.screen_width;
-  int height = game->field.screen_height;
+  int width = resolution.width;
+  int height = resolution.height;
   int text_width, text_height;
   status =
     get_text_size(game->font, title, game->field.title_font, &text_width, &text_height);

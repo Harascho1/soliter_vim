@@ -9,7 +9,7 @@ typedef struct {
 
 FONT* create_font(const char* path);
 void destroy_font(FONT* font);
-int get_text_size(FONT* font, const char* text, int size, int* width, int* height);
+bool get_text_size(FONT* font, const char* text, int size, int* width, int* height);
 bool set_font_size(FONT* font, int size);
 int render_wrapped_text(
   FONT* font, SDL_Renderer* render, const char* text, int size, const SDL_Point* point,

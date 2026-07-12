@@ -1,5 +1,6 @@
 #include "../game.h"
 #include "../res/font.h"
+#include "../res/res.h"
 #include "SDL3/SDL_log.h"
 
 SDL_Texture* tex_top_10_scores[10];
@@ -109,7 +110,7 @@ bool scores_render(GAME* game) {
     return status;
   }
 
-  SDL_Point pt = {.x = (game->field.screen_width - text_width) / 2, .y = 0 + text_height};
+  SDL_Point pt = {.x = (resolution.width - text_width) / 2, .y = 0 + text_height};
 
   for (int i = 0; i < 10; i++) {
     if (tex_top_10_scores[i] == NULL) {

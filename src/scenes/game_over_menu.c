@@ -2,6 +2,7 @@
 #include "../game.h"
 #include "../my_timer.h"
 #include "../res/texture.h"
+#include "../res/res.h"
 
 static const char* title[2] = {"GAME OVER", "YOU W0N"};
 
@@ -202,8 +203,8 @@ bool game_over_menu_render(GAME* game) {
   SDL_FRect* rect = &(SDL_FRect){
     .x = game->field.square_screen_padding_width,
     .y = 0,
-    .w = game->field.screen_height,
-    .h = game->field.screen_height,
+    .w = resolution.height,
+    .h = resolution.height,
   };
 
   status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL, rect);
@@ -213,8 +214,8 @@ bool game_over_menu_render(GAME* game) {
     return 0;
   }
 
-  const int width = game->field.screen_width;
-  const int height = game->field.screen_height;
+  const int width = resolution.width;
+  const int height = resolution.height;
   int text_width, text_height;
 
   status = render_time(game);

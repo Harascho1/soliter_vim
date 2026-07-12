@@ -78,28 +78,31 @@ extern const PATHS paths;
 // } TEXTURE;
 
 typedef struct {
-  int width;
-  int height;
+  float width;
+  float height;
 } RESOLUTION;
 extern RESOLUTION resolution;
 
 typedef struct {
-  int width_padding;
-  int height_padding;
-  int width;
-  int height;
+  float width_padding;
+  float height_padding;
+  float width;
+  float height;
 } CARD_DIMENS;
+extern CARD_DIMENS card_dimens;
 
 typedef struct {
-  int width;
-  int height;
-  int padding;
+  float width;
+  float height;
+  float padding;
 } CURSOR_DIMENS;
+extern CURSOR_DIMENS cursor_dimens;
 
 typedef struct {
-  int padding_width;
-  int padding_height;
+  float padding_width;
+  float padding_height;
 } GAMEPLAY_DIMENS;
+extern GAMEPLAY_DIMENS game_dimens;
 
 typedef struct {
   int width;
@@ -109,17 +112,15 @@ typedef struct {
 } HERO_LOGO_DIMENS;
 
 typedef struct {
-  int width;
-  int height;
+  float width;
+  float height;
 } TEXTBOX_DIMENS;
+extern TEXTBOX_DIMENS textbox_dimens;
 
 typedef struct {
   float padding;
 } DEFAULT_SCREEN_DIMENS;
-
-typedef struct {
-  float padding;
-} GAMEPLAY_SCREEN_DIMENS;
+extern DEFAULT_SCREEN_DIMENS screen_dimens;
 
 typedef struct {
   int title_font;

@@ -27,10 +27,10 @@ CARD g_invisible_card[7];
 
 bool load_game_field(DECK* deck, const FIELD* field) {
   int count = 0;
-  int x_coord = field->gameplay_screen_padding_width;
+  int x_coord = game_dimens.padding_width;
 
   for (int i = 0; i < number_of_cards_in_row; ++i) {
-    int y_coord = field->gameplay_screen_padding_height + field->card_padding_height +
+    int y_coord = game_dimens.padding_height + field->card_padding_height +
                   field->card_height;
     g_invisible_card[i].frame = SDL_malloc(sizeof(SDL_FPoint));
     g_invisible_card[i].pos = SDL_malloc(sizeof(POSITION));
@@ -55,8 +55,8 @@ bool load_game_field(DECK* deck, const FIELD* field) {
     x_coord += field->card_padding_width + field->card_width;
   }
   for (; count < 52; count++) {
-    deck->cards[count].frame->x = field->gameplay_screen_padding_width;
-    deck->cards[count].frame->y = field->gameplay_screen_padding_height;
+    deck->cards[count].frame->x = game_dimens.padding_width;
+    deck->cards[count].frame->y = game_dimens.padding_height;
     deck->cards[count].pos->col = 1;
     deck->cards[count].pos->row = 0;
     deck->cards[count].on_field = 0;

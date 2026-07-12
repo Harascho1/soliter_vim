@@ -2,6 +2,7 @@
 #include "SDL3/SDL_log.h"
 #include "game.h"
 #include "res/texture.h"
+#include "res/res.h"
 
 bool render_background(GAME* game) {
   if (game->renderer == NULL) {
@@ -36,8 +37,8 @@ bool render_logo(GAME* game) {
   const SDL_FRect* rect = &(SDL_FRect){
     .x = game->field.square_screen_padding_width,
     .y = 0,
-    .w = game->field.screen_height,
-    .h = game->field.screen_height,
+    .w = resolution.height,
+    .h = resolution.height,
   };
 
   bool status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL, rect);

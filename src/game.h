@@ -79,7 +79,7 @@ int reload_window(GAME* game);
 bool load_game_field(DECK* deck, const FIELD* field);
 void run_a_game(GAME* game);
 void save_score(const GAME* game, const char* name);
-bool render_counting_time(GAME* game);
+bool render_counting_time(const GAME* game);
 int push_user_event(Uint32 type, Sint32 code);
 
 #endif // GAME_H

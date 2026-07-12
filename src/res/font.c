@@ -17,7 +17,6 @@ FONT* create_font(const char* path) {
   }
 
   font->size = 24;
-
   return font;
 }
 
@@ -38,18 +37,17 @@ bool set_font_size(FONT* font, const int size) {
   return true;
 }
 
-int get_text_size(FONT* font, const char* text, int size, int* width, int* height) {
-  if (font == NULL) {
-    return 0;
-  }
-
-  int status = set_font_size(font, size);
+bool get_text_size(
+  FONT* font, const char* text, const int size, int* width, int* height
+)
+{
+  bool status = set_font_size(font, size);
   if (status == 0) {
     return status;
   }
 
   status = TTF_GetStringSize(font->font, text, 0, width, height);
-  if (status == 0) {
+  if (status == false) {
     return status;
   }
   return status;
@@ -59,7 +57,8 @@ SDL_Texture* get_texture_from_text(
   FONT* font, SDL_Renderer* render, const char* text, const int size,
   const SDL_Color* color
 ) {
-  if (font == NULL || render == NULL || text == NULL) {
+  if (render == NULL || text == NULL) {
+    SDL_Log("render or/and text is/are NULL\n");
     return NULL;
   }
 
@@ -89,13 +88,8 @@ SDL_Texture* get_texture_from_text(
 int render_text(SDL_Renderer* render, SDL_Texture* texture, SDL_Point* point) {
   float tex_width, tex_height;
 
-  if (render == NULL) {
-    SDL_Log("render is NULL\n");
-    return 0;
-  }
-
-  if (texture == NULL) {
-    SDL_Log("texture is NULL\n");
+  if (render == NULL || texture == NULL) {
+    SDL_Log("render or/and text is/are NULL\n");
     return 0;
   }
 
@@ -122,7 +116,8 @@ int render_wrapped_text(
   FONT* font, SDL_Renderer* render, const char* text, const int size,
   const SDL_Point* point, const SDL_Color* color
 ) {
-  if (font == NULL || render == NULL || text == NULL) {
+  if (render == NULL || text == NULL) {
+    SDL_Log("render or/and text is/are NULL\n");
     return 0;
   }
 
