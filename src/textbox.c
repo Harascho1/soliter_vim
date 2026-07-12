@@ -16,12 +16,11 @@ create_textbox(int n) {
     return textbox;
 }
 
-int
-have_requaried_num_of_characters(TEXTBOX *textbox, int num) {
+bool have_requaried_num_of_characters(const TEXTBOX *textbox, const int num) {
     if (strlen(textbox->string) >= num) {
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 void
@@ -30,8 +29,7 @@ destroy_textbox(TEXTBOX *textbox) {
     SDL_free(textbox);
 }
 
-int
-insert_text(TEXTBOX *textbox, const char *c) {
+bool insert_text(const TEXTBOX *textbox, const char *c) {
     if (strlen(textbox->string) >= textbox->max_caracters) {
         return 0;
     }
@@ -40,19 +38,18 @@ insert_text(TEXTBOX *textbox, const char *c) {
         return 1;
     }
 
-    char chr = (char)SDL_toupper(*c);
+    const char chr = (char)SDL_toupper(*c);
     textbox->string[strlen(textbox->string)] = chr;
     textbox->string[strlen(textbox->string) + 1] = 0;
     return 1;
 }
 
-int
-delete_text(TEXTBOX *textbox) {
+bool delete_text(const TEXTBOX *textbox) {
     if (strlen(textbox->string) == 0) {
         return 0;
     }
 
-    int index = strlen(textbox->string) - 1;
+    const unsigned int index = (unsigned int)strlen(textbox->string) - 1;
     textbox->string[index] = 0;
     return 1;
 }

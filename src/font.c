@@ -29,11 +29,11 @@ void destroy_font(FONT *font) {
   free(font);
 }
 
-int set_font_size(FONT *font, int size) {
+bool set_font_size(FONT *font, const int size) {
   if (font == NULL) {
     return 0;
   }
-  TTF_SetFontSize(font->font, size);
+  TTF_SetFontSize(font->font, (float)size);
   font->size = size;
   return 1;
 }
@@ -57,13 +57,13 @@ int get_text_size(FONT *font, const char *text, int size, int *width,
 }
 
 SDL_Texture *get_texture_from_text(FONT *font, SDL_Renderer *render,
-                                   const char *text, int size,
-                                   SDL_Color *color) {
+                                   const char *text, const int size,
+                                   const SDL_Color *color) {
   if (font == NULL || render == NULL || text == NULL) {
     return NULL;
   }
 
-  int status = set_font_size(font, size);
+  const int status = set_font_size(font, size);
   if (status == 0) {
     SDL_Log("set_font_size failed...\n");
     return NULL;

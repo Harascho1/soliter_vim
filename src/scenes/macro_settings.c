@@ -1,9 +1,10 @@
 #include "macro_settings.h"
+#include "../config.h"
+#include "../game.h"
+#include "../texture.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_render.h"
-#include "config.h"
-#include "game.h"
 
 static int selected_index = 0;
 static SDL_Color white_color = {255, 255, 255, 255};
@@ -27,15 +28,14 @@ SDL_Texture *tex_command_keys[14];
 SDL_Texture *tex_title_menu;
 SDL_Texture *tex_pop_out;
 
-int lazy_load_config(GAME *game) {
+bool lazy_load_config(const GAME *game) {
   for (int i = 0; i < 14; i++) {
     SDL_DestroyTexture(tex_command_keys[i]);
     SDL_DestroyTexture(tex_hover_command_keys[i]);
   }
 
-  int size;
   for (int i = 0; i < 14; i++) {
-    size = game->field.item_font;
+    int size = game->field.item_font;
     tex_command_keys[i] = get_texture_from_text(
         game->font, game->renderer, commands_keys[i], size, &white_color);
     if (tex_items[i] == NULL) {
@@ -53,22 +53,21 @@ int lazy_load_config(GAME *game) {
   return 1;
 }
 
-int macro_setting_menu_lazy_load(GAME *game) {
-  int size;
+bool macro_setting_menu_lazy_load(const GAME *game) {
 
-  size = game->field.title_font;
+  int size = game->field.title_font;
   tex_title_menu = get_texture_from_text(game->font, game->renderer, title,
                                          size, &white_color);
   if (tex_title_menu == NULL) {
     SDL_Log("title_menu cannot be initiazlied...");
-    return 0;
+    return false;
   }
 
   tex_pop_out = get_texture_from_text(game->font, game->renderer, press_key,
                                       size, &white_color);
   if (tex_pop_out == NULL) {
     SDL_Log("tex_pop_out cannot be initiazlied...");
-    return 0;
+    return false;
   }
 
   size = game->field.item_font;
@@ -77,13 +76,13 @@ int macro_setting_menu_lazy_load(GAME *game) {
                                          size, &white_color);
     if (tex_items[i] == NULL) {
       SDL_Log("items[%d]  cannot be initiazlied...", i);
-      return 0;
+      return false;
     }
     tex_command_keys[i] = get_texture_from_text(
         game->font, game->renderer, commands_keys[i], size, &white_color);
     if (tex_command_keys[i] == NULL) {
       SDL_Log("tex_command_keys[%d]  cannot be initiazlied...", i);
-      return 0;
+      return false;
     }
   }
 
@@ -93,13 +92,13 @@ int macro_setting_menu_lazy_load(GAME *game) {
                                                text[i], size, &green_color);
     if (tex_hover_items[i] == NULL) {
       SDL_Log("hover_items[%d]  cannot be initiazlied...", i);
-      return 0;
+      return false;
     }
     tex_hover_command_keys[i] = get_texture_from_text(
         game->font, game->renderer, commands_keys[i], size, &green_color);
     if (tex_hover_command_keys[i] == NULL) {
       SDL_Log("tex_hover_command_keys[%d]  cannot be initiazlied...", i);
-      return 0;
+      return false;
     }
   }
   return 1;
@@ -115,11 +114,10 @@ void macro_settings_menu_lazy_destroy() {
     SDL_DestroyTexture(tex_hover_command_keys[i]);
   }
 }
-
-int macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
+bool macro_settings_event_handler(GAME *game, const SDL_Event *event) {
   if (event->type == SDL_EVENT_KEY_DOWN) {
     if (event_status == 1) {
-      unsigned int key = event->key.key;
+      const unsigned int key = event->key.key;
       insert_command(key, selected_index);
       event_status = 0;
       return 1;
@@ -153,13 +151,12 @@ int macro_settings_event_hendler(GAME *game, const SDL_Event *event) {
       break;
     }
   }
-  return 1;
+  return true;
 }
 
-int render_press_key_popout(GAME *game) {
+int render_press_key_popout(const GAME *game) {
   int width, height;
-  int status;
-  status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
+  int status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
   if (status == 0) {
     SDL_Log("SDL_GetWindowSizeInPixels error: %s\n", SDL_GetError());
     return status;
@@ -181,12 +178,12 @@ int render_press_key_popout(GAME *game) {
 }
 
 static int flag = 0;
-int macro_settings_update(GAME *game) {
+bool macro_settings_update(const  GAME *game) {
   if (event_status == 1) {
     flag = 1;
   }
   if (event_status == 0 && flag == 1) {
-    int status = lazy_load_config(game);
+    const int status = lazy_load_config(game);
     if (status == 0) {
       SDL_Log("lazy_load_config\n");
       return 0;
@@ -195,8 +192,7 @@ int macro_settings_update(GAME *game) {
   return 1;
 }
 
-int macro_settings_render(GAME *game) {
-  int status;
+bool macro_settings_render(GAME *game) {
   if (game == NULL) {
     SDL_Log("game is NULL\n");
     return 0;
@@ -207,7 +203,7 @@ int macro_settings_render(GAME *game) {
     return 0;
   }
   int width, height;
-  status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
+  int status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
   if (status == 0) {
     SDL_Log("SDL_GetWindowSizeInPixels error: %s\n", SDL_GetError());
     return status;
@@ -338,7 +334,7 @@ int macro_settings_render(GAME *game) {
   return 1;
 }
 
-SCENE macro_setting_scene = {.handle_events = macro_settings_event_hendler,
+SCENE macro_setting_scene = {.handle_events = macro_settings_event_handler,
                              .update = macro_settings_update,
                              .render = macro_settings_render,
                              .lazy_load = macro_setting_menu_lazy_load,

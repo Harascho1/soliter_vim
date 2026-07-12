@@ -31,7 +31,6 @@ int insert_option(const unsigned int command, const int idx) {
   options_set[idx] = (char *)SDL_realloc(options_set[idx],
                                            sizeof(char) * (size_of_buffer + 1));
   strcpy(options_set[idx], buffer);
-  // SDL_Log("zamenjena komanda je: %s\n", options_set[index]);
   return 1;
 }
 
@@ -143,7 +142,7 @@ void create_option_file() {
   int opt_arr[3] = {
       1, // fullscreen
       1, // music
-      50 //%percent of volume
+      50 // % percentage of volume
   };
 
   fwrite(opt_arr, sizeof(int), 3, option_file);
@@ -195,6 +194,5 @@ bool load_config() {
       strcpy(options_set[i], "Off");
     }
   }
-  // SDL_Log("Prosao sam");
   return true;
 }

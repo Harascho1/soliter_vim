@@ -52,14 +52,14 @@ destroy_soundboard(SOUNDBOARD *sb) {
     SDL_free(sb);
 }
 
-typedef struct _packet {
+typedef struct {
     MIX_Mixer *mixer;
     MIX_Audio *sound;
 } packet;
 
 void*
 play_sound_on_thread(void *args) {
-    packet *tmp = (packet *) args;
+    const packet *tmp = (packet *) args;
     MIX_Audio *sound = (MIX_Audio*)tmp->sound;
     if (sound == NULL) {
         SDL_Log("tmp is NULL\n");

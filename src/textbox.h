@@ -8,8 +8,8 @@ typedef struct _TEXTBOX {
 
 TEXTBOX* create_textbox(int n);
 void destroy_textbox(TEXTBOX *textbox);
-int insert_text(TEXTBOX *textbox, const char *c);
-int delete_text(TEXTBOX *textbox);
-int have_requaried_num_of_characters(TEXTBOX *textbox, int num);
+bool insert_text(const TEXTBOX *textbox, const char *c);
+bool delete_text(const TEXTBOX *textbox);
+bool have_requaried_num_of_characters(const TEXTBOX *textbox, int num);
 
 #endif

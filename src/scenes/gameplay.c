@@ -1,11 +1,10 @@
 #include "gameplay.h"
+#include "../card.h"
+#include "../cursor.h"
+#include "../game.h"
+#include "../my_timer.h"
+#include "../sound.h"
 #include "SDL3/SDL_log.h"
-#include "card.h"
-#include "cursor.h"
-#include "game.h"
-#include "my_timer.h"
-#include "sound.h"
-#include <wchar.h>
 
 char buffer[10] = "";
 
@@ -58,7 +57,7 @@ CARD *draw_next_card(DECK *deck) {
   return next_new_card;
 }
 
-int reveal_card_below(GAME *game) {
+int reveal_card_below(const GAME *game) {
   for (int i = 1; i <= number_of_cards_in_row; i++) {
     int j = 1;
     CARD *card;
@@ -90,8 +89,7 @@ int selected_card(DECK *deck, CARD **selected_cards) {
   for (int i = 0; i < count - 1; i++) {
     for (int j = i + 1; j < count; j++) {
       if (selected_cards[j]->value > selected_cards[i]->value) {
-        CARD *tmp;
-        tmp = selected_cards[j];
+        CARD *tmp = selected_cards[j];
         selected_cards[j] = selected_cards[i];
         selected_cards[i] = tmp;
       }
@@ -100,14 +98,14 @@ int selected_card(DECK *deck, CARD **selected_cards) {
   return count;
 }
 
-bool place_king(CARD **card, int num, CURSOR *cursor, FIELD *field) {
-  SDL_Log("Usao sam u place king");
-  int cursor_col = cursor->pos->col;
+bool place_king(CARD **card, const int num, const CURSOR *cursor,
+                const FIELD *field) {
+  const int cursor_col = cursor->pos->col;
   int cursor_row = cursor->pos->row;
-  int x_coord, y_coord;
+  float x_coord, y_coord;
 
   if (cursor_row == 0) {
-    SDL_Log("Ne moze");
+    SDL_Log("Can not");
     return false;
   }
 
@@ -135,23 +133,22 @@ bool place_king(CARD **card, int num, CURSOR *cursor, FIELD *field) {
     card[i]->pos->col = cursor_col;
     card[i]->pos->row = cursor_row + 1;
     card[i]->frame->x = x_coord;
-    card[i]->frame->y = y_coord + field->card_padding_height;
+    card[i]->frame->y = y_coord + (float)field->card_padding_height;
     card[i]->on_field = 1;
 
     cursor_row++;
-    y_coord += field->card_padding_height;
+    y_coord += (float)field->card_padding_height;
   }
 
   return true;
 }
 
-int place_a_card(GAME *game) {
+int place_a_card(const GAME *game) {
   CARD *card =
       find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
 
   CARD *s_card[14];
-  int num_of_selected_cards;
-  num_of_selected_cards = selected_card(game->deck, s_card);
+  const int num_of_selected_cards = selected_card(game->deck, s_card);
   if (card != NULL) {
     SDL_Log("row: %d and col: %d\n", card->pos->row, card->pos->row);
   }
@@ -178,7 +175,7 @@ int place_a_card(GAME *game) {
     return 1;
   }
 
-  if (card == not_visible) {
+  if (card->visible == not_visible) {
     deselect_all_cards(game->deck);
     set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
     return 0;
@@ -297,37 +294,46 @@ int select_a_card(GAME *game) {
   return 1;
 }
 
-int change_cursor_frame(GAME *game) {
-  CARD *card =
+void change_cursor_frame(const GAME *game) {
+  const CARD *card =
       find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
+
   // * deck_card
   if (card == NULL && game->cursor->pos->row == 0) {
     game->cursor->cursor->x =
-        game->field.gameplay_screen_padding_width - game->field.cursor_padding;
+        (float)(game->field.gameplay_screen_padding_width -
+                game->field.cursor_padding);
     game->cursor->cursor->y =
-        game->field.gameplay_screen_padding_height - game->field.cursor_padding;
-    return 1;
+        (float)(game->field.gameplay_screen_padding_height -
+                game->field.cursor_padding);
+    return;
   }
+
+  if (card == NULL) {
+    SDL_Log("card is NULL and cursor pos isn't on first row\n");
+    return;
+  }
+
+  // other scenarios
   if (same_card_selected(card, top_card(&game->deck->drawn_cards)) == 1) {
-    int right_indent = g_invisible_card[1].frame->x;
-    game->cursor->cursor->x = right_indent - game->field.cursor_padding;
+    const float right_indent = g_invisible_card[1].frame->x;
+    game->cursor->cursor->x = right_indent - (float)game->field.cursor_padding;
     game->cursor->cursor->y =
-        game->field.gameplay_screen_padding_height - game->field.cursor_padding;
+        (float)(game->field.gameplay_screen_padding_height -
+                game->field.cursor_padding);
   } else {
-    game->cursor->cursor->x = card->frame->x - game->field.cursor_padding;
-    game->cursor->cursor->y = card->frame->y - game->field.cursor_padding;
+    game->cursor->cursor->x = card->frame->x - (float)game->field.cursor_padding;
+    game->cursor->cursor->y = card->frame->y - (float)game->field.cursor_padding;
   }
-  return 1;
 }
 
-int auto_sortable(CARD *card, CARD **sorted_cards) {
-
-  int card_suit = card->suit;
+int auto_sortable(const CARD *card, CARD **sorted_cards) {
+  const int card_suit = card->suit;
   if (card->value == 1)
     return 1;
 
   if (card->value == 2) {
-    CARD *card_same_suit = NULL;
+    const CARD *card_same_suit = NULL;
     for (int i = 0; i < 4; ++i) {
       if (sorted_cards[i] == NULL) {
         continue;
@@ -345,7 +351,7 @@ int auto_sortable(CARD *card, CARD **sorted_cards) {
     }
   }
 
-  // potentional buggy
+  // potential bug
   if (card->value >= 3 && card->value < 14) {
     CARD *card_other_suit[2];
     int other_suits = (card_suit + 2) % 4;
@@ -356,20 +362,15 @@ int auto_sortable(CARD *card, CARD **sorted_cards) {
     SDL_Log("other suit is %d", other_suits);
     int count = 0;
     for (int i = 0; i < 4; ++i) {
-      SDL_Log("prolazim %d-ti put\n", i);
       if (sorted_cards[i] == NULL) {
         continue;
       }
-      SDL_Log("nije NULL\n");
 
-      SDL_Log("%d-ti suit\n", sorted_cards[i]->suit);
       if ((other_suits == sorted_cards[i]->suit) ||
           (other_suits + 1 == sorted_cards[i]->suit)) {
-        SDL_Log("Proso if statement\n");
         card_other_suit[count++] = sorted_cards[i];
       }
     }
-    SDL_Log("count is %d", count);
     if (count != 2) {
       return 0;
     }
@@ -382,13 +383,12 @@ int auto_sortable(CARD *card, CARD **sorted_cards) {
         return 0;
       }
     }
-    SDL_Log("Ja sam stigao ovde");
     return 1;
   }
   return 0;
 }
 
-int auto_solve(GAME *game) {
+int auto_solve(const GAME *game) {
   if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
     return 1;
   }
@@ -443,7 +443,7 @@ int interact(GAME *game) {
   return 1;
 }
 
-int gameplay_update(GAME *game) {
+bool gameplay_update(const GAME *game) {
   int status;
 
   auto_solve(game);
@@ -477,7 +477,7 @@ int gameplay_update(GAME *game) {
   return 1;
 }
 
-SCENE gameplay_scene = {.handle_events = gamaplay_event_handler,
+SCENE gameplay_scene = {.handle_events = gameplay_event_handler,
                         .update = gameplay_update,
                         .render = gameplay_render,
                         .lazy_load = gameplay_lazy_load,

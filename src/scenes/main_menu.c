@@ -1,15 +1,13 @@
 #include "main_menu.h"
+#include "../font.h"
+#include "../game.h"
+#include "../my_timer.h"
+#include "../render.h"
+#include "../sound.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
-#include "clickable_element.h"
-#include "font.h"
-#include "game.h"
-#include "my_timer.h"
-#include "render.h"
-#include "sound.h"
-#include "texture.h"
 
 static const char *title = "SoVIMter";
 static const char *game_modes[] = {"normal", "fly"};
@@ -37,7 +35,7 @@ void lazy_destroy_main_menu() {
 
 void action() { SDL_Log("Print"); }
 
-int lazy_load_main_menu(GAME *game) {
+bool lazy_load_main_menu(const GAME *game) {
   int size;
   size = game->field.title_font;
   tex_game_title = get_texture_from_text(game->font, game->renderer, title,
@@ -87,7 +85,7 @@ int lazy_load_main_menu(GAME *game) {
   return 1;
 }
 
-int main_menu_event_handler(GAME *game, const SDL_Event *event) {
+bool main_menu_event_handler(GAME *game, const SDL_Event *event) {
   if (event->type == SDL_EVENT_MOUSE_MOTION) {
   }
   if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
@@ -143,14 +141,14 @@ int main_menu_event_handler(GAME *game, const SDL_Event *event) {
   return 1;
 }
 
-int main_menu_update(GAME *game) {
+bool main_menu_update(const GAME *game) {
   if (game->timer->start_timer == 1) {
     reset_timer(game->timer);
   }
   return 1;
 }
 
-int main_menu_render(GAME *game) {
+bool main_menu_render(GAME *game) {
   int status;
   if (game == NULL) {
     SDL_Log("game is NULL\n");

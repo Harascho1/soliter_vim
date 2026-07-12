@@ -1,4 +1,5 @@
 #include "render.h"
+#include "texture.h"
 #include "SDL3/SDL_log.h"
 #include "game.h"
 
@@ -36,7 +37,6 @@ bool render_background(GAME *game) {
 }
 
 bool render_logo(GAME *game) {
-  bool status;
   if (game->menu_texture == NULL) {
     SDL_Log("menu_texture is NULL\n");
     game->menu_texture =
@@ -46,14 +46,15 @@ bool render_logo(GAME *game) {
       return false;
     }
   }
-  SDL_FRect *rect = &(SDL_FRect){
+  const SDL_FRect *rect = &(SDL_FRect){
       .x = game->field.square_screen_padding_width,
       .y = 0,
       .w = game->field.screen_height,
       .h = game->field.screen_height,
   };
 
-  status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL, rect);
+  bool status =
+      SDL_RenderTexture(game->renderer, game->menu_texture, NULL, rect);
   if (status == false) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     push_user_event(SDL_EVENT_QUIT, 0);

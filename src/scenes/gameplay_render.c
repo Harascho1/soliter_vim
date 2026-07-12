@@ -1,13 +1,13 @@
+#include "../card.h"
+#include "../cursor.h"
+#include "../font.h"
+#include "../game.h"
+#include "gameplay.h"
+#include "../textbox.h"
+#include "../texture.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_rect.h"
 #include "SDL3/SDL_render.h"
-#include "card.h"
-#include "cursor.h"
-#include "font.h"
-#include "game.h"
-#include "gameplay.h"
-#include "textbox.h"
-#include "texture.h"
 #include <string.h>
 
 static SDL_Color white_color = {255, 255, 255, 255};
@@ -26,7 +26,7 @@ static SDL_Texture *tex_text_name_a_record;
 
 TEXTBOX *textbox;
 
-int gameplay_lazy_load(GAME *game) {
+bool gameplay_lazy_load(const GAME *game) {
   textbox = create_textbox(4);
   start_timer(game->timer);
 
@@ -145,7 +145,7 @@ void gameplay_lazy_destroy() {
   SDL_DestroyTexture(tex_fly_notaions);
 }
 
-int render_commands(GAME *game) {
+bool render_commands(GAME *game) {
   if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
     return 1;
   }
@@ -189,7 +189,7 @@ int render_commands(GAME *game) {
   return 1;
 }
 
-int render_cursor(GAME *game) {
+bool render_cursor(GAME *game) {
   int status = 0;
 
   const char *path = "assets/cursor.png";
@@ -250,14 +250,12 @@ int render_name_textbox(GAME *game) {
     return 1;
   }
 
-  int status;
-
-  int width = game->field.screen_width;
-  int height = game->field.screen_height;
+  const int width = game->field.screen_width;
+  const int height = game->field.screen_height;
 
   int text_width, text_height;
-  status = get_text_size(game->font, "GGGG", game->field.title_font,
-                         &text_width, &text_height);
+  int status = get_text_size(game->font, "GGGG", game->field.title_font,
+                             &text_width, &text_height);
   if (status == 0) {
     SDL_Log("get_text_size in render_name_textbox\n");
     return 0;
@@ -315,7 +313,7 @@ int render_name_textbox(GAME *game) {
   return 1;
 }
 
-int render_fly_notaions(GAME *game) {
+bool render_fly_notaions(GAME *game) {
   if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
     return 1;
   }
@@ -349,18 +347,16 @@ int render_fly_notaions(GAME *game) {
   return 1;
 }
 
-int render_counting_time(GAME *game) {
+bool render_counting_time(GAME *game) {
   // Rendering timer in seconds
-  int status;
-  int width, height;
-  width = game->field.screen_width;
-  height = game->field.screen_height;
+  const int width = game->field.screen_width;
+  const int height = game->field.screen_height;
 
   char timer[20];
   int text_width, text_height;
   snprintf(timer, 20, "seconds: %d", game->timer->time_elapsed);
-  status = get_text_size(game->font, timer, game->field.item_font, &text_width,
-                         &text_height);
+  int status = get_text_size(game->font, timer, game->field.item_font,
+                             &text_width, &text_height);
   if (status == 0) {
     SDL_Log("get_text_size error...\n");
     return status;
@@ -385,8 +381,7 @@ int render_counting_time(GAME *game) {
   return status;
 }
 
-int gameplay_render(GAME *game) {
-  int status;
+bool gameplay_render(GAME *game) {
   if (game == NULL) {
     SDL_Log("game is NULL\n");
     return 0;
@@ -407,13 +402,7 @@ int gameplay_render(GAME *game) {
     }
   }
 
-  // status = SDL_RenderClear(game->renderer);
-  // if (status == 0) {
-  //     SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
-  //     return 0;
-  // }
-
-  status =
+  int status =
       SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
   if (status == 0) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());

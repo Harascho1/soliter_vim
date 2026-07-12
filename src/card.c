@@ -1,10 +1,12 @@
 #include "card.h"
 #include "SDL3/SDL_log.h"
-#include "gameplay.h"
+#include "scenes/gameplay.h"
 #include "texture.h"
 #include <string.h>
 
-bool same_card_selected(const CARD *card1, const CARD *card2) { return card1 == card2; }
+bool same_card_selected(const CARD *card1, const CARD *card2) {
+  return card1 == card2;
+}
 
 void deselect_all_cards(DECK *deck) {
   for (int i = 0; i < 52; i++) {
@@ -25,8 +27,9 @@ CARD *find_card(const DECK *deck, int col, int row) {
 
   for (int i = 0; i < 52; i++) {
     if (deck->cards[i].pos->col == col && deck->cards[i].pos->row == row) {
-      // NOTE: This card can be NULL
-      return &deck->cards[i];
+      // NOTE: This card can be null
+      // TODO: need to make function that explicitly return `CARD*` from stack
+      return (CARD *)&deck->cards[i];
     }
   }
   return NULL;
@@ -54,11 +57,10 @@ void shuffle_deck(DECK *deck) {
   }
 
   srand((unsigned int)time(NULL));
-  int j;
   int count = 0;
   for (int i = deck->count - 1; i >= 0; i--) {
-    j = rand() % (i + 1);
-    CARD temp = deck->cards[i];
+    int j = rand() % (i + 1);
+    const CARD temp = deck->cards[i];
     deck->cards[i] = deck->cards[j];
     deck->cards[j] = temp;
     count++;
@@ -72,14 +74,13 @@ int sort_a_card(CARD *card, DECK *deck) {
       card->pos->col = suit + 4;
       card->pos->row = 0;
       deck->sorted_cards[suit] = card;
-      SDL_Log("sortirao\n");
+      SDL_Log("Sorted\n");
       return 1;
     }
     if (deck->sorted_cards[suit] == NULL) {
       return 0;
     }
     if (card->suit == deck->sorted_cards[suit]->suit) {
-      // SDL_Log("sortirao\n");
       if (deck->sorted_cards[suit]->value + 1 != card->value) {
         return 0;
       }
@@ -95,16 +96,16 @@ int sort_a_card(CARD *card, DECK *deck) {
 
 void pop_all(CARD_STACK *stack) {
   for (int i = 0; i < stack->count; i++) {
-    // NOTE: return cards to deck face down
+    // NOTE: return cards to the deck face down
     stack->array[i]->visible = not_visible;
   }
   memset(stack->array, 0, STACK_SIZE);
   stack->count = 0;
 }
 
-bool is_empty(CARD_STACK *stack) { return stack->count == 0; }
+bool is_empty(const CARD_STACK *stack) { return stack->count == 0; }
 
-bool is_full(CARD_STACK *stack) { return stack->count == STACK_SIZE; }
+bool is_full(const CARD_STACK *stack) { return stack->count == STACK_SIZE; }
 
 bool push(CARD_STACK *stack, CARD *card) {
   if (is_full(stack)) {
@@ -132,20 +133,19 @@ CARD *top_card(const CARD_STACK *stack) {
   return stack->array[stack->count - 1];
 }
 
-bool can_card_be_placed(const CARD* card_below, const CARD* card_above) {
+bool can_card_be_placed(const CARD *card_below, const CARD *card_above) {
   if (card_below->value + 1 != card_above->value) {
-    return 0;
+    return false;
   }
   if ((card_below->suit == suit_clubs || card_below->suit == suit_spades) &&
       (card_above->suit == suit_diamonds || card_above->suit == suit_hearts)) {
-    return 1;
-  } else if ((card_below->suit == suit_diamonds ||
-              card_below->suit == suit_hearts) &&
-             (card_above->suit == suit_clubs ||
-              card_above->suit == suit_spades)) {
-    return 1;
+    return true;
   }
-  return 0;
+  if ((card_below->suit == suit_diamonds || card_below->suit == suit_hearts) &&
+      (card_above->suit == suit_clubs || card_above->suit == suit_spades)) {
+    return true;
+  }
+  return true;
 }
 
 void create_card_stack(CARD_STACK *stack) { stack->count = 0; }
@@ -185,16 +185,16 @@ DECK *create_deck(SDL_Renderer *renderer) {
   return deck;
 }
 
-void destroy_card(CARD *card) {
+void destroy_card(const CARD *card) {
   if (card != NULL) {
     SDL_free(card->frame);
     SDL_free(card->pos);
   }
 }
 
-bool have_more_cards(const DECK* deck) {
+bool have_more_cards(const DECK *deck) {
   if (deck->deck_card != NULL) {
-    return 1;
+    return true;
   }
   int count = 0;
   for (int i = 28; i < 52; i++) {
@@ -203,9 +203,9 @@ bool have_more_cards(const DECK* deck) {
     }
   }
   if (count > 1) {
-    return 1;
+    return true;
   }
-  return 0;
+  return true;
 }
 
 void destroy_deck(DECK *deck) {
@@ -218,9 +218,8 @@ void destroy_deck(DECK *deck) {
   }
 }
 
-char *find_path(CARD *card) {
-  char *path;
-  path = SDL_malloc(sizeof(char) * 100);
+char *find_path(const CARD *card) {
+  char *path = SDL_malloc(sizeof(char) * 100);
 
   if (card->visible == not_visible) {
     if (card->selected == selected) {
@@ -278,15 +277,14 @@ char *find_path(CARD *card) {
   return path;
 }
 
-int render_card(FIELD *field, SDL_Renderer *renderer, CARD *card,
-                SDL_FPoint *point) {
+bool render_card(const FIELD *field, SDL_Renderer *renderer, const CARD *card,
+                 const SDL_FPoint *point) {
   if (renderer == NULL || card == NULL) {
     SDL_Log("renderer or card are NULL in render_card fun...\n");
     return 0;
   }
 
-  char *path;
-  path = find_path(card);
+  char *path = find_path(card);
   if (path == NULL) {
     SDL_Log("path is NULL in render_card fun...\n");
     return 0;
@@ -298,9 +296,10 @@ int render_card(FIELD *field, SDL_Renderer *renderer, CARD *card,
     return 0;
   }
 
-  int status = SDL_RenderTexture(
-      renderer, texture, NULL,
-      &(SDL_FRect){point->x, point->y, field->card_width, field->card_height});
+  int status = SDL_RenderTexture(renderer, texture, NULL,
+                                 &(SDL_FRect){point->x, point->y,
+                                              (float)field->card_width,
+                                              (float)field->card_height});
 
   if (status == 0) {
     SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());

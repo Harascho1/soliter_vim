@@ -281,7 +281,7 @@ void game_quit(GAME *game) {
   if (game->timer != NULL) {
     destroy_timer(game->timer);
   }
-  SDL_Log("Kraj\n");
+  SDL_Log("End\n");
 }
 
 void run_a_game(GAME *game) {
@@ -373,7 +373,7 @@ int make_string_array(char **array_of_strings, int *i) {
 
 int make_array_of_times(char **array_of_strings, int array[], const int i) {
   const char *seconds = "name:name seconds:";
-  int jmp = strlen(seconds);
+  const int jmp = (int)strlen(seconds);
   for (int j = 0; j < i; j++) {
     int num_of_digits = 1;
     while (num_of_digits <= 4 &&
@@ -383,12 +383,14 @@ int make_array_of_times(char **array_of_strings, int array[], const int i) {
     char num_string[5];
     memcpy(num_string, &array_of_strings[j][jmp + 0], num_of_digits);
     num_string[num_of_digits] = '\0';
-    array[j] = atoi(num_string);
+
+    // TODO: neads investigating I changed atoi -> strtoimax
+    array[j] = (int)strtoimax(num_string, NULL, 10);
   }
   return 1;
 }
 
-int get_new_insert_index(int *array, int *i, int num) {
+int get_new_insert_index(const int *array, int *i, const unsigned int num) {
   int new_insert;
   for (int j = 0; j < 10; j++) {
     SDL_Log("[%d] broj je: [%d]\n", j, array[j]);
@@ -418,8 +420,8 @@ int make_new_array_of_strings(char **strings_of_array, int i, char *new_string,
     strcpy(strings_of_array[j], tmp);
     strcpy(tmp, new_tmp);
   }
-  for (int j = 0; j < 10; j++) {
-    SDL_Log("[%d] %s\n", j, strings_of_array[j]);
+  for (int idx = 0; idx < 10; idx++) {
+    SDL_Log("[%d] %s\n", idx, strings_of_array[idx]);
   }
   return 1;
 }
@@ -427,14 +429,14 @@ int make_new_array_of_strings(char **strings_of_array, int i, char *new_string,
 int print_in_bin(char **strings_of_array, int i) {
   FILE *bin_eg = fopen("assets/bin/saves.bin", "wb+");
   for (int j = 0; j < i && j < 10; j++) {
-    int n_size = strlen(strings_of_array[j]) + 1;
+    const int n_size = (int)strlen(strings_of_array[j]) + 1;
     fwrite(strings_of_array[j], sizeof(char), n_size, bin_eg);
   }
   fclose(bin_eg);
   return 1;
 }
 
-void save_score(GAME *game, const char *name) {
+void save_score(const GAME *game, const char *name) {
   // TODO ovo mora da ostane zakomentarisano pre nego sto se pablisuje
   if (g_game_win != 1) {
     return;
@@ -448,32 +450,27 @@ void save_score(GAME *game, const char *name) {
   strftime(time_buff, 80, "%Y-%m-%d %H:%M:%S", tm_info);
 
   char buff[255];
-  int time_in_sec = game->timer->time_elapsed;
+  const unsigned int time_in_sec = game->timer->time_elapsed;
   sprintf(buff, "name:%s seconds:%d mode:none time:%s", name, time_in_sec,
           time_buff);
-  int buff_size = strlen(buff) + 1;
 
-  char **saves;
-  saves = (char **)SDL_malloc(sizeof(char *) * 10);
+  char **saves = SDL_malloc(sizeof(char *) * 10);
   for (int i = 0; i < 10; i++) {
     saves[i] = (char *)SDL_malloc(sizeof(char) * 255);
     memset(saves[i], 0, 255);
   }
 
-  int status;
   int i = 0;
-  status = make_string_array(saves, &i);
+  int status = make_string_array(saves, &i);
   if (status == 0) {
     free_resurses(saves);
     SDL_Log("make_string_array error...\n");
   }
 
-  int best_times[10];
-  memset(best_times, 0, sizeof(int) * 10);
+  int best_times[10] = {0};
   status = make_array_of_times(saves, best_times, i);
 
-  int new_index;
-  new_index = get_new_insert_index(best_times, &i, time_in_sec);
+  const int new_index = get_new_insert_index(best_times, &i, time_in_sec);
   if (new_index == -1) {
     free_resurses(saves);
     return;
@@ -481,13 +478,14 @@ void save_score(GAME *game, const char *name) {
   // SDL_Log("new index: %d", new_index);
 
   status = make_new_array_of_strings(saves, i, buff, new_index);
-  if (status == 0) {
+
+  if (status == false) {
     SDL_Log("make_new_array_of_string error...\n");
     return;
   }
 
   status = print_in_bin(saves, i);
-  if (status == 0) {
+  if (status == false) {
     SDL_Log("print_in_bin error...\n");
   }
   free_resurses(saves);

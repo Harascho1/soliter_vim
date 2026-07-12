@@ -1,13 +1,13 @@
+#include "../config.h"
+#include "../cursor.h"
+#include "../game.h"
+#include "gameplay.h"
+#include "../sound.h"
+#include "../textbox.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_keyboard.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_log.h"
-#include "config.h"
-#include "cursor.h"
-#include "game.h"
-#include "gameplay.h"
-#include "sound.h"
-#include "textbox.h"
 
 static char *text_box_text = "";
 
@@ -117,20 +117,21 @@ int convert_controls(unsigned int key) {
 }
 
 int fly_mode(GAME *game, const SDL_Event *event) {
-  int tmp;
   int status;
-  int num;
   if (event->type == SDL_EVENT_KEY_DOWN) {
-    int key = convert_controls(num = event->key.key);
+    int tmp;
+    const int key = convert_controls(event->key.key);
     switch (key) {
     case 0:
       tmp = 10;
       if ((status = have_number_hover(game->cursor)) == 0) {
         break;
-      } else if (have_a_flag(game->cursor, CURSOR_HOVER_10) == 0) {
+      }
+      if (have_a_flag(game->cursor, CURSOR_HOVER_10) == 0) {
         set_a_flag(game->cursor, CURSOR_HOVER_10);
         break;
-      } else if (find_card(game->deck, status, tmp) != NULL) {
+      }
+      if (find_card(game->deck, status, tmp) != NULL) {
         game->cursor->pos->col = status;
         game->cursor->pos->row = tmp;
         delete_hover_flag(game->cursor);
@@ -148,7 +149,8 @@ int fly_mode(GAME *game, const SDL_Event *event) {
       if ((status = have_number_hover(game->cursor)) == 0) {
         set_a_flag(game->cursor, CURSOR_HOVER_1);
         break;
-      } else if (find_card(game->deck, status, tmp) != NULL) {
+      }
+      if (find_card(game->deck, status, tmp) != NULL) {
         game->cursor->pos->col = status;
         game->cursor->pos->row = tmp;
         delete_hover_flag(game->cursor);
@@ -369,7 +371,6 @@ int text_mode(GAME *game, const SDL_Event *event) {
       break;
     }
   } else if (event->type == SDL_EVENT_TEXT_INPUT) {
-    SDL_Log("UPAO\n");
     if (textbox == NULL) {
       SDL_Log("textbox je NULL\n");
       return 0;
@@ -384,7 +385,7 @@ int text_mode(GAME *game, const SDL_Event *event) {
   return 1;
 }
 
-int gamaplay_event_handler(GAME *game, const SDL_Event *event) {
+bool gameplay_event_handler(GAME *game, const SDL_Event *event) {
   if (g_game_win == 1) {
     SDL_StartTextInput(game->window);
     text_mode(game, event);

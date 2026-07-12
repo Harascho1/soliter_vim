@@ -3,53 +3,58 @@ cmake_minimum_required(VERSION 3.20)
 set(ASSETS_PATH ${PROJECT_SOURCE_DIR}/assets)
 
 set(HEADER_FILES
-    ${CMAKE_SOURCE_DIR}/src/textbox.h
-    ${CMAKE_SOURCE_DIR}/src/sound.h
-    ${CMAKE_SOURCE_DIR}/src/field.h
-    ${CMAKE_SOURCE_DIR}/src/menu.h
-    ${CMAKE_SOURCE_DIR}/src/settings.h
-    ${CMAKE_SOURCE_DIR}/src/option_settings.h
-    ${CMAKE_SOURCE_DIR}/src/macro_settings.h
-    ${CMAKE_SOURCE_DIR}/src/config.h
-    ${CMAKE_SOURCE_DIR}/src/cursor.h
-    ${CMAKE_SOURCE_DIR}/src/font.h
-    ${CMAKE_SOURCE_DIR}/src/game.h
-    ${CMAKE_SOURCE_DIR}/src/texture.h
-    ${CMAKE_SOURCE_DIR}/src/card.h
-    ${CMAKE_SOURCE_DIR}/src/my_timer.h
-    ${CMAKE_SOURCE_DIR}/src/render.h
-        stack.h
+    card.h
+    clickable_element.h
+    config.h
+    cursor.h
+    field.h
+    font.h
+    game.h
+    menu.h
+    my_timer.h
+    render.h
+    sound.h
+    stack.h
+    textbox.h
+    texture.h
+    scenes/game_over_menu.h
+    scenes/gameplay.h
+    scenes/macro_settings.h
+    scenes/main_menu.h
+    scenes/option_settings.h
+    scenes/settings.h
 )
 
-file(GLOB_RECURSE soliter_src 
-    ${CMAKE_SOURCE_DIR}/src/textbox.c
-    ${CMAKE_SOURCE_DIR}/src/sound.c
-    ${CMAKE_SOURCE_DIR}/src/field.c
-    ${CMAKE_SOURCE_DIR}/src/render.c
-    ${CMAKE_SOURCE_DIR}/src/option_settings.c
-    ${CMAKE_SOURCE_DIR}/src/macro_settings.c
-    ${CMAKE_SOURCE_DIR}/src/config.c
-    ${CMAKE_SOURCE_DIR}/src/font.c
-    ${CMAKE_SOURCE_DIR}/src/cursor.c
-    ${CMAKE_SOURCE_DIR}/src/texture.c
-    ${CMAKE_SOURCE_DIR}/src/main_menu.c
-    ${CMAKE_SOURCE_DIR}/src/scores.c
-    ${CMAKE_SOURCE_DIR}/src/gameplay_event.c
-    ${CMAKE_SOURCE_DIR}/src/gameplay_render.c
-    ${CMAKE_SOURCE_DIR}/src/gameplay.c
-    ${CMAKE_SOURCE_DIR}/src/settings.c
-    ${CMAKE_SOURCE_DIR}/src/game_over_menu.c
-    ${CMAKE_SOURCE_DIR}/src/menu.c
-    ${CMAKE_SOURCE_DIR}/src/game.c
-    ${CMAKE_SOURCE_DIR}/src/card.c
-    ${CMAKE_SOURCE_DIR}/src/my_timer.c
-    ${CMAKE_SOURCE_DIR}/src/main.c
+set(SOURCE_FILES
+    card.c
+    clickable_element.c
+    config.c
+    cursor.c
+    field.c
+    font.c
+    game.c
+    main.c
+    menu.c
+    my_timer.c
+    render.c
+    sound.c
+    textbox.c
+    texture.c
+    scenes/game_over_menu.c
+    scenes/gameplay.c
+    scenes/gameplay_event.c
+    scenes/gameplay_render.c
+    scenes/macro_settings.c
+    scenes/main_menu.c
+    scenes/option_settings.c
+    scenes/scores.c
+    scenes/settings.c
 )
 
 if (WIN32)
-    add_executable(${PROJECT_NAME} WIN32 ${HEADER_FILES} ${soliter_src} ${ASSETS_PATH}/icon.rc)
+    add_executable(${PROJECT_NAME} WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_PATH}/icon.rc)
 else()
-    add_executable(${PROJECT_NAME} ${HEADER_FILES} ${soliter_src})
+    add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 endif()
 
 if (WIN32)

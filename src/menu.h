@@ -28,13 +28,13 @@ enum GAME_OVER_ITEM_TYPE {
     game_over_item_type_max
 };
 
-typedef struct _MENU_ITEM {
+typedef struct {
     char *text;
     int state;
     int type;
 } MENU_ITEM;
 
-typedef struct _MENU {
+typedef struct {
     MENU_ITEM *items;
     int selected_item;
     int count;

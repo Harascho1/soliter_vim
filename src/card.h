@@ -9,9 +9,9 @@ enum { not_visible = 0, visible };
 
 enum { not_selected = 0, selected };
 
-typedef enum _SUIT { suit_clubs, suit_spades, suit_diamonds, suit_hearts } SUIT;
+typedef enum { suit_clubs, suit_spades, suit_diamonds, suit_hearts } SUIT;
 
-typedef enum _VALUE {
+typedef enum {
   value_ace = 1,
   value_2,
   value_3,
@@ -27,12 +27,12 @@ typedef enum _VALUE {
   value_king
 } VALUE;
 
-typedef struct _POSITION {
+typedef struct {
   int row;
   int col;
 } POSITION;
 
-typedef struct _CARD {
+typedef struct {
   VALUE value;
   SUIT suit;
   int visible;
@@ -42,7 +42,7 @@ typedef struct _CARD {
   int on_field;
 } CARD;
 
-typedef struct _CARD_STACK {
+typedef struct {
   int count;
   CARD *array[STACK_SIZE];
 } CARD_STACK;
@@ -50,18 +50,18 @@ typedef struct _CARD_STACK {
 CARD *pop(CARD_STACK *stack);
 // CARD *pop_top(CARD_STACK *stack);
 bool push(CARD_STACK *stack, CARD *card);
-bool is_empty(CARD_STACK *stack);
-bool is_full(CARD_STACK *stack);
+bool is_empty(const CARD_STACK *stack);
+bool is_full(const CARD_STACK *stack);
 
 CARD *top_card(const CARD_STACK *stack);
 void pop_all(CARD_STACK *queue);
 
-typedef struct _DECK {
+typedef struct {
   // NOTE: whole deck
   CARD cards[52];
   // NOTE: number of cards in deck
   int count;
-  // NOTE: cards that are drown from deck
+  // NOTE: cards that are drawn from the deck
   CARD_STACK drawn_cards;
   // NOTE: top card in deck
   CARD *deck_card;
@@ -77,19 +77,19 @@ extern CARD g_invisible_card[7];
 DECK *create_deck(SDL_Renderer *renderer);
 void destroy_deck(DECK *deck);
 
-int render_card(FIELD *field, SDL_Renderer *renderer, CARD *card,
-                SDL_FPoint *point);
+bool render_card(const FIELD *field, SDL_Renderer *renderer, const CARD *card,
+                 const SDL_FPoint *point);
 void deselect_all_cards(DECK *deck);
 
 /*
-  NOTE: returns CARD pointer if find in deck for inserted col and row. Returns
-  NULL if dont find
+  NOTE: returns a CARD pointer if it finds in deck for inserted col and row.
+  Returns NULL if it doesn't find
 */
 CARD *find_card(const DECK *deck, int col, int row);
-bool can_card_be_placed(const CARD* card_below, const CARD* card_above);
+bool can_card_be_placed(const CARD *card_below, const CARD *card_above);
 int sort_a_card(CARD *card, DECK *deck);
 int select_card_below(const CARD *card, const DECK *deck);
-bool same_card_selected(const CARD* card1, const CARD* card2);
-bool have_more_cards(const DECK* deck);
+bool same_card_selected(const CARD *card1, const CARD *card2);
+bool have_more_cards(const DECK *deck);
 
 #endif // CARD_H

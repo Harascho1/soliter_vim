@@ -2,14 +2,13 @@
 #define GAME_H
 
 #include "SDL3/SDL_stdinc.h"
-#include "menu.h"
-#include "font.h"
 #include "card.h"
 #include "cursor.h"
-#include "sound.h"
-#include "texture.h"
-#include "my_timer.h"
 #include "field.h"
+#include "font.h"
+#include "menu.h"
+#include "my_timer.h"
+#include "sound.h"
 
 extern Uint32 g_change_scene_event_type;
 extern Uint8 game_c;
@@ -31,7 +30,7 @@ enum {
 
 typedef struct _CURSOR CURSOR;
 
-typedef struct _GAME{
+typedef struct {
     SDL_Window      *window;
     SDL_Renderer    *renderer;
     MENU            *main_menu;
@@ -48,18 +47,18 @@ typedef struct _GAME{
     MY_TIMER        *timer;
 } GAME;
 
-typedef struct _RESOULUTION {
+typedef struct {
     int width;
     int height;
 } RESOLUTION;
 
-typedef int (*scene_handle_events_t)(GAME* game, const SDL_Event *event);
-typedef int (*scene_update_t)(GAME *game);
-typedef int (*scene_render_t)(GAME *game);
-typedef int (*lazy_load_t)(GAME *game);
+typedef bool (*scene_handle_events_t)(GAME* game, const SDL_Event *event);
+typedef bool (*scene_update_t)(const GAME *game);
+typedef bool (*scene_render_t)(GAME *game);
+typedef bool (*lazy_load_t)(const GAME *game);
 typedef void (*lazy_destroy_t)();
 
-typedef struct _SCENE {
+typedef struct {
     scene_handle_events_t handle_events;
     scene_update_t update;
     scene_render_t render;
@@ -84,8 +83,8 @@ void game_quit(GAME* game);
 int reload_window(GAME *game);
 int load_game_field(DECK *game, FIELD *field);
 void run_a_game(GAME *game);
-void save_score(GAME *game, const char *name);
-int render_counting_time(GAME *game);
+void save_score(const GAME *game, const char *name);
+bool render_counting_time(GAME *game);
 int push_user_event(Uint32 type, Sint32 code);
 
 #endif // GAME_H

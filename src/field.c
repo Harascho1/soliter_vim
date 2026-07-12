@@ -28,17 +28,11 @@ load_field(FIELD *field, int screen_width, int screen_height, FONT *font) {
 
     int tmp_text_height;
     int tmp_text_width;
-    int status;
 
     field->title_font = screen_height / 10;
 
-    status = get_text_size(
-        font, 
-        "soVIMter", 
-        field->title_font, 
-        &tmp_text_width, 
-        &tmp_text_height
-    );
+    int status = get_text_size(font, "soVIMter", field->title_font,
+                               &tmp_text_width, &tmp_text_height);
     if (status == 0) {
         SDL_Log("get_text_size error...\n");
         return 0;

@@ -1,5 +1,5 @@
+#include "../game.h"
 #include "SDL3/SDL_render.h"
-#include "game.h"
 
 static SDL_Color green_color = {150, 255, 150, 255};
 static SDL_Color white_color = {255, 255, 255, 255};
@@ -13,7 +13,7 @@ static char* fly_mode = "FLY mode:\n\nUse numbers to jump to the card. For an ex
 static char* universal_rule = "X - move to NORMAL mode\nC - move to FLY mode";
 static int width, height;
 
-int
+bool
 setting_event_handler(GAME *game, const SDL_Event *event) {
     if (event->type != SDL_EVENT_KEY_DOWN) {
         return 1;
@@ -54,28 +54,23 @@ setting_event_handler(GAME *game, const SDL_Event *event) {
                     break;
             }
             break;
-        case SDLK_E:
-            break;
         default:
             break;
     }
     return 1;
 }
 
-int
-setting_update(GAME *game) {
+bool
+setting_update(const GAME *game) {
     return 1;
 }
 
-int
+bool
 render_guide(GAME *game) {
     int status;
 
     int text_width, text_height;
-    status = set_font_size(
-        game->font,
-        game->field.text_font
-    );
+    status = set_font_size(game->font, game->field.text_font);
     if (status == 0) {
         SDL_Log("get_text_size error\n");
         return 0;
@@ -223,7 +218,7 @@ render_guide(GAME *game) {
     return status;
 }
 
-int
+bool
 setting_render(GAME *game) {
 
 
@@ -259,18 +254,14 @@ setting_render(GAME *game) {
     return status;
 }
 
-int
-setting_lazy_load(GAME *game) {
+bool
+setting_lazy_load(const GAME *game) {
     int size;
     size = game->field.item_font;
     for (int i = 0; i < 3; i++) {
         tex_settings_menu_items[i] = get_texture_from_text(
-            game->font, 
-            game->renderer, 
-            game->setting_menu->items[i].text, 
-            size, 
-            &white_color
-        );
+          game->font, game->renderer, game->setting_menu->items[i].text, size,
+          &white_color);
         if (tex_settings_menu_items[i] == NULL) {
             SDL_Log("menu_items[%d] cannot be initiazlied...", i);
             return 0;
@@ -279,12 +270,8 @@ setting_lazy_load(GAME *game) {
     size = game->field.hover_item_font;
     for (int i = 0; i < 3; i++) {
         tex_hover_settings_menu_items[i] = get_texture_from_text(
-            game->font,
-            game->renderer,
-            game->setting_menu->items[i].text,
-            size,
-            &green_color
-        );
+          game->font, game->renderer, game->setting_menu->items[i].text, size,
+          &green_color);
         if (tex_hover_settings_menu_items[i] == NULL) {
             SDL_Log("menu_items[%d] cannot be initiazlied...", i);
             return 0;

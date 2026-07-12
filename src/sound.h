@@ -14,7 +14,7 @@ enum {
     move_sound
 };
 
-typedef struct _SOUNDBOARD {
+typedef struct {
     MIX_Audio **sounds;
     int lenght;
     int count;

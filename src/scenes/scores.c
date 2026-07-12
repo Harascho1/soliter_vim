@@ -1,15 +1,15 @@
+#include "../font.h"
+#include "../game.h"
 #include "SDL3/SDL_log.h"
-#include "font.h"
-#include "game.h"
 
 SDL_Texture *tex_top_10_scores[10];
 static int text_width;
 
-int
-scores_lazy_load(GAME *game) {
+bool
+scores_lazy_load(const GAME *game) {
     FILE *saves = fopen("assets/bin/saves.bin", "rb+");
     if (saves == NULL) {
-        SDL_Log("Nisam uspeo da otvorim fajl");
+        SDL_Log("Unable to open file");
         return 1;
     }
     SDL_Color white_color = {255, 255, 255, 255};
@@ -64,12 +64,7 @@ scores_lazy_load(GAME *game) {
 
     for (int j = 0; j < i; j++) {
         tex_top_10_scores[j] = get_texture_from_text(
-            game->font, 
-            game->renderer, 
-            scores_txt[j], 
-            font_size, 
-            &white_color
-        );
+          game->font, game->renderer, scores_txt[j], font_size, &white_color);
     }
     fclose(saves);
     return 1;
@@ -82,7 +77,7 @@ scores_lazy_destroy(GAME *game) {
     }
 }
 
-int
+bool
 scores_event_hendler(GAME *game, const SDL_Event *event) {
     if (event->type == SDL_EVENT_KEY_DOWN) {
         switch (event->key.key) {
@@ -96,13 +91,12 @@ scores_event_hendler(GAME *game, const SDL_Event *event) {
     return 1;
 }
 
-int
-scores_update(GAME *game) {
-    //That is it
-    return 1;
+bool
+scores_update(const GAME *game) {
+    return true;
 }
 
-int
+bool
 scores_render(GAME *game) {
     int status = 0;
 
@@ -131,6 +125,9 @@ scores_render(GAME *game) {
         NULL, 
         &text_height
     );
+    if (status == false) {
+        return status;
+    }
 
     SDL_Point pt = {
         .x = (game->field.screen_width - text_width) / 2,
