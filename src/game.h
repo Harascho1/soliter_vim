@@ -78,10 +78,10 @@ extern int game_update;
 extern int g_game_win;
 
 int game_init(GAME* game, const char *title, const RESOLUTION *res);
-void game_quit(GAME* game);
+void game_quit(const GAME *game);
 
 int reload_window(GAME *game);
-int load_game_field(DECK *game, FIELD *field);
+bool load_game_field(DECK *deck, const FIELD *field);
 void run_a_game(GAME *game);
 void save_score(const GAME *game, const char *name);
 bool render_counting_time(GAME *game);

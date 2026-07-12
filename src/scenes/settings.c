@@ -45,7 +45,8 @@ setting_event_handler(GAME *game, const SDL_Event *event) {
                     push_user_event(g_change_scene_event_type, game_state_option);
                     break;
                 case settings_item_type_cancel:
-                    push_user_event(g_change_scene_event_type, game_state_main_menu);
+                    push_user_event(g_change_scene_event_type,
+                                  game_state_main_menu);
                     break;
                 case settings_item_type_macro:
                     push_user_event(g_change_scene_event_type, game_state_macro);

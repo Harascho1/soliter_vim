@@ -18,15 +18,14 @@ const char *game_over_items[] = {"Restart", "Scores", "Main Menu"};
 
 const char *setting_items[] = {"Options", "Cancel", "Macros"};
 
-static FILE *saves_file;
-
 Uint32 g_change_scene_event_type = (Uint32)-1;
 
 int game_update = 0;
 int g_game_win = 0;
 CARD g_invisible_card[7];
 
-int load_game_field(DECK *deck, FIELD *field) {
+bool load_game_field(DECK *deck, const FIELD *field)
+{
   int count = 0;
   int x_coord = field->gameplay_screen_padding_width;
 
@@ -69,36 +68,13 @@ int load_game_field(DECK *deck, FIELD *field) {
 }
 
 int fullscree_mode(GAME *game) {
-  int status;
   SDL_DisplayID id;
-  status = SDL_SetWindowFullscreen(game->window, config_options[0]);
+  int status = SDL_SetWindowFullscreen(game->window, config_options[0]);
   if (status == 0) {
     SDL_Log("SDL_SetWindowFullscreen error %s", SDL_GetError());
     return status;
   }
   return status;
-}
-
-int reload_window(GAME *game) {
-  int status;
-  status = fullscree_mode(game);
-  if (status == 0) {
-    SDL_Log("fullscreen is not set\n");
-    return 0;
-  }
-
-  SDL_SyncWindow(game->window);
-  int w, h;
-  status = SDL_GetWindowSizeInPixels(game->window, &w, &h);
-
-  status = load_field(&game->field, w, h, game->font);
-  if (status == 0) {
-    SDL_Log("load_field error...\n");
-    game_quit(game);
-    return 0;
-  }
-
-  return 1;
 }
 
 int game_init(GAME *game, const char *title, const RESOLUTION *res) {
@@ -107,14 +83,14 @@ int game_init(GAME *game, const char *title, const RESOLUTION *res) {
   game->mixer = NULL;
   game->soundboard = NULL;
 
-  SDL_AudioDeviceID devid;
   SDL_AudioSpec spec;
   SDL_memset(&spec, 0, sizeof(spec));
   spec.format = SDL_AUDIO_S32;
   spec.channels = 2;
   spec.freq = 48000;
 
-  devid = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec);
+  const SDL_AudioDeviceID devid =
+      SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec);
   if (devid == 0) {
     SDL_Log("SDL_OpenAudioDevice failed: %s\n", SDL_GetError());
     game_quit(game);
@@ -241,7 +217,7 @@ int game_init(GAME *game, const char *title, const RESOLUTION *res) {
   return 1;
 }
 
-void game_quit(GAME *game) {
+void game_quit(const GAME *game) {
   if (game->soundboard != NULL) {
     destroy_soundboard(game->soundboard);
   }
@@ -284,12 +260,37 @@ void game_quit(GAME *game) {
   SDL_Log("End\n");
 }
 
+int reload_window(GAME *game) {
+  int status = fullscree_mode(game);
+  if (status == 0) {
+    SDL_Log("fullscreen is not set\n");
+    return 0;
+  }
+
+  SDL_SyncWindow(game->window);
+  int w, h;
+  status = SDL_GetWindowSizeInPixels(game->window, &w, &h);
+
+  status = load_field(&game->field, w, h, game->font);
+  if (status == 0) {
+    SDL_Log("load_field error...\n");
+    game_quit(game);
+    return 0;
+  }
+
+  return 1;
+}
+
 void run_a_game(GAME *game) {
   if (game == NULL) {
     SDL_Log("game is NULL\n");
+    return;
   }
 
-  destroy_cursor(game->cursor);
+  if (game->cursor != NULL) {
+    destroy_cursor(game->cursor);
+  }
+
   destroy_deck(game->deck);
 
   game->deck = create_deck(game->renderer);
@@ -310,16 +311,17 @@ void run_a_game(GAME *game) {
   SDL_Log("je loadan\n");
 }
 
-int push_user_event(Uint32 type, Sint32 code) {
-  SDL_Event event;
-  memset(&event, 0, sizeof(event));
+int push_user_event(const Uint32 type, const Sint32 code) {
+  SDL_Event event = {0};
   event.type = type;
   event.user.code = code;
   return SDL_PushEvent(&event);
 }
 
 void free_resurses(char **array_of_strings) {
+  if (array_of_strings == NULL) {return;}
   for (int i = 0; i < 10; i++) {
+    if (array_of_strings[i] == NULL) {continue;}
     SDL_free(array_of_strings[i]);
   }
   SDL_free(array_of_strings);
@@ -328,28 +330,26 @@ void free_resurses(char **array_of_strings) {
 int make_string_array(char **array_of_strings, int *i) {
   FILE *saves_files_bin = fopen("assets/bin/saves.bin", "rb");
   if (saves_files_bin == NULL) {
-    // SDL_Log("prazan je\n");
     return 1;
   }
   char ptr;
   int index = 0;
   int prev_index = index;
-  int status;
-  status = fread(&ptr, sizeof(char), 1, saves_files_bin);
+  int status = (int)fread(&ptr, sizeof(char), 1, saves_files_bin);
   if (status == 0) {
-    return 0;
+    return false;
   }
 
   while (*i < 10 && ptr != EOF) {
     // printf("ptr = %d, ", ptr);
     if (ptr == '\0') {
-      int n_size = index - prev_index + 1;
+      const int n_size = index - prev_index + 1;
       // printf("n_size = %d\n", n_size);
       if (n_size == 1) {
         break;
       }
       fseek(saves_files_bin, prev_index, SEEK_SET);
-      status = fread(array_of_strings[(*i)++], sizeof(char), n_size,
+      status = (int)fread(array_of_strings[(*i)++], sizeof(char), n_size,
                      saves_files_bin);
       if (status == 0) {
         return 0;
@@ -358,7 +358,7 @@ int make_string_array(char **array_of_strings, int *i) {
       printf("index = %d\n", index);
       printf("\n");
     }
-    status = fread(&ptr, sizeof(char), 1, saves_files_bin);
+    status = (int)fread(&ptr, sizeof(char), 1, saves_files_bin);
     if (status == 0) {
       return 1;
     }
@@ -437,15 +437,13 @@ int print_in_bin(char **strings_of_array, int i) {
 }
 
 void save_score(const GAME *game, const char *name) {
-  // TODO ovo mora da ostane zakomentarisano pre nego sto se pablisuje
   if (g_game_win != 1) {
     return;
   }
 
   time_t t;
-  struct tm *tm_info;
   time(&t);
-  tm_info = localtime(&t);
+  const struct tm *tm_info = localtime(&t);
   char time_buff[80];
   strftime(time_buff, 80, "%Y-%m-%d %H:%M:%S", tm_info);
 
