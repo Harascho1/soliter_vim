@@ -104,20 +104,26 @@ bool scores_render(GAME* game) {
   }
 
   int text_height;
-  status =
-    get_text_size(game->font, "normal mode", fonts.text_font, NULL, &text_height);
+  status = get_text_size(game->font, "normal mode", fonts.text_font, NULL, &text_height);
   if (status == false) {
     return status;
   }
 
-  SDL_Point pt = {.x = (resolution.width - text_width) / 2, .y = 0 + text_height};
+  SDL_FPoint pt = {
+    .x = (resolution.width - (float)text_width) / 2,
+    .y = (float)text_height,
+  };
 
   for (int i = 0; i < 10; i++) {
     if (tex_top_10_scores[i] == NULL) {
       break;
     }
     status = render_text(game->renderer, tex_top_10_scores[i], &pt);
-    pt.y += fonts.text_padding + text_height;
+    if (status == false) {
+      SDL_Log("render_text error: %s", SDL_GetError());
+      return status;
+    }
+    pt.y += fonts.text_padding + (float)text_height;
   }
 
   status = SDL_RenderPresent(game->renderer);

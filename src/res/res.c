@@ -8,13 +8,14 @@
 
 const COLOR colors = {
   .white = {255, 255, 255, 255},
-  .green = {150, 150, 150, 255},
-  .title = {230, 230, 230, 255},
+  .green = {150, 255, 150, 255},
+  .title = {23, 150, 52, 255},
 };
 
 const TEXT texts = {
   .titles =
     {
+      .sovimter = "SoVIMter",
       .main_menu = "MAIN MENU",
       .macro_settings = "MACRO SETTINGS",
       .option_settings = "OPTION SETTINGS",
@@ -66,9 +67,12 @@ CARD_DIMENS card_dimens = {
   .height = 140.0F,
 };
 
-DEFAULT_SCREEN_DIMENS screen_dimens = {
-  .padding = 20.0F
+HERO_LOGO_DIMENS hero_logo_dimens = {
+  .width = 0,
+  .height = 0,
+  .margin = 0
 };
+DEFAULT_SCREEN_DIMENS screen_dimens = {.padding = 20.0F};
 
 TEXTBOX_DIMENS textbox_dimens = {
   .width = 880,

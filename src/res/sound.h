@@ -24,6 +24,6 @@ typedef struct {
 SOUNDBOARD* create_soundboard(MIX_Mixer* mixer);
 void destroy_soundboard(SOUNDBOARD* sb);
 
-int play_sound(SOUNDBOARD* soundboard, int index);
+bool play_sound(SOUNDBOARD* soundboard, int index);
 
 #endif

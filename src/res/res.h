@@ -1,7 +1,7 @@
 #ifndef SOVIMTER_RES_H
 #define SOVIMTER_RES_H
-#include <SDL3/SDL_pixels.h>
 #include "font.h"
+#include <SDL3/SDL_pixels.h>
 
 typedef struct {
   SDL_Color white;
@@ -13,6 +13,7 @@ typedef struct {
 extern const COLOR colors;
 
 typedef struct {
+  const char* sovimter;
   const char* main_menu;
   const char* macro_settings;
   const char* option_settings;
@@ -102,11 +103,12 @@ typedef struct {
 extern GAMEPLAY_DIMENS game_dimens;
 
 typedef struct {
-  int width;
-  int height;
+  float width;
+  float height;
   // NOTE: Possibly margin
-  int padding;
+  float margin;
 } HERO_LOGO_DIMENS;
+extern HERO_LOGO_DIMENS hero_logo_dimens;
 
 typedef struct {
   float width;
@@ -134,6 +136,6 @@ typedef struct {
 } FONT_DIMENS;
 extern FONT_DIMENS fonts;
 
-bool load_field(int screen_width, int screen_height, FONT* font);
+bool load_field(int width, int height, FONT* font);
 
 #endif

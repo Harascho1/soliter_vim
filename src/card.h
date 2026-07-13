@@ -1,8 +1,6 @@
 #ifndef CARD_H
 #define CARD_H
 
-#include "res/field.h"
-
 #define STACK_SIZE 30
 
 enum { not_visible = 0, visible };
@@ -77,9 +75,7 @@ extern CARD g_invisible_card[7];
 DECK* create_deck(SDL_Renderer* renderer);
 void destroy_deck(DECK* deck);
 
-bool render_card(
-  const FIELD* field, SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* point
-);
+bool render_card(SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* point);
 void deselect_all_cards(DECK* deck);
 
 /*

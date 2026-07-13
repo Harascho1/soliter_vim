@@ -29,14 +29,14 @@ void destroy_soundboard(SOUNDBOARD* sb) {
   // TODO ne moze ovo jer ne moze posle da se obrise ako se ni jednom nije
   // koristio sound pthread_join(sb->thread, NULL);
   if (sb == NULL) {
-    SDL_Log("sb is NULL");
+    SDL_Log("Soundboard is NULL");
     return;
   }
   if (sb->sounds != NULL) {
     for (int i = 0; i < sb->lenght; i++) {
       MIX_DestroyAudio(sb->sounds[i]);
     }
-    SDL_free(sb->sounds);
+    SDL_free((MIX_Audio*)sb->sounds);
   }
   SDL_free(sb);
 }
@@ -60,29 +60,35 @@ void* play_sound_on_thread(void* args) {
   return (void*)sound;
 }
 
-int play_sound(SOUNDBOARD* sb, int index) {
-  MIX_SetMixerGain(sb->mixer, config_options[2] / 128.0f);
+bool play_sound(SOUNDBOARD* soundboard, const int index) {
+  if (soundboard == NULL) {
+    SDL_Log("Soundboard is NULL\n");
+    return 0;
+  }
+
+  MIX_SetMixerGain(soundboard->mixer, (float)config_options[2] / 128.0F);
   if (config_options[1] == 0) {
     return 1;
   }
-  if (sb == NULL) {
-    SDL_Log("SoundBoard is NULL\n");
-    return 0;
-  }
-  if (sb->count > 0) {
+
+  if (soundboard->count > 0) {
     // pthread_join(sb->thread, NULL);
-    sb->count--;
+    soundboard->count--;
   }
-  if (index < 0 || index > sb->lenght - 1) {
+
+  if (index < 0 || index > soundboard->lenght - 1) {
     SDL_Log("Invalid index\n");
-    return 0;
+    return false;
   }
-  if (sb->count >= QUEUE_SOUNDS) {
-    return 1;
+
+  if (soundboard->count >= QUEUE_SOUNDS) {
+    return true;
   }
-  packet pckg = {sb->mixer, sb->sounds[index]};
-  void* tmp = play_sound_on_thread((void*)&pckg);
+
+  packet pckg = {soundboard->mixer, soundboard->sounds[index]};
+  play_sound_on_thread((void*)&pckg);
   // pthread_create(&sb->thread, NULL, play_sound_on_thread, (void*)(&pckg));
-  sb->count++;
-  return 1;
+  soundboard->count++;
+
+  return true;
 }

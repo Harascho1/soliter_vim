@@ -2,7 +2,7 @@
 
 #include "res/res.h"
 
-CURSOR* create_cursor(FIELD* field, int col, int row) {
+CURSOR* create_cursor(int col, int row) {
   CURSOR* cursor = SDL_malloc(sizeof(CURSOR));
   cursor->pos = SDL_malloc(sizeof(POSITION));
   cursor->pos->col = col;

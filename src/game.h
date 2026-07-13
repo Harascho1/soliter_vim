@@ -6,7 +6,6 @@
 #include "cursor.h"
 #include "menu.h"
 #include "my_timer.h"
-#include "res/field.h"
 #include "res/font.h"
 #include "res/sound.h"
 
@@ -42,7 +41,6 @@ typedef struct {
   MIX_Mixer* mixer;
   SOUNDBOARD* soundboard;
   DECK* deck;
-  FIELD field;
   CURSOR* cursor;
   MY_TIMER* timer;
 } GAME;
@@ -75,8 +73,8 @@ extern int g_game_win;
 int game_init(GAME* game, const char* title);
 void game_quit(const GAME* game);
 
-int reload_window(GAME* game);
-bool load_game_field(DECK* deck, const FIELD* field);
+bool reload_window(const GAME* game);
+bool load_game_field(DECK* deck);
 void run_a_game(GAME* game);
 void save_score(const GAME* game, const char* name);
 bool render_counting_time(const GAME* game);

@@ -9,8 +9,6 @@
 #include "SDL3/SDL_log.h"
 #include "gameplay.h"
 
-static char* text_box_text = "";
-
 int normal_select_mode(GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_KEY_DOWN) {
     switch (event->key.key) {

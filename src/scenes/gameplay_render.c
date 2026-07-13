@@ -145,7 +145,7 @@ void gameplay_lazy_destroy() {
   SDL_DestroyTexture(tex_fly_notaions);
 }
 
-bool render_commands(GAME* game) {
+bool render_commands(const GAME* game) {
   if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
     return 1;
   }
@@ -154,21 +154,15 @@ bool render_commands(GAME* game) {
     return 1;
   }
 
-  int status;
   int text_width, text_height;
-
   if (strlen(buffer) == 0) {
     return 1;
   }
-  status =
+  int status =
     get_text_size(game->font, buffer, fonts.text_font, &text_width, &text_height);
   if (status == 0) {
     return 0;
   }
-
-  int width, height;
-  width = resolution.width;
-  height = resolution.height;
 
   tex_small_buffer = get_texture_from_text(
     game->font, game->renderer, buffer, fonts.text_font, &white_color
@@ -180,8 +174,10 @@ bool render_commands(GAME* game) {
 
   status = render_text(
     game->renderer, tex_small_buffer,
-    &(SDL_Point){.x = (width - text_width) / 2,
-                 .y = (height - text_height - card_dimens.height_padding)}
+    &(SDL_FPoint){
+      .x = (resolution.width - (float)text_width) / 2,
+      .y = (resolution.height - (float)text_height - card_dimens.height_padding),
+    }
   );
   if (status == 0) {
     SDL_Log("render_text error...\n");
@@ -191,10 +187,10 @@ bool render_commands(GAME* game) {
   return 1;
 }
 
-bool render_cursor(GAME* game) {
+bool render_cursor(const GAME* game) {
   int status = 0;
 
-  const char* path = "assets/cursor.png";
+  const char* path = paths.images.cursor;
   SDL_Texture* texture = create_texture_from_image(game->renderer, path);
   if (texture == NULL) {
     return 0;
@@ -213,7 +209,7 @@ bool render_cursor(GAME* game) {
   return status;
 }
 
-int sorted_card_render(GAME* game) {
+bool sorted_card_render(const GAME* game) {
   int status;
   float padding_width =
     (3.0F * (card_dimens.width + card_dimens.width_padding)) + game_dimens.padding_width;
@@ -234,7 +230,7 @@ int sorted_card_render(GAME* game) {
       }
     } else {
       status = render_card(
-        &game->field, game->renderer, game->deck->sorted_cards[suit],
+        game->renderer, game->deck->sorted_cards[suit],
         &(SDL_FPoint){.x = padding_width, .y = screen_dimens.padding}
       );
       if (status == 0) {
@@ -245,7 +241,7 @@ int sorted_card_render(GAME* game) {
     padding_width += card_dimens.width + card_dimens.width_padding;
   }
 
-  return status;
+  return true;
 }
 
 int render_name_textbox(const GAME* game) {
@@ -253,9 +249,6 @@ int render_name_textbox(const GAME* game) {
   if (g_game_win == 0) {
     return 1;
   }
-
-  const int width = resolution.width;
-  const int height = resolution.height;
 
   int text_width, text_height;
   int status =
@@ -265,10 +258,10 @@ int render_name_textbox(const GAME* game) {
     return 0;
   }
 
-  int rect_width = text_width;
-  int rect_height = text_height;
-  int height_indent = (height - rect_height) / 2;
-  int width_indent = (width - text_width) / 2;
+  const float rect_width = (float)text_width;
+  const float rect_height = (float)text_height;
+  const float width_indent = (resolution.width - (float)text_width) / 2;
+  const float height_indent = (resolution.height - (float)rect_height) / 2;
 
   status = get_text_size(
     game->font, "Name a Record", fonts.item_font, &text_width, &text_height
@@ -280,15 +273,20 @@ int render_name_textbox(const GAME* game) {
 
   status = render_text(
     game->renderer, tex_text_name_a_record,
-    &(SDL_Point){.x = (width - text_width) / 2,
-                 .y = height_indent - fonts.title_padding}
+    &(SDL_FPoint){
+      .x = (resolution.width - (float)text_width) / 2,
+      .y = height_indent - fonts.title_padding,
+    }
   );
   if (status == false) {
     SDL_Log("render_text error: %s\n", SDL_GetError());
   }
 
   const SDL_FRect rect = {
-    .x = width_indent, .y = height_indent, .w = rect_width, .h = rect_height
+    .x = width_indent,
+    .y = height_indent,
+    .w = rect_width,
+    .h = rect_height,
   };
 
   status = SDL_RenderTexture(game->renderer, tex_text_box, NULL, &rect);
@@ -310,7 +308,10 @@ int render_name_textbox(const GAME* game) {
     return 0;
   }
 
-  SDL_Point point = {.x = width_indent, .y = height_indent};
+  const SDL_FPoint point = {
+    .x = width_indent,
+    .y = height_indent,
+  };
 
   status = render_text(game->renderer, tex_text_in_textbox, &point);
   if (status == 0) {
@@ -328,8 +329,7 @@ bool render_fly_notaions(const GAME* game) {
     return 1;
   }
   const float height_indent = game_dimens.padding_height + card_dimens.height +
-                      card_dimens.height_padding +
-                      2 * card_dimens.height_padding;
+                              card_dimens.height_padding + 2 * card_dimens.height_padding;
   const float width_indent = game_dimens.padding_width;
 
   const float rect_width = resolution.width - (2 * game_dimens.padding_width);
@@ -354,9 +354,6 @@ bool render_fly_notaions(const GAME* game) {
 
 bool render_counting_time(const GAME* game) {
   // Rendering timer in seconds
-  const int width = resolution.width;
-  const int height = resolution.height;
-
   char timer[20];
   int text_width, text_height;
   snprintf(timer, 20, "seconds: %d", game->timer->time_elapsed);
@@ -377,8 +374,10 @@ bool render_counting_time(const GAME* game) {
 
   status = render_text(
     game->renderer, tex_timer_text,
-    &(SDL_Point){.x = width - screen_dimens.padding - text_width,
-                 .y = height - text_height - screen_dimens.padding}
+    &(SDL_FPoint){
+      .x = resolution.width - screen_dimens.padding - (float)text_width,
+      .y = resolution.height - screen_dimens.padding - (float)text_height,
+    }
   );
   if (status == 0) {
     SDL_Log("render_text error...\n");
@@ -417,8 +416,6 @@ bool gameplay_render(GAME* game) {
     return 0;
   }
 
-  const int height = resolution.height;
-
   // *RENDERING SORTED_CARDS
   status = sorted_card_render(game);
   if (status == 0) {
@@ -429,7 +426,7 @@ bool gameplay_render(GAME* game) {
   // *RENDERING DECK AND ONE MORE CARD ON LEFT RIGHT CORNER
   if (game->deck->deck_card != NULL) {
     status = render_card(
-      &game->field, game->renderer, game->deck->deck_card,
+      game->renderer, game->deck->deck_card,
       &(SDL_FPoint){.x = game_dimens.padding_width, .y = game_dimens.padding_height}
     );
     if (status == 0) {
@@ -448,7 +445,7 @@ bool gameplay_render(GAME* game) {
   const CARD* card = top_card(&game->deck->drawn_cards);
   if (card != NULL) {
     status = render_card(
-      &game->field, game->renderer, card,
+      game->renderer, card,
       &(SDL_FPoint){.x = game_dimens.padding_width + card_dimens.width_padding +
                          card_dimens.width,
                     .y = game_dimens.padding_height}
@@ -466,12 +463,11 @@ bool gameplay_render(GAME* game) {
     }
   }
 
-  // * RENDERING TEXT THAT SHOWS WHAT IN WHAT MODE U ARE
-  int mode = game->cursor->mode % 4;
+  // * RENDERING TEXT THAT SHOWS WHAT IN WHAT MODE YOU'RE
+  const int mode = game->cursor->mode % 4;
   int text_width, text_height;
-  status = get_text_size(
-    game->font, modes[mode], fonts.text_font, &text_width, &text_height
-  );
+  status =
+    get_text_size(game->font, modes[mode], fonts.text_font, &text_width, &text_height);
   if (status == 0) {
     SDL_Log("get_text_size error...\n");
     return 0;
@@ -479,8 +475,8 @@ bool gameplay_render(GAME* game) {
 
   status = render_text(
     game->renderer, tex_modes[mode],
-    &(SDL_Point){.x = screen_dimens.padding,
-                 .y = height - text_height - screen_dimens.padding}
+    &(SDL_FPoint){.x = screen_dimens.padding,
+                 .y = resolution.height - (float)text_height - screen_dimens.padding}
   );
   if (status == 0) {
     SDL_Log("render_text error...\n");
@@ -490,9 +486,9 @@ bool gameplay_render(GAME* game) {
   // * RENDERING GAME FIELD
   for (int i = 1; i <= number_of_cards_in_row; ++i) {
     int j = 1;
-    CARD* card;
-    while ((card = find_card(game->deck, i, j)) != NULL) {
-      status = render_card(&game->field, game->renderer, card, card->frame);
+    CARD* tmp_card;
+    while ((tmp_card = find_card(game->deck, i, j)) != NULL) {
+      status = render_card(game->renderer, tmp_card, tmp_card->frame);
       if (status == 0) {
         SDL_Log("render_card error...\n");
         return 0;

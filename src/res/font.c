@@ -39,8 +39,7 @@ bool set_font_size(FONT* font, const int size) {
 
 bool get_text_size(
   FONT* font, const char* text, const int size, int* width, int* height
-)
-{
+) {
   bool status = set_font_size(font, size);
   if (status == 0) {
     return status;
@@ -85,23 +84,27 @@ SDL_Texture* get_texture_from_text(
   return texture;
 }
 
-int render_text(SDL_Renderer* render, SDL_Texture* texture, SDL_Point* point) {
-  float tex_width, tex_height;
-
+int render_text(SDL_Renderer* render, SDL_Texture* texture, const SDL_FPoint* point) {
   if (render == NULL || texture == NULL) {
     SDL_Log("render or/and text is/are NULL\n");
     return 0;
   }
 
+  float tex_width, tex_height;
   int status = SDL_GetTextureSize(texture, &tex_width, &tex_height);
   if (status == 0) {
     SDL_Log("SDL_GetTextureSize failed: %s\n", SDL_GetError());
     SDL_DestroyTexture(texture);
     return 0;
   }
-
   status = SDL_RenderTexture(
-    render, texture, NULL, &(SDL_FRect){point->x, point->y, tex_width, tex_height}
+    render, texture, NULL,
+    &(SDL_FRect){
+      .x = point->x,
+      .y = point->y,
+      .w = tex_width,
+      .h = tex_height,
+    }
   );
   if (status == 0) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
@@ -114,7 +117,7 @@ int render_text(SDL_Renderer* render, SDL_Texture* texture, SDL_Point* point) {
 
 int render_wrapped_text(
   FONT* font, SDL_Renderer* render, const char* text, const int size,
-  const SDL_Point* point, const SDL_Color* color
+  const SDL_FPoint* point, const SDL_Color* color
 ) {
   if (render == NULL || text == NULL) {
     SDL_Log("render or/and text is/are NULL\n");
@@ -150,7 +153,13 @@ int render_wrapped_text(
   }
 
   status = SDL_RenderTexture(
-    render, texture, NULL, &(SDL_FRect){point->x, point->y, surface->w, surface->h}
+    render, texture, NULL,
+    &(SDL_FRect){
+      point->x,
+      point->y,
+      (float)surface->w,
+      (float)surface->h,
+    }
   );
   if (status == 0) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());

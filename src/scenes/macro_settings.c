@@ -1,15 +1,13 @@
 #include "macro_settings.h"
 #include "../game.h"
 #include "../res/config.h"
-#include "../res/texture.h"
 #include "../res/res.h"
+#include "../res/texture.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_render.h"
 
 static int selected_index = 0;
-static SDL_Color white_color = {255, 255, 255, 255};
-static SDL_Color green_color = {150, 255, 150, 255};
 static int event_status = 0;
 
 static char* text[14] = {"number 0",       "number 1",          "number 2",
@@ -37,7 +35,7 @@ bool lazy_load_config(const GAME* game) {
   for (int i = 0; i < 14; i++) {
     int size = fonts.item_font;
     tex_command_keys[i] = get_texture_from_text(
-      game->font, game->renderer, commands_keys[i], size, &white_color
+      game->font, game->renderer, commands_keys[i], size, &colors.white
     );
     if (tex_items[i] == NULL) {
       SDL_Log("items[%d]  cannot be initiazlied...", i);
@@ -45,7 +43,7 @@ bool lazy_load_config(const GAME* game) {
     }
     size = fonts.item_hover_font;
     tex_hover_command_keys[i] = get_texture_from_text(
-      game->font, game->renderer, commands_keys[i], size, &green_color
+      game->font, game->renderer, commands_keys[i], size, &colors.green
     );
     if (tex_command_keys[i] == NULL) {
       SDL_Log("tex_command_keys[%d]  cannot be initiazlied...", i);
@@ -59,14 +57,14 @@ bool macro_setting_menu_lazy_load(const GAME* game) {
 
   int size = fonts.title_font;
   tex_title_menu =
-    get_texture_from_text(game->font, game->renderer, title, size, &white_color);
+    get_texture_from_text(game->font, game->renderer, title, size, &colors.white);
   if (tex_title_menu == NULL) {
     SDL_Log("title_menu cannot be initiazlied...");
     return false;
   }
 
   tex_pop_out =
-    get_texture_from_text(game->font, game->renderer, press_key, size, &white_color);
+    get_texture_from_text(game->font, game->renderer, press_key, size, &colors.white);
   if (tex_pop_out == NULL) {
     SDL_Log("tex_pop_out cannot be initiazlied...");
     return false;
@@ -75,13 +73,13 @@ bool macro_setting_menu_lazy_load(const GAME* game) {
   size = fonts.item_font;
   for (int i = 0; i < 14; i++) {
     tex_items[i] =
-      get_texture_from_text(game->font, game->renderer, text[i], size, &white_color);
+      get_texture_from_text(game->font, game->renderer, text[i], size, &colors.white);
     if (tex_items[i] == NULL) {
       SDL_Log("items[%d]  cannot be initiazlied...", i);
       return false;
     }
     tex_command_keys[i] = get_texture_from_text(
-      game->font, game->renderer, commands_keys[i], size, &white_color
+      game->font, game->renderer, commands_keys[i], size, &colors.white
     );
     if (tex_command_keys[i] == NULL) {
       SDL_Log("tex_command_keys[%d]  cannot be initiazlied...", i);
@@ -92,13 +90,13 @@ bool macro_setting_menu_lazy_load(const GAME* game) {
   size = fonts.item_hover_font;
   for (int i = 0; i < 14; i++) {
     tex_hover_items[i] =
-      get_texture_from_text(game->font, game->renderer, text[i], size, &green_color);
+      get_texture_from_text(game->font, game->renderer, text[i], size, &colors.green);
     if (tex_hover_items[i] == NULL) {
       SDL_Log("hover_items[%d]  cannot be initiazlied...", i);
       return false;
     }
     tex_hover_command_keys[i] = get_texture_from_text(
-      game->font, game->renderer, commands_keys[i], size, &green_color
+      game->font, game->renderer, commands_keys[i], size, &colors.green
     );
     if (tex_hover_command_keys[i] == NULL) {
       SDL_Log("tex_hover_command_keys[%d]  cannot be initiazlied...", i);
@@ -159,15 +157,8 @@ bool macro_settings_event_handler(GAME* game, const SDL_Event* event) {
 }
 
 int render_press_key_popout(const GAME* game) {
-  int width, height;
-  int status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
-  if (status == 0) {
-    SDL_Log("SDL_GetWindowSizeInPixels error: %s\n", SDL_GetError());
-    return status;
-  }
-
   int text_width, text_height;
-  status = get_text_size(
+  int status = get_text_size(
     game->font, press_key,
     fonts.title_font, // ? nzm da li je font okej?
     &text_width, &text_height
@@ -179,7 +170,10 @@ int render_press_key_popout(const GAME* game) {
 
   status = render_text(
     game->renderer, tex_pop_out,
-    &(SDL_Point){.x = (width - text_width) / 2, .y = (height - text_height) / 2}
+    &(SDL_FPoint){
+      .x = (resolution.width - (float)text_width) / 2,
+      .y = (resolution.height - (float)text_height) / 2,
+    }
   );
   return status;
 }
@@ -209,14 +203,8 @@ bool macro_settings_render(GAME* game) {
     SDL_Log("game->renderer is NULL\n");
     return 0;
   }
-  int width, height;
-  int status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
-  if (status == 0) {
-    SDL_Log("SDL_GetWindowSizeInPixels error: %s\n", SDL_GetError());
-    return status;
-  }
 
-  status = SDL_RenderClear(game->renderer);
+  bool status = SDL_RenderClear(game->renderer);
   if (status == 0) {
     SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
     return 0;
@@ -240,7 +228,10 @@ bool macro_settings_render(GAME* game) {
 
   status = render_text(
     game->renderer, tex_title_menu,
-    &(SDL_Point){.x = (width - title_width) / 2, .y = screen_dimens.padding}
+    &(SDL_FPoint){
+      .x = (resolution.width - (float)title_width) / 2,
+      .y = screen_dimens.padding,
+    }
   );
   if (status == 0) {
     SDL_Log("render_text error...\n");
@@ -259,14 +250,11 @@ bool macro_settings_render(GAME* game) {
     return 0;
   }
 
-  int y_pos = (title_height + screen_dimens.padding);
-  int text_x_pos = screen_dimens.padding;
-  int commands_x_pos = width - text_width;
-  int font = fonts.item_font;
+  float y_pos = (float)title_height + screen_dimens.padding;
+  const float text_x_pos = screen_dimens.padding;
+  const float commands_x_pos = resolution.width - (float)text_width;
   for (int i = 0; i < 14; i++) {
-    SDL_Color* color;
-    int font = fonts.item_font;
-    int commands_y_pos;
+    float commands_y_pos;
 
     int commands_selected_height;
     if (selected_index == i) {
@@ -274,15 +262,10 @@ bool macro_settings_render(GAME* game) {
         game->font, commands_keys[i], fonts.item_hover_font, &text_width,
         &commands_selected_height
       );
-      color = &green_color;
-      font = fonts.item_hover_font;
-      commands_y_pos = y_pos + (text_height - commands_selected_height) / 2;
+      commands_y_pos = y_pos + ((float)(text_height - commands_selected_height) / 2);
     } else {
-      status = get_text_size(
-        game->font, commands_keys[i], fonts.item_font, &text_width, NULL
-      );
-      color = &white_color;
-      font = fonts.item_font;
+      status =
+        get_text_size(game->font, commands_keys[i], fonts.item_font, &text_width, NULL);
       commands_y_pos = y_pos;
     }
 
@@ -295,7 +278,11 @@ bool macro_settings_render(GAME* game) {
     }
 
     status = render_text(
-      game->renderer, item, &(SDL_Point){.x = text_x_pos, .y = commands_y_pos}
+      game->renderer, item,
+      &(SDL_FPoint){
+        .x = text_x_pos,
+        .y = commands_y_pos,
+      }
     );
     if (status == 0) {
       SDL_Log("render_text error...\n");
@@ -310,13 +297,16 @@ bool macro_settings_render(GAME* game) {
 
     status = render_text(
       game->renderer, key,
-      &(SDL_Point){.x = commands_x_pos - text_width / 2, .y = commands_y_pos}
+      &(SDL_FPoint){
+        .x = commands_x_pos - ((float)text_width / 2),
+        .y = commands_y_pos,
+      }
     );
     if (status == 0) {
       SDL_Log("render_text error...\n");
     }
 
-    y_pos += text_height + fonts.text_padding / 2;
+    y_pos += (float)text_height + (fonts.text_padding / 2);
   }
 
   if (event_status == 1) {

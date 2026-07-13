@@ -1,8 +1,8 @@
 #include "render.h"
 #include "SDL3/SDL_log.h"
 #include "game.h"
-#include "res/texture.h"
 #include "res/res.h"
+#include "res/texture.h"
 
 bool render_background(const GAME* game) {
   if (game->renderer == NULL) {
@@ -35,7 +35,7 @@ bool render_logo(GAME* game) {
     }
   }
   const SDL_FRect* rect = &(SDL_FRect){
-    .x = 0,
+    .x = hero_logo_dimens.margin,
     .y = 0,
     .w = resolution.height,
     .h = resolution.height,

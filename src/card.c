@@ -1,7 +1,7 @@
 #include "card.h"
 #include "SDL3/SDL_log.h"
-#include "res/texture.h"
 #include "res/res.h"
+#include "res/texture.h"
 #include "scenes/gameplay.h"
 #include <string.h>
 
@@ -284,9 +284,7 @@ char* find_path(const CARD* card) {
   return path;
 }
 
-bool render_card(
-  const FIELD* field, SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* point
-) {
+bool render_card(SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* point) {
   if (renderer == NULL || card == NULL) {
     SDL_Log("renderer or card are NULL in render_card fun...\n");
     return 0;

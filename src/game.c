@@ -6,7 +6,6 @@
 #include "SDL3/SDL_video.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "res/config.h"
-#include "res/field.h"
 #include "res/res.h"
 #include "res/sound.h"
 #include "res/texture.h"
@@ -25,13 +24,13 @@ int game_update = 0;
 int g_game_win = 0;
 CARD g_invisible_card[7];
 
-bool load_game_field(DECK* deck, const FIELD* field) {
+bool load_game_field(DECK* deck) {
   int count = 0;
-  int x_coord = game_dimens.padding_width;
+  float x_coord = game_dimens.padding_width;
 
   for (int i = 0; i < number_of_cards_in_row; ++i) {
-    int y_coord = game_dimens.padding_height + card_dimens.height_padding +
-                  card_dimens.height;
+    float y_coord =
+      game_dimens.padding_height + card_dimens.height_padding + card_dimens.height;
     g_invisible_card[i].frame = SDL_malloc(sizeof(SDL_FPoint));
     g_invisible_card[i].pos = SDL_malloc(sizeof(POSITION));
     g_invisible_card[i].pos->row = 1;
@@ -258,11 +257,11 @@ void game_quit(const GAME* game) {
   SDL_Log("End\n");
 }
 
-int reload_window(GAME* game) {
+bool reload_window(const GAME* game) {
   int status = fullscree_mode(game);
   if (status == 0) {
     SDL_Log("fullscreen is not set\n");
-    return 0;
+    return false;
   }
 
   SDL_SyncWindow(game->window);
@@ -270,16 +269,17 @@ int reload_window(GAME* game) {
   status = SDL_GetWindowSizeInPixels(game->window, &screen_width, &screen_height);
   if (status == false) {
     SDL_Log("SDL_GetWindowSizeInPixels failed: %s\n", SDL_GetError());
+    return false;
   }
 
   status = load_field(screen_width, screen_height, game->font);
   if (status == false) {
     SDL_Log("load_field error...\n");
     game_quit(game);
-    return 0;
+    return false;
   }
 
-  return 1;
+  return true;
 }
 
 void run_a_game(GAME* game) {
@@ -300,7 +300,7 @@ void run_a_game(GAME* game) {
     game_quit(game);
   }
 
-  game->cursor = create_cursor(&game->field, 1, 1);
+  game->cursor = create_cursor(1, 1);
   if (game->cursor == NULL) {
     SDL_Log("create_cursor error\n");
     game_quit(game);
@@ -308,8 +308,7 @@ void run_a_game(GAME* game) {
 
   g_game_win = 0;
   game_update = 0;
-  load_game_field(game->deck, &game->field);
-  SDL_Log("je loadan\n");
+  load_game_field(game->deck);
 }
 
 int push_user_event(const Uint32 type, const Sint32 code) {

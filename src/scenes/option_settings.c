@@ -1,8 +1,8 @@
 #include "option_settings.h"
 #include "../game.h"
 #include "../res/config.h"
-#include "../res/texture.h"
 #include "../res/res.h"
+#include "../res/texture.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_render.h"
 
@@ -178,7 +178,6 @@ bool option_settings_update(const GAME* game) {
 }
 
 bool option_settings_render(GAME* game) {
-  int status;
   if (game == NULL) {
     SDL_Log("game is NULL\n");
     return 0;
@@ -189,7 +188,7 @@ bool option_settings_render(GAME* game) {
     return 0;
   }
   int width, height;
-  status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
+  int status = SDL_GetWindowSizeInPixels(game->window, &width, &height);
   if (status == 0) {
     SDL_Log("SDL_GetWindowSizeInPixels error: %s\n", SDL_GetError());
     return status;
@@ -217,9 +216,13 @@ bool option_settings_render(GAME* game) {
     return 0;
   }
 
+
   status = render_text(
     game->renderer, tex_opt->tex_title_menu,
-    &(SDL_Point){.x = (width - title_width) / 2, .y = screen_dimens.padding}
+    &(SDL_FPoint){
+      .x = (float)(width - title_width) / 2.0F,
+      .y = screen_dimens.padding,
+    }
   );
   if (status == 0) {
     SDL_Log("render_text error...\n");
@@ -227,17 +230,15 @@ bool option_settings_render(GAME* game) {
   }
 
   int text_width, text_height;
-  status =
-    get_text_size(game->font, "shift", fonts.item_font, &text_width, &text_height);
+  status = get_text_size(game->font, "shift", fonts.item_font, &text_width, &text_height);
   if (status == 0) {
     SDL_Log("get_text_size error...\n");
     return 0;
   }
 
-  int y_pos = (title_height + screen_dimens.padding);
-  int text_x_pos = screen_dimens.padding;
-  int commands_x_pos = width - text_width;
-  int font = fonts.item_font;
+  float y_pos = (float)title_height + screen_dimens.padding;
+  const float text_x_pos = screen_dimens.padding;
+  const float commands_x_pos = (float)(width - text_width);
   for (int i = 0; i < 3; i++) {
     SDL_Color* color;
     int font = fonts.item_font;
@@ -253,9 +254,8 @@ bool option_settings_render(GAME* game) {
       font = fonts.item_hover_font;
       commands_y_pos = y_pos + (text_height - commands_selected_height) / 2;
     } else {
-      status = get_text_size(
-        game->font, options_set[i], fonts.item_font, &text_width, NULL
-      );
+      status =
+        get_text_size(game->font, options_set[i], fonts.item_font, &text_width, NULL);
       color = &white_color;
       font = fonts.item_font;
       commands_y_pos = y_pos;
@@ -269,7 +269,7 @@ bool option_settings_render(GAME* game) {
     }
 
     status = render_text(
-      game->renderer, item, &(SDL_Point){.x = text_x_pos, .y = commands_y_pos}
+      game->renderer, item, &(SDL_FPoint){.x = text_x_pos, .y = commands_y_pos}
     );
     if (status == 0) {
       SDL_Log("render_text error...\n");
@@ -284,7 +284,7 @@ bool option_settings_render(GAME* game) {
 
     status = render_text(
       game->renderer, opt,
-      &(SDL_Point){.x = commands_x_pos - text_width / 2, .y = commands_y_pos}
+      &(SDL_FPoint){.x = commands_x_pos - text_width / 2, .y = commands_y_pos}
     );
     if (status == 0) {
       SDL_Log("render_text error...\n");
