@@ -123,15 +123,22 @@ extern DEFAULT_SCREEN_DIMENS screen_dimens;
 
 typedef struct {
   int title_font;
+  float title_padding;
   float title_width;
   float title_height;
-  float title_padding;
 
   int item_font;
+  float item_width;
+  float item_height;
   float item_padding;
+
   int item_hover_font;
+  float item_hover_width;
+  float item_hover_height;
 
   int text_font;
+  float text_width;
+  float text_height;
   float text_padding;
 } FONT_DIMENS;
 extern FONT_DIMENS fonts;

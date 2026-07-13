@@ -18,7 +18,7 @@ const TEXT texts = {
       .sovimter = "SoVIMter",
       .main_menu = "MAIN MENU",
       .macro_settings = "MACRO SETTINGS",
-      .option_settings = "OPTION SETTINGS",
+      .option_settings = "OPTIONS",
       .gameplay_won = "YOU WON",
       .gameplay_lost = "YOU LOST",
       .scores = "SCORES",
@@ -115,9 +115,11 @@ RESOLUTION resolution = {
 FONT_DIMENS fonts = {
   .title_font = 90,
   .title_padding = 45,
+
   .item_font = 45,
   .item_padding = 22,
   .item_hover_font = 66,
+
   .text_font = 30,
   .text_padding = 15,
 };

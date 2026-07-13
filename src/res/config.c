@@ -160,7 +160,7 @@ bool load_config() {
 
   config_commands = (int*)SDL_malloc(sizeof(int) * 14);
   status = fread(config_commands, sizeof(int), 14, config_file);
-  if (status == 0) {
+  if (!status) {
     return false;
   }
   fclose(config_file);
@@ -178,7 +178,7 @@ bool load_config() {
   }
   config_options = (int*)SDL_malloc(sizeof(int) * 3);
   status = fread(config_options, sizeof(int), 3, option_file);
-  if (status == 0) {
+  if (!status) {
     return false;
   }
   fclose(option_file);

@@ -72,7 +72,7 @@ bool render_guide(const GAME* game) {
 
   int text_width, text_height;
   int status = set_font_size(game->font, fonts.text_font);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("get_text_size error\n");
     return 0;
   }
@@ -84,7 +84,7 @@ bool render_guide(const GAME* game) {
     },
     &(SDL_Color){255, 255, 255, 255}
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("render_wrapped_text error\n");
     return 0;
   }
@@ -97,7 +97,7 @@ bool render_guide(const GAME* game) {
     },
     &(SDL_Color){255, 255, 255, 255}
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("render_wrapped_text error\n");
     return 0;
   }
@@ -110,7 +110,7 @@ bool render_guide(const GAME* game) {
     },
     &(SDL_Color){255, 255, 255, 255}
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("render_wrapped_text error\n");
     return 0;
   }
@@ -119,7 +119,7 @@ bool render_guide(const GAME* game) {
     game->font, game->setting_menu->items[0].text, fonts.item_font, &text_width,
     &text_height
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("get_text_size error...\n");
     return 0;
   }
@@ -129,7 +129,7 @@ bool render_guide(const GAME* game) {
     game->font, game->setting_menu->items[0].text, fonts.item_hover_font,
     &selected_text_width, &selected_text_height
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("get_text_size error...\n");
     return 0;
   }
@@ -159,7 +159,7 @@ bool render_guide(const GAME* game) {
     }
 
     status = render_text(game->renderer, item, point);
-    if (status == 0) {
+    if (!status) {
       SDL_Log("render_text error...\n");
     }
 
@@ -168,7 +168,7 @@ bool render_guide(const GAME* game) {
         game->font, game->setting_menu->items[i + 1].text, fonts.item_font, &text_width,
         &text_height
       );
-      if (status == 0) {
+      if (!status) {
         SDL_Log("get_text_size error...\n");
         return 0;
       }
@@ -176,7 +176,7 @@ bool render_guide(const GAME* game) {
         game->font, game->setting_menu->items[i + 1].text, fonts.item_hover_font,
         &selected_text_width, &selected_text_height
       );
-      if (status == 0) {
+      if (!status) {
         SDL_Log("get_text_size error...\n");
         return 0;
       }
@@ -199,19 +199,19 @@ bool setting_render(GAME* game) {
     return 0;
   }
   int status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
     return status;
   }
 
   status = render_guide(game);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("render_guide error\n");
     return status;
   }
 
   status = SDL_RenderPresent(game->renderer);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderPresent error %s\n", SDL_GetError());
     return 0;
   }

@@ -429,7 +429,7 @@ int interact(GAME* game) {
     select_a_card(game);
   } else if (game->cursor->mode % 2 == 1) {
     const int status = place_a_card(game);
-    if (status == 0) {
+    if (!status) {
       play_sound(game->soundboard, blip_select_sound);
     }
   }

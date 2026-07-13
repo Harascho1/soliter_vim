@@ -18,6 +18,6 @@ int render_wrapped_text(
 SDL_Texture* get_texture_from_text(
   FONT* font, SDL_Renderer* render, const char* text, int size, const SDL_Color* color
 );
-int render_text(SDL_Renderer* render, SDL_Texture* texture, const SDL_FPoint* point);
+bool render_text(SDL_Renderer* render, SDL_Texture* texture, const SDL_FPoint* point);
 
 #endif // FONT_H

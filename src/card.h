@@ -52,7 +52,7 @@ bool is_empty(const CARD_STACK* stack);
 bool is_full(const CARD_STACK* stack);
 
 CARD* top_card(const CARD_STACK* stack);
-void pop_all(CARD_STACK* queue);
+void pop_all(CARD_STACK* stack);
 
 typedef struct {
   // NOTE: whole deck

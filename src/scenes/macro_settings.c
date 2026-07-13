@@ -163,7 +163,7 @@ int render_press_key_popout(const GAME* game) {
     fonts.title_font, // ? nzm da li je font okej?
     &text_width, &text_height
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("get_text_size error...\n");
     return 0;
   }
@@ -185,7 +185,7 @@ bool macro_settings_update(const GAME* game) {
   }
   if (event_status == 0 && flag == 1) {
     const int status = lazy_load_config(game);
-    if (status == 0) {
+    if (!status) {
       SDL_Log("lazy_load_config\n");
       return 0;
     }
@@ -205,13 +205,13 @@ bool macro_settings_render(GAME* game) {
   }
 
   bool status = SDL_RenderClear(game->renderer);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
     return 0;
   }
 
   status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     printf("ZASTOOOOO\n");
     push_user_event(SDL_EVENT_QUIT, 0);
@@ -221,7 +221,7 @@ bool macro_settings_render(GAME* game) {
   int title_width, title_height;
   status =
     get_text_size(game->font, title, fonts.title_font, &title_width, &title_height);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("get_text_size error...\n");
     return 0;
   }
@@ -233,7 +233,7 @@ bool macro_settings_render(GAME* game) {
       .y = screen_dimens.padding,
     }
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("render_text error...\n");
     return 0;
   }
@@ -245,7 +245,7 @@ bool macro_settings_render(GAME* game) {
                 // shift, right ctrl, left ctrl...
     fonts.item_font, &text_width, &text_height
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("get_text_size error...\n");
     return 0;
   }
@@ -284,7 +284,7 @@ bool macro_settings_render(GAME* game) {
         .y = commands_y_pos,
       }
     );
-    if (status == 0) {
+    if (!status) {
       SDL_Log("render_text error...\n");
     }
 
@@ -302,7 +302,7 @@ bool macro_settings_render(GAME* game) {
         .y = commands_y_pos,
       }
     );
-    if (status == 0) {
+    if (!status) {
       SDL_Log("render_text error...\n");
     }
 
@@ -311,14 +311,14 @@ bool macro_settings_render(GAME* game) {
 
   if (event_status == 1) {
     status = render_press_key_popout(game);
-    if (status == 0) {
+    if (!status) {
       SDL_Log("render_press_key_popout error\n");
       return status;
     }
   }
 
   status = SDL_RenderPresent(game->renderer);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderPresent failed: %s\n", SDL_GetError());
     push_user_event(SDL_EVENT_QUIT, 0);
     return 0;

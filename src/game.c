@@ -68,7 +68,7 @@ bool load_game_field(DECK* deck) {
 
 int fullscree_mode(const GAME* game) {
   const int status = SDL_SetWindowFullscreen(game->window, config_options[0]);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_SetWindowFullscreen error %s", SDL_GetError());
     return status;
   }
@@ -124,7 +124,7 @@ int game_init(GAME* game, const char* title) {
   }
 
   status = fullscree_mode(game);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("fullscreen is not set\n");
   }
 
@@ -144,7 +144,7 @@ int game_init(GAME* game, const char* title) {
   }
 
   status = load_field(w, h, game->font);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("load_field error...\n");
     game_quit(game);
     return 0;
@@ -259,7 +259,7 @@ void game_quit(const GAME* game) {
 
 bool reload_window(const GAME* game) {
   int status = fullscree_mode(game);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("fullscreen is not set\n");
     return false;
   }
@@ -341,7 +341,7 @@ int make_string_array(char** array_of_strings, int* i) {
   int index = 0;
   int prev_index = index;
   int status = (int)fread(&ptr, sizeof(char), 1, saves_files_bin);
-  if (status == 0) {
+  if (!status) {
     return false;
   }
 
@@ -358,7 +358,7 @@ int make_string_array(char** array_of_strings, int* i) {
       fseek(saves_files_bin, prev_index, SEEK_SET);
       status =
         (int)fread(array_of_strings[(*i)++], sizeof(char), n_size, saves_files_bin);
-      if (status == 0) {
+      if (!status) {
         return 0;
       }
       prev_index = index + 1;
@@ -366,7 +366,7 @@ int make_string_array(char** array_of_strings, int* i) {
       printf("\n");
     }
     status = (int)fread(&ptr, sizeof(char), 1, saves_files_bin);
-    if (status == 0) {
+    if (!status) {
       return 1;
     }
     index++;
@@ -467,7 +467,7 @@ void save_score(const GAME* game, const char* name) {
 
   int i = 0;
   int status = make_string_array(saves, &i);
-  if (status == 0) {
+  if (!status) {
     free_resurses(saves);
     SDL_Log("make_string_array error...\n");
   }

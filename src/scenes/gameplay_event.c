@@ -360,7 +360,7 @@ int text_mode(GAME* game, const SDL_Event* event) {
       break;
     case SDLK_BACKSPACE:
       status = delete_text(textbox);
-      if (status == 0) {
+      if (!status) {
         SDL_Log("delete_text error...\n");
         return 0;
       }
@@ -374,7 +374,7 @@ int text_mode(GAME* game, const SDL_Event* event) {
       return 0;
     }
     status = insert_text(textbox, event->text.text);
-    if (status == 0) {
+    if (!status) {
       SDL_Log("insert_text error...\n");
       return 0;
     }

@@ -23,6 +23,7 @@ set(HEADER_FILES
     scenes/option_settings.h
     scenes/settings.h
     res/res.h
+    scenes/render_helper.h
 )
 
 set(SOURCE_FILES
@@ -50,6 +51,7 @@ set(SOURCE_FILES
     scenes/scores.c
     scenes/settings.c
     res/res.c
+    scenes/render_helper.c
 )
 
 if (WIN32)

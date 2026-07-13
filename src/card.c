@@ -307,7 +307,7 @@ bool render_card(SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* poi
     &(SDL_FRect){point->x, point->y, card_dimens.width, card_dimens.height}
   );
 
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
     return status;
   }

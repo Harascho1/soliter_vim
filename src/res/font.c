@@ -41,7 +41,7 @@ bool get_text_size(
   FONT* font, const char* text, const int size, int* width, int* height
 ) {
   bool status = set_font_size(font, size);
-  if (status == 0) {
+  if (!status) {
     return status;
   }
 
@@ -62,7 +62,7 @@ SDL_Texture* get_texture_from_text(
   }
 
   const int status = set_font_size(font, size);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("set_font_size failed...\n");
     return NULL;
   }
@@ -84,18 +84,18 @@ SDL_Texture* get_texture_from_text(
   return texture;
 }
 
-int render_text(SDL_Renderer* render, SDL_Texture* texture, const SDL_FPoint* point) {
+bool render_text(SDL_Renderer* render, SDL_Texture* texture, const SDL_FPoint* point) {
   if (render == NULL || texture == NULL) {
     SDL_Log("render or/and text is/are NULL\n");
-    return 0;
+    return false;
   }
 
   float tex_width, tex_height;
-  int status = SDL_GetTextureSize(texture, &tex_width, &tex_height);
-  if (status == 0) {
+  bool status = SDL_GetTextureSize(texture, &tex_width, &tex_height);
+  if (!status) {
     SDL_Log("SDL_GetTextureSize failed: %s\n", SDL_GetError());
     SDL_DestroyTexture(texture);
-    return 0;
+    return false;
   }
   status = SDL_RenderTexture(
     render, texture, NULL,
@@ -106,10 +106,10 @@ int render_text(SDL_Renderer* render, SDL_Texture* texture, const SDL_FPoint* po
       .h = tex_height,
     }
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     SDL_DestroyTexture(texture);
-    return 0;
+    return false;
   }
 
   return status;
@@ -125,7 +125,7 @@ int render_wrapped_text(
   }
 
   int status = set_font_size(font, size);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("set_font_size failed...\n");
     return status;
   }
@@ -145,7 +145,7 @@ int render_wrapped_text(
 
   float tex_width, tex_height;
   status = SDL_GetTextureSize(texture, &tex_width, &tex_height);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_GetTextureSize failed: %s\n", SDL_GetError());
     SDL_DestroyTexture(texture);
     SDL_DestroySurface(surface);
@@ -161,7 +161,7 @@ int render_wrapped_text(
       (float)surface->h,
     }
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     SDL_DestroyTexture(texture);
     SDL_DestroySurface(surface);

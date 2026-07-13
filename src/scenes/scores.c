@@ -36,7 +36,7 @@ bool scores_lazy_load(const GAME* game) {
     fseek(saves, prev_pointer, SEEK_SET);
     scores_txt[i] = (char*)SDL_malloc(sizeof(char) * pointer);
     status = fread(scores_txt[i], sizeof(char), pointer, saves);
-    if (status == 0) {
+    if (!status) {
       SDL_Log("fread error\n");
     }
     scores_txt[i][pointer - 1] = '\0';
@@ -51,7 +51,7 @@ bool scores_lazy_load(const GAME* game) {
   int font_size = fonts.text_font;
 
   status = get_text_size(game->font, scores_txt[0], font_size, &text_width, NULL);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("get_text_size error in lazy load..\n");
     return 0;
   }
@@ -92,13 +92,13 @@ bool scores_render(GAME* game) {
   int status = 0;
 
   status = SDL_RenderClear(game->renderer);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderClear error: %s", SDL_GetError());
     return 0;
   }
 
   status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderTexture error: %s", SDL_GetError());
     return 0;
   }
@@ -127,7 +127,7 @@ bool scores_render(GAME* game) {
   }
 
   status = SDL_RenderPresent(game->renderer);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderPresent error: %s", SDL_GetError());
     return 0;
   }

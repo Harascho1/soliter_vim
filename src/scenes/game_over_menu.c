@@ -1,9 +1,10 @@
 #include "game_over_menu.h"
+
 #include "../game.h"
 #include "../my_timer.h"
 #include "../render.h"
 #include "../res/res.h"
-#include "../res/texture.h"
+#include "render_helper.h"
 
 static const char* title[2] = {"GAME OVER", "YOU W0N"};
 
@@ -32,7 +33,7 @@ bool game_over_menu_lazy_load(const GAME* game) {
     get_texture_from_text(game->font, game->renderer, buff, font_size, &colors.white);
   if (tex_time == NULL) {
     SDL_Log("tex_time cannot be initialized...");
-    return 0;
+    return false;
   }
 
   font_size = fonts.title_font;
@@ -42,7 +43,7 @@ bool game_over_menu_lazy_load(const GAME* game) {
     );
     if (tex_game_result[i] == NULL) {
       SDL_Log("tex_game_result[%d]  cannot be initialized...", i);
-      return 0;
+      return false;
     }
   }
 
@@ -54,7 +55,7 @@ bool game_over_menu_lazy_load(const GAME* game) {
     );
     if (tex_game_over_items[i] == NULL) {
       SDL_Log("tex_game_over_items[%d]  cannot be initialized...", i);
-      return 0;
+      return false;
     }
   }
 
@@ -66,10 +67,10 @@ bool game_over_menu_lazy_load(const GAME* game) {
     );
     if (tex_hover_game_over_items[i] == NULL) {
       SDL_Log("tex_hover_game_over_items[%d] cannot be initiazlied...", i);
-      return 0;
+      return false;
     }
   }
-  return 1;
+  return true;
 }
 
 void game_over_menu_lazy_destroy() {
@@ -123,11 +124,11 @@ bool game_over_menu_event_handler(GAME* game, const SDL_Event* event) {
       break;
     }
   }
-  return 1;
+  return true;
 }
 
 bool game_over_menu_update(const GAME* game) {
-  return 1;
+  return true;
 }
 
 bool render_time(const GAME* game) {
@@ -137,11 +138,11 @@ bool render_time(const GAME* game) {
   }
   int text_width, text_height;
 
-  int status =
+  bool status =
     get_text_size(game->font, win_in_seconds, fonts.text_font, &text_width, &text_height);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("get_text_size error ...\n");
-    return 0;
+    return false;
   }
 
   status = render_text(
@@ -151,36 +152,36 @@ bool render_time(const GAME* game) {
       .y = fonts.title_padding,
     }
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("render_text error ...\n");
-    return 0;
+    return false;
   }
-  return 1;
+  return true;
 }
 
 bool game_over_menu_render(GAME* game) {
   if (game == NULL) {
     SDL_Log("game is NULL\n");
-    return 0;
+    return false;
   }
 
   if (game->renderer == NULL) {
     SDL_Log("game->renderer is NULL\n");
-    return 0;
+    return false;
   }
 
-  int status = SDL_RenderClear(game->renderer);
-  if (status == 0) {
+  bool status = SDL_RenderClear(game->renderer);
+  if (!status) {
     SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     printf("ZASTOOOOO\n");
     push_user_event(SDL_EVENT_QUIT, 0);
-    return 0;
+    return false;
   }
 
   render_logo(game);
@@ -193,15 +194,15 @@ bool game_over_menu_render(GAME* game) {
   };
 
   status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL, rect);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     push_user_event(SDL_EVENT_QUIT, 0);
-    return 0;
+    return false;
   }
 
   int text_width, text_height;
   status = render_time(game);
-  if (status == false) {
+  if (!status) {
     SDL_Log("render_time failed: %s\n", SDL_GetError());
     return false;
   }
@@ -209,87 +210,42 @@ bool game_over_menu_render(GAME* game) {
   status = get_text_size(
     game->font, title[g_game_win], fonts.title_font, &text_width, &text_height
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("get_text_size failed...\n");
-    return 0;
+    return false;
   }
 
   status = render_text(
     game->renderer, tex_game_result[g_game_win],
     &(SDL_FPoint){.x = (resolution.width - (float)text_width) / 2, .y = resolution.height / 4}
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("render_text failed...\n");
-    return 0;
+    return false;
   }
 
   status = get_text_size(
     game->font, game->game_over_menu->items[0].text, fonts.item_font, NULL, &text_height
   );
-  if (status == 0) {
+  if (!status) {
     SDL_Log("get_text_size failed...\n");
-    return 0;
+    return false;
   }
 
-  float y_coord = (resolution.height / 2) + fonts.title_padding;
-
-  for (int i = 0; i < game->game_over_menu->count; i++) {
-    int font_size;
-    int selected_height;
-    float render_coord_y;
-    if (i == game->game_over_menu->selected_item) {
-      font_size = fonts.item_hover_font;
-      status = get_text_size(
-        game->font, game->game_over_menu->items[i].text, font_size, &text_width,
-        &selected_height
-      );
-      if (status == 0) {
-        SDL_Log("get_text_size failed...\n");
-        return 0;
-      }
-      render_coord_y = y_coord + ((float)(text_height - selected_height) / 2);
-    } else {
-      font_size = fonts.item_font;
-      status = get_text_size(
-        game->font, game->game_over_menu->items[i].text, font_size, &text_width,
-        &text_height
-      );
-      if (status == 0) {
-        SDL_Log("get_text_size failed...\n");
-        return 0;
-      }
-      render_coord_y = y_coord;
-    }
-
-    SDL_FPoint dest_point = {
-      .x = (resolution.width - (float)text_width) / 2,
-      .y = render_coord_y,
-    };
-
-    SDL_Texture* item = NULL;
-    if (i == game->game_over_menu->selected_item) {
-      item = tex_hover_game_over_items[i];
-    } else {
-      item = tex_game_over_items[i];
-    }
-
-    status = render_text(game->renderer, item, &dest_point);
-    if (status == 0) {
-      SDL_Log("render_text failed...\n");
-      return 0;
-    }
-
-    y_coord += (float)text_height + fonts.item_padding;
+  status =
+    render_menu(tex_game_over_items, tex_hover_game_over_items, game->renderer, game->game_over_menu);
+  if (!status) {
+    return false;
   }
 
   status = SDL_RenderPresent(game->renderer);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderPresent failed: %s\n", SDL_GetError());
     push_user_event(SDL_EVENT_QUIT, 0);
-    return 0;
+    return false;
   }
 
-  return 1;
+  return true;
 }
 
 SCENE game_over_menu_scene = {

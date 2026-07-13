@@ -11,13 +11,13 @@ bool render_background(const GAME* game) {
   }
 
   bool status = SDL_RenderClear(game->renderer);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
     return 0;
   }
 
   status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
-  if (status == 0) {
+  if (!status) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     push_user_event(SDL_EVENT_QUIT, 0);
     return 0;
