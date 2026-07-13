@@ -1,8 +1,6 @@
 #ifndef CARD_H
 #define CARD_H
 
-#include "field.h"
-
 #define STACK_SIZE 30
 
 enum { not_visible = 0, visible };
@@ -37,24 +35,24 @@ typedef struct {
   SUIT suit;
   int visible;
   int selected;
-  SDL_FPoint *frame;
-  POSITION *pos;
+  SDL_FPoint* frame;
+  POSITION* pos;
   int on_field;
 } CARD;
 
 typedef struct {
   int count;
-  CARD *array[STACK_SIZE];
+  CARD* array[STACK_SIZE];
 } CARD_STACK;
 
-CARD *pop(CARD_STACK *stack);
+CARD* pop(CARD_STACK* stack);
 // CARD *pop_top(CARD_STACK *stack);
-bool push(CARD_STACK *stack, CARD *card);
-bool is_empty(const CARD_STACK *stack);
-bool is_full(const CARD_STACK *stack);
+bool push(CARD_STACK* stack, CARD* card);
+bool is_empty(const CARD_STACK* stack);
+bool is_full(const CARD_STACK* stack);
 
-CARD *top_card(const CARD_STACK *stack);
-void pop_all(CARD_STACK *queue);
+CARD* top_card(const CARD_STACK* stack);
+void pop_all(CARD_STACK* queue);
 
 typedef struct {
   // NOTE: whole deck
@@ -64,32 +62,31 @@ typedef struct {
   // NOTE: cards that are drawn from the deck
   CARD_STACK drawn_cards;
   // NOTE: top card in deck
-  CARD *deck_card;
+  CARD* deck_card;
   // NOTE: sorted small decks
-  CARD *sorted_cards[4];
+  CARD* sorted_cards[4];
   // NOTE: texture for empty small deck
-  SDL_Texture *empty_sorted_card;
+  SDL_Texture* empty_sorted_card;
 
 } DECK;
 
 extern CARD g_invisible_card[7];
 
-DECK *create_deck(SDL_Renderer *renderer);
-void destroy_deck(DECK *deck);
+DECK* create_deck(SDL_Renderer* renderer);
+void destroy_deck(DECK* deck);
 
-bool render_card(const FIELD *field, SDL_Renderer *renderer, const CARD *card,
-                 const SDL_FPoint *point);
-void deselect_all_cards(DECK *deck);
+bool render_card(SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* point);
+void deselect_all_cards(DECK* deck);
 
 /*
   NOTE: returns a CARD pointer if it finds in deck for inserted col and row.
   Returns NULL if it doesn't find
 */
-CARD *find_card(const DECK *deck, int col, int row);
-bool can_card_be_placed(const CARD *card_below, const CARD *card_above);
-int sort_a_card(CARD *card, DECK *deck);
-int select_card_below(const CARD *card, const DECK *deck);
-bool same_card_selected(const CARD *card1, const CARD *card2);
-bool have_more_cards(const DECK *deck);
+CARD* find_card(const DECK* deck, int col, int row);
+bool can_card_be_placed(const CARD* card_below, const CARD* card_above);
+int sort_a_card(CARD* card, DECK* deck);
+int select_card_below(const CARD* card, const DECK* deck);
+bool same_card_selected(const CARD* card1, const CARD* card2);
+bool have_more_cards(const DECK* deck);
 
 #endif // CARD_H

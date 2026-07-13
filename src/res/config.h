@@ -18,10 +18,10 @@ int insert_command(unsigned int command, int idx);
 // Call this function if you want to set new configuration
 int insert_option(unsigned int command, int idx);
 
-extern int *config_commands;
-extern unsigned int *config_options;
+extern int* config_commands;
+extern unsigned int* config_options;
 
-extern char *commands_keys[14];
-extern char *options_set[3];
+extern char* commands_keys[14];
+extern char* options_set[3];
 
 #endif

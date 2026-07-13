@@ -5,41 +5,41 @@ set(ASSETS_PATH ${PROJECT_SOURCE_DIR}/assets)
 set(HEADER_FILES
     card.h
     clickable_element.h
-    config.h
+    res/config.h
     cursor.h
-    field.h
-    font.h
+    res/font.h
     game.h
     menu.h
     my_timer.h
     render.h
-    sound.h
+    res/sound.h
     stack.h
-    textbox.h
-    texture.h
+    res/textbox.h
+    res/texture.h
     scenes/game_over_menu.h
     scenes/gameplay.h
     scenes/macro_settings.h
     scenes/main_menu.h
     scenes/option_settings.h
     scenes/settings.h
+    res/res.h
 )
 
 set(SOURCE_FILES
     card.c
     clickable_element.c
-    config.c
+    res/config.c
     cursor.c
-    field.c
-    font.c
+    res/load_field.c
+    res/font.c
     game.c
     main.c
     menu.c
     my_timer.c
     render.c
-    sound.c
-    textbox.c
-    texture.c
+    res/sound.c
+    res/textbox.c
+    res/texture.c
     scenes/game_over_menu.c
     scenes/gameplay.c
     scenes/gameplay_event.c
@@ -49,19 +49,20 @@ set(SOURCE_FILES
     scenes/option_settings.c
     scenes/scores.c
     scenes/settings.c
+    res/res.c
 )
 
 if (WIN32)
     add_executable(${PROJECT_NAME} WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_PATH}/icon.rc)
-else()
+else ()
     add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
-endif()
+endif ()
 
 if (WIN32)
     set_target_properties(${PROJECT_NAME} PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
-endif()
+endif ()
 
 
 # EXPORT_BUILD=ON  -> distributable build into <repo>/output
@@ -69,17 +70,17 @@ endif()
 #                     (cmake-build-debug/, cmake-build-release/, build/, ...)
 option(EXPORT_BUILD "Build the distributable release into output/" OFF)
 
-if(EXPORT_BUILD)
+if (EXPORT_BUILD)
     set(RUNTIME_DIR "${CMAKE_SOURCE_DIR}/output")
-else()
+else ()
     set(RUNTIME_DIR "${CMAKE_BINARY_DIR}")
-endif()
+endif ()
 
 set_target_properties(${PROJECT_NAME}
     PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY            "${RUNTIME_DIR}"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG      "${RUNTIME_DIR}"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE    "${RUNTIME_DIR}")
+    RUNTIME_OUTPUT_DIRECTORY "${RUNTIME_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${RUNTIME_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${RUNTIME_DIR}")
 
 set(ASSETS_PATH ${CMAKE_SOURCE_DIR}/assets)
 
