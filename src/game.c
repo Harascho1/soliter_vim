@@ -75,9 +75,8 @@ int fullscree_mode(const GAME* game) {
   return status;
 }
 
-int game_init(GAME* game, const char* title) {
-  int status = 0;
-
+bool game_init(GAME* game, const char* title) {
+  bool status = false;
   game->mixer = NULL;
   game->soundboard = NULL;
 
@@ -99,14 +98,14 @@ int game_init(GAME* game, const char* title) {
   if (game->mixer == NULL) {
     SDL_Log("MIX_CreateMixerDevice failed: %s\n", SDL_GetError());
     game_quit(game);
-    return 0;
+    return false;
   }
 
   game->soundboard = create_soundboard(game->mixer);
   if (game->soundboard == NULL) {
     SDL_Log("create_soundboard error\n");
     game_quit(game);
-    return 0;
+    return false;
   }
 
   if (does_config_file_exist() == 0) {
@@ -147,7 +146,7 @@ int game_init(GAME* game, const char* title) {
   if (!status) {
     SDL_Log("load_field error...\n");
     game_quit(game);
-    return 0;
+    return false;
   }
 
   game->renderer = SDL_CreateRenderer(game->window, NULL);
@@ -359,11 +358,10 @@ int make_string_array(char** array_of_strings, int* i) {
       status =
         (int)fread(array_of_strings[(*i)++], sizeof(char), n_size, saves_files_bin);
       if (!status) {
-        return 0;
+        return false;
       }
       prev_index = index + 1;
-      printf("index = %d\n", index);
-      printf("\n");
+      SDL_Log("index = %d\n", index);
     }
     status = (int)fread(&ptr, sizeof(char), 1, saves_files_bin);
     if (!status) {
@@ -372,7 +370,6 @@ int make_string_array(char** array_of_strings, int* i) {
     index++;
   }
 
-  fflush(stdout);
   fclose(saves_files_bin);
 
   return 1;
@@ -414,7 +411,6 @@ int get_new_insert_index(const int* array, int* i, const unsigned int num) {
   return -1;
 }
 
-// TODO:
 int make_new_array_of_strings(
   char** strings_of_array, const int i, const char* new_string, const int new_insert_index
 ) {
@@ -484,13 +480,13 @@ void save_score(const GAME* game, const char* name) {
 
   status = make_new_array_of_strings(saves, i, buff, new_index);
 
-  if (status == false) {
+  if (!status) {
     SDL_Log("make_new_array_of_string error...\n");
     return;
   }
 
   status = print_in_bin(saves, i);
-  if (status == false) {
+  if (!status) {
     SDL_Log("print_in_bin error...\n");
   }
   free_resurses(saves);

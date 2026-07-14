@@ -8,7 +8,7 @@ build-release:
 	cmake $(TOOLCHAIN) -DCMAKE_BUILD_TYPE=Release -B build .
 
 build-debbug:
-	cmake $(TOOLCHAIN) -B build .
+	cmake $(TOOLCHAIN) -DCMAKE_BUILD_TYPE=Debug -B build .
 
 compile:
 	cmake --build build -j$(nproc)
