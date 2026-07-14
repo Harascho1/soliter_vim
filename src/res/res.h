@@ -51,6 +51,7 @@ typedef struct {
 typedef struct {
   const char* config;
   const char* option;
+  const char* save;
 } BIN_PATH;
 
 // typedef struct {

@@ -29,25 +29,25 @@ void destroy_textbox(TEXTBOX* textbox) {
 
 bool insert_text(const TEXTBOX* textbox, const char* c) {
   if (strlen(textbox->string) >= textbox->max_caracters) {
-    return 0;
+    return false;
   }
 
   if (*c == ' ') {
-    return 1;
+    return true;
   }
 
   const char chr = (char)SDL_toupper(*c);
   textbox->string[strlen(textbox->string)] = chr;
   textbox->string[strlen(textbox->string) + 1] = 0;
-  return 1;
+  return true;
 }
 
 bool delete_text(const TEXTBOX* textbox) {
   if (strlen(textbox->string) == 0) {
-    return 0;
+    return false;
   }
 
   const unsigned int index = (unsigned int)strlen(textbox->string) - 1;
   textbox->string[index] = 0;
-  return 1;
+  return true;
 }

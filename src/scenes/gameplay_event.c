@@ -347,12 +347,12 @@ int fly_mode(GAME* game, const SDL_Event* event) {
   return 1;
 }
 
-int text_mode(GAME* game, const SDL_Event* event) {
-  int status;
+bool text_mode(const GAME* game, const SDL_Event* event) {
+  bool status;
   if (event->type == SDL_EVENT_KEY_DOWN) {
     switch (event->key.key) {
     case SDLK_RETURN:
-      if (have_requaried_num_of_characters(textbox, 4) == 0) {
+      if (!have_requaried_num_of_characters(textbox, 4)) {
         break;
       }
       save_score(game, textbox->string);
@@ -362,7 +362,7 @@ int text_mode(GAME* game, const SDL_Event* event) {
       status = delete_text(textbox);
       if (!status) {
         SDL_Log("delete_text error...\n");
-        return 0;
+        return false;
       }
       break;
     default:
@@ -371,16 +371,16 @@ int text_mode(GAME* game, const SDL_Event* event) {
   } else if (event->type == SDL_EVENT_TEXT_INPUT) {
     if (textbox == NULL) {
       SDL_Log("textbox je NULL\n");
-      return 0;
+      return false;
     }
     status = insert_text(textbox, event->text.text);
     if (!status) {
       SDL_Log("insert_text error...\n");
-      return 0;
+      return false;
     }
-    SDL_Log("text is %s", textbox->string);
+    SDL_Log("textbox value: %s", textbox->string);
   }
-  return 1;
+  return true;
 }
 
 bool gameplay_event_handler(GAME* game, const SDL_Event* event) {

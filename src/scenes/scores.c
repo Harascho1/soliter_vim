@@ -4,15 +4,13 @@
 #include "SDL3/SDL_log.h"
 
 SDL_Texture* tex_top_10_scores[10];
-static int text_width;
 
 bool scores_lazy_load(const GAME* game) {
-  FILE* saves = fopen("assets/bin/saves.bin", "rb+");
+  FILE* saves = fopen(paths.bins.save, "rb+");
   if (saves == NULL) {
     SDL_Log("Unable to open file");
-    return 1;
+    return true;
   }
-  const SDL_Color white_color = {255, 255, 255, 255};
   int status;
 
   char* scores_txt[10];
@@ -29,10 +27,9 @@ bool scores_lazy_load(const GAME* game) {
       }
     }
     if (byte == EOF || pointer == 0) {
-      SDL_Log("dobar je kod && pointer = %d\n", pointer);
       break;
     }
-    SDL_Log("velicana stringa je %d\n", pointer);
+    SDL_Log("Size in bytes of score buffer: %d\n", pointer);
     fseek(saves, prev_pointer, SEEK_SET);
     scores_txt[i] = (char*)SDL_malloc(sizeof(char) * pointer);
     status = fread(scores_txt[i], sizeof(char), pointer, saves);
@@ -40,32 +37,23 @@ bool scores_lazy_load(const GAME* game) {
       SDL_Log("fread error\n");
     }
     scores_txt[i][pointer - 1] = '\0';
-    SDL_Log("string je %s", scores_txt[i]);
-    SDL_Log("dobar je kod && i = %d\n", i);
+    SDL_Log("Score buffer is: %s", scores_txt[i]);
     if (strcpy(scores_txt[i], scores_txt[i]) == NULL) {
-      SDL_Log("jebeni strcpy ne radi...");
+      SDL_Log("strcpy error...");
     }
-    SDL_Log("dobar je kod\n");
     prev_pointer += pointer;
-  }
-  int font_size = fonts.text_font;
-
-  status = get_text_size(game->font, scores_txt[0], font_size, &text_width, NULL);
-  if (!status) {
-    SDL_Log("get_text_size error in lazy load..\n");
-    return 0;
   }
 
   for (int j = 0; j < i; j++) {
     tex_top_10_scores[j] = get_texture_from_text(
-      game->font, game->renderer, scores_txt[j], font_size, &white_color
+      game->font, game->renderer, scores_txt[j], fonts.text_font, &colors.white
     );
   }
   fclose(saves);
-  return 1;
+  return true;
 }
 
-void scores_lazy_destroy(GAME* game) {
+void scores_lazy_destroy() {
   for (int i = 0; i < 10; i++) {
     SDL_DestroyTexture(tex_top_10_scores[i]);
   }
@@ -89,49 +77,50 @@ bool scores_update(const GAME* game) {
 }
 
 bool scores_render(GAME* game) {
-  int status = 0;
-
-  status = SDL_RenderClear(game->renderer);
+  bool status = SDL_RenderClear(game->renderer);
   if (!status) {
     SDL_Log("SDL_RenderClear error: %s", SDL_GetError());
-    return 0;
+    return false;
   }
 
   status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
   if (!status) {
     SDL_Log("SDL_RenderTexture error: %s", SDL_GetError());
-    return 0;
+    return false;
   }
-
-  int text_height;
-  status = get_text_size(game->font, "normal mode", fonts.text_font, NULL, &text_height);
-  if (status == false) {
-    return status;
-  }
-
-  SDL_FPoint pt = {
-    .x = (resolution.width - (float)text_width) / 2,
-    .y = (float)text_height,
-  };
 
   for (int i = 0; i < 10; i++) {
     if (tex_top_10_scores[i] == NULL) {
       break;
     }
+
+    float tex_width;
+    status = SDL_GetTextureSize(tex_top_10_scores[0], &tex_width, NULL);
+
+    if (!status) {
+      SDL_Log("SDL_GetTextureSize failed: %s\n", SDL_GetError());
+      SDL_DestroyTexture(tex_top_10_scores[0]);
+      return false;
+    }
+
+    SDL_FPoint pt = {
+      .x = (resolution.width - tex_width) / 2,
+      .y = fonts.text_height,
+    };
+
     status = render_text(game->renderer, tex_top_10_scores[i], &pt);
-    if (status == false) {
+    if (!status) {
       SDL_Log("render_text error: %s", SDL_GetError());
       return status;
     }
-    pt.y += fonts.text_padding + (float)text_height;
   }
 
   status = SDL_RenderPresent(game->renderer);
   if (!status) {
     SDL_Log("SDL_RenderPresent error: %s", SDL_GetError());
-    return 0;
+    return false;
   }
-  return 1;
+  return true;
 }
 
 SCENE scores_scene = {

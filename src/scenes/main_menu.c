@@ -92,7 +92,7 @@ bool main_menu_event_handler(GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
     SDL_Log("x:%f, y:%f", event->motion.x, event->motion.y);
     if (event->motion.x <= 200 && event->motion.y <= 200) {
-      SDL_Log("Radi");
+      SDL_Log("WORKS");
     }
   }
   if (event->type == SDL_EVENT_KEY_DOWN) {

@@ -84,6 +84,7 @@ const PATHS paths = {
     {
       .config = "assets/bin/config.bin",
       .option = "assets/bin/option.bin",
+      .save = "assets/bin/saves.bin",
     },
   .images =
     {
