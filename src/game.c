@@ -331,7 +331,7 @@ void free_resurses(char** array_of_strings) {
 }
 
 int make_string_array(char** array_of_strings, int* i) {
-  FILE* saves_files_bin = fopen("assets/bin/saves.bin", "rb");
+  FILE* saves_files_bin = fopen(paths.bins.save, "rb");
   if (saves_files_bin == NULL) {
     return 1;
   }
@@ -430,8 +430,8 @@ int make_new_array_of_strings(
   return 1;
 }
 
-int print_in_bin(char** strings_of_array, int i) {
-  FILE* bin_eg = fopen("assets/bin/saves.bin", "wb+");
+int print_in_bin(char** strings_of_array, const int i) {
+  FILE* bin_eg = fopen(paths.bins.save, "wb+");
   for (int j = 0; j < i && j < 10; j++) {
     const int n_size = (int)strlen(strings_of_array[j]) + 1;
     fwrite(strings_of_array[j], sizeof(char), n_size, bin_eg);

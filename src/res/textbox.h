@@ -1,7 +1,7 @@
 #ifndef TEXTBOX_H
 #define TEXTBOX_H
 
-typedef struct _TEXTBOX {
+typedef struct {
   int max_caracters;
   char* string;
 } TEXTBOX;
