@@ -213,7 +213,6 @@ bool macro_settings_render(GAME* game) {
   status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
   if (!status) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
-    printf("ZASTOOOOO\n");
     push_user_event(SDL_EVENT_QUIT, 0);
     return 0;
   }

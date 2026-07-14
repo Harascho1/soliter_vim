@@ -9,6 +9,7 @@ set(HEADER_FILES
     cursor.h
     res/font.h
     game.h
+    log.h
     menu.h
     my_timer.h
     render.h
@@ -34,6 +35,7 @@ set(SOURCE_FILES
     res/load_field.c
     res/font.c
     game.c
+    log.c
     main.c
     menu.c
     my_timer.c
@@ -66,10 +68,9 @@ if (WIN32)
     )
 endif ()
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
-# EXPORT_BUILD=ON  -> distributable build into <repo>/output
-# EXPORT_BUILD=OFF -> normal dev build, binary stays in the CMake build dir
-#                     (cmake-build-debug/, cmake-build-release/, build/, ...)
+
 option(EXPORT_BUILD "Build the distributable release into output/" OFF)
 
 if (EXPORT_BUILD)

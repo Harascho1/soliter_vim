@@ -70,7 +70,7 @@ extern SCENE option_setting_scene;
 extern int game_update;
 extern int g_game_win;
 
-int game_init(GAME* game, const char* title);
+bool game_init(GAME* game, const char* title);
 void game_quit(const GAME* game);
 
 bool reload_window(const GAME* game);

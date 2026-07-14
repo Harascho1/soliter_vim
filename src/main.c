@@ -3,6 +3,7 @@
 #include "SDL3/SDL_log.h"
 #include "SDL3_mixer/SDL_mixer.h"
 #include "game.h"
+#include "log.h"
 #include <stdbool.h>
 static GAME_STATE g_current_game_state = game_state_main_menu;
 
@@ -29,7 +30,7 @@ static bool is_period_pass(const int period, const uint32_t last_update_time) {
   return false;
 }
 
-bool sld_init() {
+static bool sld_init() {
   bool status = SDL_InitSubSystem(SDL_INIT_EVENTS);
   if (!status) {
     SDL_Log("SDL_InitSubSystem failed: %s\n", SDL_GetError());
@@ -62,18 +63,21 @@ bool sld_init() {
   return status;
 }
 
-void cleanup() {
+static void cleanup() {
   SDL_QuitSubSystem(SDL_INIT_EVENTS);
   TTF_Quit();
   MIX_Quit();
   SDL_Quit();
 }
 
-int main() {
-  int status = sld_init();
+int main(int argc, char** argv) {
+  log_init(argc, argv);
+
+  bool status = sld_init();
   if (!status) {
     SDL_Log("SDL_Init failed: %s\n", SDL_GetError());
-    return status;
+    log_quit();
+    return -1;
   }
 
   GAME game;
@@ -81,7 +85,8 @@ int main() {
   if (!status) {
     SDL_Log("game_init failed: %s\n", SDL_GetError());
     cleanup();
-    return status;
+    log_quit();
+    return -1;
   }
 
   SDL_Event event;
@@ -89,7 +94,7 @@ int main() {
 
   g_game_scenes[g_current_game_state]->lazy_load(&game);
   g_game_scenes[g_current_game_state]->render(&game);
-  while (1) {
+  while (true) {
     if (SDL_WaitEvent(&event)) {
       if (event.type == SDL_EVENT_PRIVATE0) {
         if (game.timer->time_elapsed >= 3600) {
@@ -115,7 +120,7 @@ int main() {
       }
     }
     g_game_scenes[g_current_game_state]->handle_events(&game, &event);
-    if (is_period_pass(1000 / g_scene_fps[g_current_game_state], last_frame_time) == 1) {
+    if (is_period_pass(1000 / g_scene_fps[g_current_game_state], last_frame_time)) {
       g_game_scenes[g_current_game_state]->update(&game);
       g_game_scenes[g_current_game_state]->render(&game);
       last_frame_time = SDL_GetTicks();
@@ -123,5 +128,6 @@ int main() {
   }
   game_quit(&game);
   cleanup();
+  log_quit();
   return 0;
 }

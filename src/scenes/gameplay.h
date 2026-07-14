@@ -18,7 +18,7 @@ int reveal_card_below(const GAME* game);
 // selected and returns a number of selected cards
 int selected_card(DECK* deck, CARD** selected_cards);
 bool place_king(CARD** card, int num, const CURSOR* cursor);
-int place_a_card(const GAME* game);
+bool place_a_card(const GAME* game);
 int select_a_card(GAME* game);
 int go_to_invisible_card(GAME* game, int col);
 int interact(GAME* game);
