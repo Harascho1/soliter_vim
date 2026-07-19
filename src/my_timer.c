@@ -1,12 +1,11 @@
 #include "my_timer.h"
 #include "SDL3/SDL_events.h"
 
-static int m_fps = 60;
+// static int m_fps = 60;
 
 MY_TIMER* create_timer() {
   MY_TIMER* timer = SDL_malloc(sizeof(MY_TIMER));
   timer->begin_time = 0;
-  timer->thread_clock;
   timer->time_elapsed = 0;
   timer->start_timer = 0;
   return timer;
@@ -14,20 +13,18 @@ MY_TIMER* create_timer() {
 
 void destroy_timer(MY_TIMER* timer) {
 #ifdef _WIN32
-// CloseHandle(timer->thread_clock);
+  CloseHandle(timer->thread_clock);
 #endif
   SDL_free(timer);
 }
 
-void* count_down(void* atribute) {
-  MY_TIMER* timer = (MY_TIMER*)atribute;
-  int m_sec = 0;
-  int old_sec = 0;
+void* count_down(void* parse_timer) {
+  MY_TIMER* timer = parse_timer;
+  uint32_t old_sec = 0;
   while (timer->start_timer) {
-    Uint32 now = SDL_GetTicks();
-    int m_sec = (now - timer->begin_time) / 1000;
+    const Uint32 now = SDL_GetTicks();
+    const uint32_t m_sec = (now - timer->begin_time) / 1000;
     if (m_sec > old_sec) {
-      // SDL_Log("idalje curka\n");
       old_sec = m_sec;
       timer->time_elapsed = old_sec;
       SDL_Event user;
@@ -76,7 +73,7 @@ int start_timer(MY_TIMER* timer) {
   timer->thread_clock =
     CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)count_down, (void*)timer, 0, NULL);
 #else
-  pthread_create(&timer->thread_clock, NULL, count_down, (void*)timer);
+  pthread_create(&timer->thread_clock, NULL, count_down, timer);
 #endif
   return 1;
 }

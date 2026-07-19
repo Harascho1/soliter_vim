@@ -5,7 +5,7 @@ bool does_config_file_exist();
 bool does_option_file_exist();
 
 void create_config_file();
-void update_config_file();
+bool update_config_file();
 
 void create_option_file();
 void update_option_file();

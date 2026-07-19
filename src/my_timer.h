@@ -1,7 +1,7 @@
 #ifndef MY_TIMER_H
 #define MY_TIMER_H
 
-typedef struct _MY_TIMER {
+typedef struct {
   Uint32 begin_time;
   unsigned int time_elapsed;
 #ifdef _WIN32
@@ -19,6 +19,6 @@ void destroy_timer(MY_TIMER* timer);
 int reset_timer(MY_TIMER* timer);
 int start_timer(MY_TIMER* timer);
 int stop_timer(MY_TIMER* timer);
-void* count_down(void* timer);
+void* count_down(void* parse_timer);
 
 #endif

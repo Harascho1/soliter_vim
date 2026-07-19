@@ -101,7 +101,7 @@ bool main_menu_event_handler(GAME* game, const SDL_Event* event) {
     case SDLK_W:
       game->main_menu->selected_item--;
       if (game->main_menu->selected_item < 0) {
-        game->main_menu->selected_item = texts.items.count_main_menu - 1;
+        game->main_menu->selected_item = (int)texts.items.count_main_menu - 1;
       }
       break;
     case SDLK_DOWN:

@@ -121,16 +121,17 @@ void update_option_file() {
   fclose(option_file);
 }
 
-void update_config_file() {
+bool update_config_file() {
   FILE* config_file = fopen(paths.bins.config, "wb+");
 
   if (config_file == NULL) {
     SDL_Log("config_file is NULL\n");
-    return;
+    return false;
   }
 
   fwrite(config_commands, sizeof(int), 14, config_file);
   fclose(config_file);
+  return true;
 }
 
 void create_option_file() {

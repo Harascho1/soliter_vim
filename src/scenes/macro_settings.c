@@ -2,7 +2,6 @@
 #include "../game.h"
 #include "../res/config.h"
 #include "../res/res.h"
-#include "../res/texture.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_log.h"
 #include "SDL3/SDL_render.h"
@@ -39,7 +38,7 @@ bool lazy_load_config(const GAME* game) {
     );
     if (tex_items[i] == NULL) {
       SDL_Log("items[%d]  cannot be initiazlied...", i);
-      return 0;
+      return false;
     }
     size = fonts.item_hover_font;
     tex_hover_command_keys[i] = get_texture_from_text(
@@ -47,10 +46,10 @@ bool lazy_load_config(const GAME* game) {
     );
     if (tex_command_keys[i] == NULL) {
       SDL_Log("tex_command_keys[%d]  cannot be initiazlied...", i);
-      return 0;
+      return false;
     }
   }
-  return 1;
+  return true;
 }
 
 bool macro_setting_menu_lazy_load(const GAME* game) {
@@ -103,7 +102,7 @@ bool macro_setting_menu_lazy_load(const GAME* game) {
       return false;
     }
   }
-  return 1;
+  return true;
 }
 
 void macro_settings_menu_lazy_destroy() {
@@ -122,11 +121,16 @@ bool macro_settings_event_handler(GAME* game, const SDL_Event* event) {
       const unsigned int key = event->key.key;
       insert_command(key, selected_index);
       event_status = 0;
-      return 1;
+      return true;
     }
+    bool status;
     switch (event->key.key) {
     case SDLK_ESCAPE:
-      update_config_file();
+      status = update_config_file();
+      if (!status) {
+        SDL_Log("Config file did not update");
+        return false;
+      }
       push_user_event(g_change_scene_event_type, game_state_setting);
       break;
     case SDLK_W:
@@ -156,16 +160,16 @@ bool macro_settings_event_handler(GAME* game, const SDL_Event* event) {
   return true;
 }
 
-int render_press_key_popout(const GAME* game) {
+bool render_press_key_popout(const GAME* game) {
   int text_width, text_height;
-  int status = get_text_size(
+  bool status = get_text_size(
     game->font, press_key,
     fonts.title_font, // ? nzm da li je font okej?
     &text_width, &text_height
   );
   if (!status) {
     SDL_Log("get_text_size error...\n");
-    return 0;
+    return false;
   }
 
   status = render_text(
@@ -184,37 +188,37 @@ bool macro_settings_update(const GAME* game) {
     flag = 1;
   }
   if (event_status == 0 && flag == 1) {
-    const int status = lazy_load_config(game);
+    const bool status = lazy_load_config(game);
     if (!status) {
       SDL_Log("lazy_load_config\n");
-      return 0;
+      return false;
     }
   }
-  return 1;
+  return true;
 }
 
 bool macro_settings_render(GAME* game) {
   if (game == NULL) {
     SDL_Log("game is NULL\n");
-    return 0;
+    return false;
   }
 
   if (game->renderer == NULL) {
     SDL_Log("game->renderer is NULL\n");
-    return 0;
+    return false;
   }
 
   bool status = SDL_RenderClear(game->renderer);
   if (!status) {
     SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
   if (!status) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     push_user_event(SDL_EVENT_QUIT, 0);
-    return 0;
+    return false;
   }
 
   int title_width, title_height;
@@ -222,7 +226,7 @@ bool macro_settings_render(GAME* game) {
     get_text_size(game->font, title, fonts.title_font, &title_width, &title_height);
   if (!status) {
     SDL_Log("get_text_size error...\n");
-    return 0;
+    return false;
   }
 
   status = render_text(
@@ -234,7 +238,7 @@ bool macro_settings_render(GAME* game) {
   );
   if (!status) {
     SDL_Log("render_text error...\n");
-    return 0;
+    return false;
   }
 
   int text_width, text_height;
@@ -246,7 +250,7 @@ bool macro_settings_render(GAME* game) {
   );
   if (!status) {
     SDL_Log("get_text_size error...\n");
-    return 0;
+    return false;
   }
 
   float y_pos = (float)title_height + screen_dimens.padding;
@@ -261,10 +265,18 @@ bool macro_settings_render(GAME* game) {
         game->font, commands_keys[i], fonts.item_hover_font, &text_width,
         &commands_selected_height
       );
+      if (!status) {
+        SDL_Log("get_text_size error...\n");
+        return false;
+      }
       commands_y_pos = y_pos + ((float)(text_height - commands_selected_height) / 2);
     } else {
       status =
         get_text_size(game->font, commands_keys[i], fonts.item_font, &text_width, NULL);
+      if (!status) {
+        SDL_Log("get_text_size error...\n");
+        return false;
+      }
       commands_y_pos = y_pos;
     }
 
@@ -320,10 +332,10 @@ bool macro_settings_render(GAME* game) {
   if (!status) {
     SDL_Log("SDL_RenderPresent failed: %s\n", SDL_GetError());
     push_user_event(SDL_EVENT_QUIT, 0);
-    return 0;
+    return false;
   }
 
-  return 1;
+  return true;
 }
 
 SCENE macro_setting_scene = {

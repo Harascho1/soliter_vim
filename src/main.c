@@ -70,7 +70,7 @@ static void cleanup() {
   SDL_Quit();
 }
 
-int main(int argc, char** argv) {
+int main(const int argc, char** argv) {
   log_init(argc, argv);
 
   bool status = sld_init();
