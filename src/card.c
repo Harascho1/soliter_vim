@@ -150,7 +150,7 @@ bool can_card_be_placed(const CARD* card_below, const CARD* card_above) {
       (card_above->suit == suit_clubs || card_above->suit == suit_spades)) {
     return true;
   }
-  return true;
+  return false;
 }
 
 void create_card_stack(CARD_STACK* stack) {

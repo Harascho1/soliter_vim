@@ -176,8 +176,7 @@ bool place_a_card(const GAME* game) {
 
   CARD* s_card[14];
   const int num_of_selected_cards = selected_card(game->deck, s_card);
-  // SDL_Log("Num of seleceted cards: %d", num_of_selected_cards);
-  // SDL_Log("same cards %b", same_card_selected(card, *s_card));
+
   if (card != NULL) {
     SDL_Log("row: %d and col: %d\n", card->pos->row, card->pos->row);
   }
@@ -193,7 +192,7 @@ bool place_a_card(const GAME* game) {
       set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
       return false;
     }
-    if (same_card_selected(top_card(&game->deck->drawn_cards), *s_card) == 0) {
+    if (!same_card_selected(top_card(&game->deck->drawn_cards), *s_card)) {
       game_update = 1;
     } else {
       pop(&game->deck->drawn_cards);
