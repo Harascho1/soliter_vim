@@ -242,18 +242,17 @@ bool sorted_card_render(const GAME* game) {
   return true;
 }
 
-int render_name_textbox(const GAME* game) {
-
+bool render_name_textbox(const GAME* game) {
   if (g_game_win == 0) {
-    return 1;
+    return true;
   }
 
   int text_width, text_height;
-  int status =
+  bool status =
     get_text_size(game->font, "GGGG", fonts.title_font, &text_width, &text_height);
   if (!status) {
     SDL_Log("get_text_size in render_name_textbox\n");
-    return 0;
+    return false;
   }
 
   const float rect_width = (float)text_width;
@@ -266,7 +265,7 @@ int render_name_textbox(const GAME* game) {
   );
   if (!status) {
     SDL_Log("get_text_size in render_name_textbox\n");
-    return 0;
+    return false;
   }
 
   status = render_text(
@@ -276,8 +275,9 @@ int render_name_textbox(const GAME* game) {
       .y = height_indent - fonts.title_padding,
     }
   );
-  if (status == false) {
+  if (!status) {
     SDL_Log("render_text error: %s\n", SDL_GetError());
+    return false;
   }
 
   const SDL_FRect rect = {
@@ -290,11 +290,11 @@ int render_name_textbox(const GAME* game) {
   status = SDL_RenderTexture(game->renderer, tex_text_box, NULL, &rect);
   if (!status) {
     SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   if (strlen(textbox->string) == 0) {
-    return 1;
+    return true;
   }
 
   SDL_Texture* tex_text_in_textbox = get_texture_from_text(
@@ -303,7 +303,7 @@ int render_name_textbox(const GAME* game) {
   );
   if (tex_text_in_textbox == NULL) {
     SDL_Log("tex_text_in_textbox is NULL & get_texture_from_text error...\n");
-    return 0;
+    return false;
   }
 
   const SDL_FPoint point = {
@@ -315,11 +315,11 @@ int render_name_textbox(const GAME* game) {
   if (!status) {
     SDL_Log("render_text error... in render_name_textbox\n");
     SDL_DestroyTexture(tex_text_in_textbox);
-    return 0;
+    return false;
   }
 
   SDL_DestroyTexture(tex_text_in_textbox);
-  return 1;
+  return true;
 }
 
 bool render_fly_notaions(const GAME* game) {
