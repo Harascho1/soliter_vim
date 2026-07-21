@@ -2,9 +2,9 @@ width: 900 & height: 900
 card_padding_width: 30
 card_padding_height: 25
 screen_padding: 20
-    gameplay_screen_padding_width: 10
+gameplay_screen_padding_width: 10
 square_screen_padding_width: 0
-    gameplay_screen_padding_height: 20
+gameplay_screen_padding_height: 20
 card_width: 100
 card_height: 140
 cursor_padding: 7

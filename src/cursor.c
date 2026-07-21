@@ -2,7 +2,7 @@
 
 #include "res/res.h"
 
-CURSOR* create_cursor(int col, int row) {
+CURSOR* create_cursor(const int col, const int row) {
   CURSOR* cursor = SDL_malloc(sizeof(CURSOR));
   cursor->pos = SDL_malloc(sizeof(POSITION));
   cursor->pos->col = col;
@@ -12,8 +12,8 @@ CURSOR* create_cursor(int col, int row) {
   cursor->cursor->x = game_dimens.padding_width - cursor_dimens.padding;
   cursor->cursor->y = game_dimens.padding_height + card_dimens.height_padding +
                       card_dimens.height - cursor_dimens.padding;
-  cursor->cursor->w = card_dimens.width + cursor_dimens.padding * 2;
-  cursor->cursor->h = card_dimens.height + cursor_dimens.padding * 2;
+  cursor->cursor->w = card_dimens.width + (cursor_dimens.padding * 2);
+  cursor->cursor->h = card_dimens.height + (cursor_dimens.padding * 2);
 
   cursor->mode = 0;
   return cursor;
@@ -37,7 +37,7 @@ int set_a_flag(CURSOR* cursor, int flag) {
   return 1;
 }
 
-int have_a_flag(CURSOR* cursor, int flag) {
+int have_a_flag(const CURSOR* cursor, const int flag) {
   if (cursor->mode & flag) {
     return 1;
   }
@@ -49,6 +49,6 @@ int delete_hover_flag(CURSOR* cursor) {
   return 1;
 }
 
-int have_number_hover(CURSOR* cursor) {
+int have_number_hover(const CURSOR* cursor) {
   return (cursor->mode % CURSOR_HOVER_10) / CURSOR_HOVER_1;
 }

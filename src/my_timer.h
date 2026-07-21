@@ -16,9 +16,9 @@ typedef struct {
 
 MY_TIMER* create_timer();
 void destroy_timer(MY_TIMER* timer);
-int reset_timer(MY_TIMER* timer);
+void reset_timer(MY_TIMER* timer);
 int start_timer(MY_TIMER* timer);
-int stop_timer(MY_TIMER* timer);
+void stop_timer(MY_TIMER* timer);
 void* count_down(void* parse_timer);
 
 #endif

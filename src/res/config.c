@@ -9,30 +9,30 @@ unsigned int* config_options = NULL;
 char* commands_keys[14];
 char* options_set[3];
 
-int insert_option(const unsigned int command, const int idx) {
+bool insert_option(const unsigned int command, const int idx) {
   if (config_options == NULL) {
     SDL_Log("config_options is NULL\n");
-    return 0;
+    return false;
   }
   char buffer[10];
   if (idx == 2) {
     config_options[idx] = command;
     sprintf(buffer, "%d", command);
-    strcpy(options_set[idx], buffer);
+    strlcpy(options_set[idx], buffer, sizeof(options_set[idx]));
 
-    return 1;
+    return true;
   }
   config_options[idx] = command;
   if (command == 1) {
-    strcpy(buffer, "On");
+    strlcpy(buffer, "On", sizeof(buffer));
   } else {
-    strcpy(buffer, "Off");
+    strlcpy(buffer, "Off", sizeof(buffer));
   }
-  int size_of_buffer = strlen(buffer) + 1;
+  const uint32_t size_of_buffer = (uint32_t)strlen(buffer) + 1;
   options_set[idx] =
     (char*)SDL_realloc(options_set[idx], sizeof(char) * (size_of_buffer + 1));
-  strcpy(options_set[idx], buffer);
-  return 1;
+  strlcpy(options_set[idx], buffer, size_of_buffer);
+  return true;
 }
 
 int insert_command(SDL_Keycode command, int idx) {
@@ -47,12 +47,13 @@ int insert_command(SDL_Keycode command, int idx) {
     }
   }
 
-  config_commands[idx] = command;
+  config_commands[idx] = (int)command;
+
   const char* buffer = SDL_GetKeyName(command);
-  int size_of_buffer = strlen(buffer);
+  const uint32_t size_of_buffer = (uint32_t)strlen(buffer);
   commands_keys[idx] =
     (char*)SDL_realloc(commands_keys[idx], sizeof(char) * (size_of_buffer + 1));
-  strcpy(commands_keys[idx], buffer);
+  strlcpy(commands_keys[idx], buffer, size_of_buffer + 1);
 
   return 1;
 }
@@ -61,37 +62,37 @@ bool does_option_file_exist() {
   FILE* option_file = fopen(paths.bins.option, "rb");
 
   if (option_file == NULL) {
-    return 0;
+    return false;
   }
 
   fseek(option_file, 0, SEEK_END);
-  long bytes_of_file = ftell(option_file);
-
-  if (bytes_of_file != sizeof(int) * 3) {
-    return 0;
-  }
+  const long bytes_of_file = ftell(option_file);
 
   fclose(option_file);
-  return 1;
+
+  if (bytes_of_file != sizeof(int) * 3) {
+    return false;
+  }
+  return true;
 }
 
 bool does_config_file_exist() {
   FILE* config_file = fopen(paths.bins.config, "rb");
 
   if (config_file == NULL) {
-    return 0;
+    return false;
   }
 
   fseek(config_file, 0, SEEK_END);
-  long bytes_of_file = ftell(config_file);
-
-  if (bytes_of_file != sizeof(int) * 14) {
-    return 0;
-  }
+  const long bytes_of_file = ftell(config_file);
 
   fclose(config_file);
 
-  return 1;
+  if (bytes_of_file != sizeof(int) * 14) {
+    SDL_Log("config_file does not contain all config options");
+    return false;
+  }
+  return true;
 }
 
 void create_config_file() {
@@ -141,7 +142,7 @@ void create_option_file() {
     return;
   }
 
-  int opt_arr[3] = {
+  const int opt_arr[3] = {
     1, // fullscreen
     1, // music
     50 // % percentage of volume
@@ -152,7 +153,6 @@ void create_option_file() {
 }
 
 bool load_config() {
-  int status;
   FILE* config_file = fopen(paths.bins.config, "rb");
 
   if (config_file == NULL) {
@@ -160,39 +160,40 @@ bool load_config() {
   }
 
   config_commands = (int*)SDL_malloc(sizeof(int) * 14);
-  status = fread(config_commands, sizeof(int), 14, config_file);
+  int status = (int)fread(config_commands, sizeof(int), 14, config_file);
   if (!status) {
+    fclose(config_file);
     return false;
   }
   fclose(config_file);
 
   for (int i = 0; i < 14; i++) {
     const char* buffer = SDL_GetKeyName(config_commands[i]);
-    int size_of_buffer = strlen(buffer);
+    const uint32_t size_of_buffer = strlen(buffer);
     commands_keys[i] = (char*)SDL_malloc(sizeof(buffer) * (size_of_buffer + 1));
-    strcpy(commands_keys[i], buffer);
+    strlcpy(commands_keys[i], buffer, size_of_buffer + 1);
   }
 
   FILE* option_file = fopen(paths.bins.option, "rb");
   if (option_file == NULL) {
     return false;
   }
-  config_options = (int*)SDL_malloc(sizeof(int) * 3);
-  status = fread(config_options, sizeof(int), 3, option_file);
+  config_options = (uint32_t*)SDL_malloc(sizeof(int) * 3);
+  status = (int)fread(config_options, sizeof(int), 3, option_file);
   if (!status) {
     return false;
   }
   fclose(option_file);
   for (int i = 0; i < 3; i++) {
-    options_set[i] = (char*)SDL_malloc(sizeof(char) * 10);
+    options_set[i] = SDL_malloc(sizeof(char) * 10);
     if (i == 2) {
-      sprintf(options_set[i], "%d", config_options[i]);
+      snprintf(options_set[i], sizeof(options_set[i]), "%d", config_options[i]);
       continue;
     }
     if (config_options[i] == 1) {
-      strcpy(options_set[i], "On");
+      strlcpy(options_set[i], "On", sizeof(options_set[i]));
     } else {
-      strcpy(options_set[i], "Off");
+      strlcpy(options_set[i], "Off", sizeof(options_set[i]));
     }
   }
   return true;

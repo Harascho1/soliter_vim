@@ -30,9 +30,9 @@ typedef struct _CURSOR {
 CURSOR* create_cursor(int col, int row);
 void destroy_cursor(CURSOR* cursor);
 
-int have_a_flag(CURSOR* cursor, int flag);
+int have_a_flag(const CURSOR* cursor, int flag);
 int delete_hover_flag(CURSOR* cursor);
-int have_number_hover(CURSOR* cursor);
+int have_number_hover(const CURSOR* cursor);
 int set_a_flag(CURSOR* cursor, int flag);
 
 #endif

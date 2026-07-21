@@ -210,7 +210,7 @@ bool place_a_card(const GAME* game) {
   // }
 
   // DRAW a new card
-  if (same_card_selected(card, *s_card) == 1 && num_of_selected_cards == 1) {
+  if (same_card_selected(card, *s_card) && num_of_selected_cards == 1) {
     if (same_card_selected(card, game->deck->deck_card)) {
       play_sound(game->soundboard, draw_card_sound);
       const CARD* next_card = draw_next_card(game->deck);

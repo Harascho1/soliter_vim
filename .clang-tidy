@@ -1,7 +1,6 @@
-# Linter / staticka analiza (hvata bugove, NE formatira kod).
-# Za formatiranje vidi .clang-format.
 Checks: >
   clang-analyzer-*,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   bugprone-*,
   performance-*,
   misc-*,

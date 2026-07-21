@@ -15,7 +15,7 @@ void deselect_all_cards(DECK* deck) {
   }
 }
 
-CARD* find_card(const DECK* deck, int col, int row) {
+CARD* find_card(const DECK* deck, const int col, const int row) {
   if (col == 1 && row == 0) {
     // NOTE: Deck card can be NULL.
     return deck->deck_card;
@@ -100,7 +100,7 @@ void pop_all(CARD_STACK* stack) {
     // NOTE: return cards to the deck face down
     stack->array[i]->visible = not_visible;
   }
-  memset(stack->array, 0, STACK_SIZE);
+  memset((void*)stack->array, 0, STACK_SIZE);
   stack->count = 0;
 }
 
@@ -287,22 +287,22 @@ char* find_path(const CARD* card) {
 bool render_card(SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* point) {
   if (renderer == NULL || card == NULL) {
     SDL_Log("renderer or card are NULL in render_card fun...\n");
-    return 0;
+    return false;
   }
 
   char* path = find_path(card);
   if (path == NULL) {
     SDL_Log("path is NULL in render_card fun...\n");
-    return 0;
+    return false;
   }
 
   SDL_Texture* texture = create_texture_from_image(renderer, path);
   if (texture == NULL) {
     SDL_Log("texture is NULL in render_card fun...\n");
-    return 0;
+    return false;
   }
 
-  const int status = SDL_RenderTexture(
+  const bool status = SDL_RenderTexture(
     renderer, texture, NULL,
     &(SDL_FRect){point->x, point->y, card_dimens.width, card_dimens.height}
   );

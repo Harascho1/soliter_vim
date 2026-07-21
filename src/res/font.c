@@ -46,9 +46,6 @@ bool get_text_size(
   }
 
   status = TTF_GetStringSize(font->font, text, 0, width, height);
-  if (status == false) {
-    return status;
-  }
   return status;
 }
 
@@ -61,7 +58,7 @@ SDL_Texture* get_texture_from_text(
     return NULL;
   }
 
-  const int status = set_font_size(font, size);
+  const bool status = set_font_size(font, size);
   if (!status) {
     SDL_Log("set_font_size failed...\n");
     return NULL;
@@ -115,16 +112,16 @@ bool render_text(SDL_Renderer* render, SDL_Texture* texture, const SDL_FPoint* p
   return status;
 }
 
-int render_wrapped_text(
+bool render_wrapped_text(
   FONT* font, SDL_Renderer* render, const char* text, const int size,
   const SDL_FPoint* point, const SDL_Color* color
 ) {
   if (render == NULL || text == NULL) {
     SDL_Log("render or/and text is/are NULL\n");
-    return 0;
+    return false;
   }
 
-  int status = set_font_size(font, size);
+  bool status = set_font_size(font, size);
   if (!status) {
     SDL_Log("set_font_size failed...\n");
     return status;
@@ -133,14 +130,14 @@ int render_wrapped_text(
   SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(font->font, text, 0, *color, 0);
   if (surface == NULL) {
     SDL_Log("TTF_RenderText_Solid failed: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   SDL_Texture* texture = SDL_CreateTextureFromSurface(render, surface);
   if (texture == NULL) {
     SDL_Log("SDL_CreateTextureFromSurface failed: %s\n", SDL_GetError());
     SDL_DestroySurface(surface);
-    return 0;
+    return false;
   }
 
   float tex_width, tex_height;
@@ -149,7 +146,7 @@ int render_wrapped_text(
     SDL_Log("SDL_GetTextureSize failed: %s\n", SDL_GetError());
     SDL_DestroyTexture(texture);
     SDL_DestroySurface(surface);
-    return 0;
+    return false;
   }
 
   status = SDL_RenderTexture(
@@ -165,7 +162,7 @@ int render_wrapped_text(
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     SDL_DestroyTexture(texture);
     SDL_DestroySurface(surface);
-    return 0;
+    return false;
   }
 
   SDL_DestroyTexture(texture);

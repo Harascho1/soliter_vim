@@ -11,13 +11,6 @@
 #include "res/texture.h"
 #include <ctype.h>
 #include <string.h>
-
-const char* main_menu_items[] = {"Play", "Settings", "Scores", "Exit"};
-
-const char* game_over_items[] = {"Restart", "Scores", "Main Menu"};
-
-const char* setting_items[] = {"Options", "Cancel", "Macros"};
-
 Uint32 g_change_scene_event_type = (Uint32)-1;
 
 int game_update = 0;
@@ -63,11 +56,11 @@ bool load_game_field(DECK* deck) {
   for (int suit = suit_clubs; suit <= suit_hearts; ++suit) {
     deck->sorted_cards[suit] = NULL;
   }
-  return 1;
+  return true;
 }
 
-int fullscree_mode(const GAME* game) {
-  const int status = SDL_SetWindowFullscreen(game->window, config_options[0]);
+bool fullscree_mode(const GAME* game) {
+  const bool status = SDL_SetWindowFullscreen(game->window, (bool)config_options[0]);
   if (!status) {
     SDL_Log("SDL_SetWindowFullscreen error %s", SDL_GetError());
     return status;
@@ -108,15 +101,15 @@ bool game_init(GAME* game, const char* title) {
     return false;
   }
 
-  if (does_config_file_exist() == 0) {
+  if (does_config_file_exist()) {
     create_config_file();
   }
-  if (does_option_file_exist() == 0) {
+  if (does_option_file_exist()) {
     create_option_file();
   }
   load_config();
 
-  game->window = SDL_CreateWindow(title, resolution.width, resolution.height, 0);
+  game->window = SDL_CreateWindow(title, (int)resolution.width, (int)resolution.height, 0);
   if (game->window == NULL) {
     SDL_Log("SDL_CreateWindow failed: %s\n", SDL_GetError());
     return status;
@@ -138,8 +131,9 @@ bool game_init(GAME* game, const char* title) {
 
   int w, h;
   status = SDL_GetWindowSizeInPixels(game->window, &w, &h);
-  if (status == false) {
+  if (!status) {
     SDL_Log("SDL_GetWindowSizeInPixels failed: %s\n", SDL_GetError());
+    return false;
   }
 
   status = load_field(w, h, game->font);
@@ -210,7 +204,7 @@ bool game_init(GAME* game, const char* title) {
   game->deck = NULL;
   game->cursor = NULL;
 
-  return 1;
+  return true;
 }
 
 void game_quit(const GAME* game) {
@@ -257,7 +251,7 @@ void game_quit(const GAME* game) {
 }
 
 bool reload_window(const GAME* game) {
-  int status = fullscree_mode(game);
+  bool status = fullscree_mode(game);
   if (!status) {
     SDL_Log("fullscreen is not set\n");
     return false;
@@ -266,13 +260,13 @@ bool reload_window(const GAME* game) {
   SDL_SyncWindow(game->window);
   int screen_width, screen_height;
   status = SDL_GetWindowSizeInPixels(game->window, &screen_width, &screen_height);
-  if (status == false) {
+  if (!status) {
     SDL_Log("SDL_GetWindowSizeInPixels failed: %s\n", SDL_GetError());
     return false;
   }
 
   status = load_field(screen_width, screen_height, game->font);
-  if (status == false) {
+  if (!status) {
     SDL_Log("load_field error...\n");
     game_quit(game);
     return false;
@@ -310,7 +304,7 @@ void run_a_game(GAME* game) {
   load_game_field(game->deck);
 }
 
-int push_user_event(const Uint32 type, const Sint32 code) {
+bool push_user_event(const Uint32 type, const Sint32 code) {
   SDL_Event event = {0};
   event.type = type;
   event.user.code = code;
@@ -330,10 +324,10 @@ void free_resurses(char** array_of_strings) {
   SDL_free(array_of_strings);
 }
 
-int make_string_array(char** array_of_strings, int* i) {
+bool make_string_array(char** array_of_strings, int* i) {
   FILE* saves_files_bin = fopen(paths.bins.save, "rb");
   if (saves_files_bin == NULL) {
-    return 1;
+    return true;
   }
 
   char ptr;
@@ -341,14 +335,12 @@ int make_string_array(char** array_of_strings, int* i) {
   int prev_index = index;
   int status = (int)fread(&ptr, sizeof(char), 1, saves_files_bin);
   if (!status) {
+    fclose(saves_files_bin);
     return false;
   }
 
   while (*i < 10 && ptr != EOF) {
     if (ptr == '\0') {
-      /*
-       * In the first iteration this will be 1
-       */
       const int n_size = index - prev_index + 1;
       if (n_size == 1) {
         break;
@@ -358,6 +350,7 @@ int make_string_array(char** array_of_strings, int* i) {
       status =
         (int)fread(array_of_strings[(*i)++], sizeof(char), n_size, saves_files_bin);
       if (!status) {
+        fclose(saves_files_bin);
         return false;
       }
       prev_index = index + 1;
@@ -365,17 +358,18 @@ int make_string_array(char** array_of_strings, int* i) {
     }
     status = (int)fread(&ptr, sizeof(char), 1, saves_files_bin);
     if (!status) {
-      return 1;
+      fclose(saves_files_bin);
+      return true;
     }
     index++;
   }
 
   fclose(saves_files_bin);
 
-  return 1;
+  return true;
 }
 
-int make_array_of_times(char** array_of_strings, int array[], const int i) {
+bool make_array_of_times(char** array_of_strings, int array[], const int i) {
   const char* seconds = "name:name seconds:";
   const int jmp = (int)strlen(seconds);
   for (int j = 0; j < i; j++) {
@@ -384,13 +378,17 @@ int make_array_of_times(char** array_of_strings, int array[], const int i) {
       num_of_digits++;
     }
     char num_string[5];
-    memcpy(num_string, &array_of_strings[j][jmp + 0], num_of_digits);
+    const void* tmp = memcpy(num_string, &array_of_strings[j][jmp + 0], num_of_digits);
+    if (tmp == NULL) {
+      SDL_Log("memcpy error");
+      return false;
+    }
     num_string[num_of_digits] = '\0';
 
     // TODO: neads investigating I changed atoi -> strtoimax
     array[j] = (int)strtoimax(num_string, NULL, 10);
   }
-  return 1;
+  return true;
 }
 
 int get_new_insert_index(const int* array, int* i, const unsigned int num) {
@@ -411,33 +409,35 @@ int get_new_insert_index(const int* array, int* i, const unsigned int num) {
   return -1;
 }
 
-int make_new_array_of_strings(
+void make_new_array_of_strings(
   char** strings_of_array, const int i, const char* new_string, const int new_insert_index
 ) {
   char tmp[255];
   int j = new_insert_index;
-  strcpy(tmp, strings_of_array[j]);
-  strcpy(strings_of_array[j++], new_string);
+  strlcpy(tmp, strings_of_array[j], sizeof(tmp));
+  strlcpy(strings_of_array[j++], new_string, sizeof(strings_of_array[j]));
   for (; j < i && j < 10; j++) {
     char new_tmp[255];
-    strcpy(new_tmp, strings_of_array[j]);
-    strcpy(strings_of_array[j], tmp);
-    strcpy(tmp, new_tmp);
+    strlcpy(new_tmp, strings_of_array[j], sizeof(new_tmp));
+    strlcpy(strings_of_array[j], tmp, sizeof(strings_of_array[j]));
+    strlcpy(tmp, new_tmp, sizeof(tmp));
   }
   for (int idx = 0; idx < 10; idx++) {
     SDL_Log("[%d] %s\n", idx, strings_of_array[idx]);
   }
-  return 1;
 }
 
-int print_in_bin(char** strings_of_array, const int i) {
+bool print_in_bin(char** strings_of_array, const int i) {
   FILE* bin_eg = fopen(paths.bins.save, "wb+");
+  if (bin_eg == NULL) {
+    return false;
+  }
   for (int j = 0; j < i && j < 10; j++) {
     const int n_size = (int)strlen(strings_of_array[j]) + 1;
     fwrite(strings_of_array[j], sizeof(char), n_size, bin_eg);
   }
   fclose(bin_eg);
-  return 1;
+  return true;
 }
 
 void save_score(const GAME* game, const char* name) {
@@ -457,15 +457,16 @@ void save_score(const GAME* game, const char* name) {
 
   char** saves = SDL_malloc(sizeof(char*) * 10);
   for (int i = 0; i < 10; i++) {
-    saves[i] = (char*)SDL_malloc(sizeof(char) * 255);
+    saves[i] = SDL_malloc(sizeof(char) * 255);
     memset(saves[i], 0, 255);
   }
 
   int i = 0;
-  int status = make_string_array(saves, &i);
+  bool status = make_string_array(saves, &i);
   if (!status) {
     free_resurses(saves);
     SDL_Log("make_string_array error...\n");
+    return;
   }
 
   int best_times[10] = {0};
@@ -476,9 +477,8 @@ void save_score(const GAME* game, const char* name) {
     free_resurses(saves);
     return;
   }
-  // SDL_Log("new index: %d", new_index);
 
-  status = make_new_array_of_strings(saves, i, buff, new_index);
+  make_new_array_of_strings(saves, i, buff, new_index);
 
   if (!status) {
     SDL_Log("make_new_array_of_string error...\n");

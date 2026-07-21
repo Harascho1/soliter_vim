@@ -7,20 +7,20 @@
 bool render_background(const GAME* game) {
   if (game->renderer == NULL) {
     SDL_Log("game->renderer is NULL\n");
-    return 0;
+    return false;
   }
 
   bool status = SDL_RenderClear(game->renderer);
   if (!status) {
     SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
   if (!status) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     push_user_event(SDL_EVENT_QUIT, 0);
-    return 0;
+    return false;
   }
   return status;
 }
@@ -42,7 +42,7 @@ bool render_logo(GAME* game) {
   };
 
   const bool status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL, rect);
-  if (status == false) {
+  if (!status) {
     SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
     push_user_event(SDL_EVENT_QUIT, 0);
     return false;

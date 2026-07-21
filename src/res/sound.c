@@ -6,8 +6,8 @@
 #include "config.h"
 #include "res.h"
 
-const int QUEUE_SOUNDS = 3;
-const int num_of_sounds = 7;
+static const int QUEUE_SOUNDS = 3;
+static const int num_of_sounds = 7;
 
 SOUNDBOARD* create_soundboard(MIX_Mixer* mixer) {
   SOUNDBOARD* sb = (SOUNDBOARD*)SDL_malloc(sizeof(SOUNDBOARD));
@@ -63,12 +63,12 @@ void* play_sound_on_thread(void* args) {
 bool play_sound(SOUNDBOARD* soundboard, const int index) {
   if (soundboard == NULL) {
     SDL_Log("Soundboard is NULL\n");
-    return 0;
+    return false;
   }
 
   MIX_SetMixerGain(soundboard->mixer, (float)config_options[2] / 128.0F);
   if (config_options[1] == 0) {
-    return 1;
+    return true;
   }
 
   if (soundboard->count > 0) {

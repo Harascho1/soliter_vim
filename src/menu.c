@@ -5,6 +5,7 @@ MENU* create_menu(const char* const* texts, const unsigned int count) {
 
   menu->items = (MENU_ITEM*)malloc(sizeof(MENU_ITEM) * count);
   if (menu->items == NULL) {
+    free(menu);
     return NULL;
   }
   menu->count = count;
@@ -12,7 +13,8 @@ MENU* create_menu(const char* const* texts, const unsigned int count) {
 
   for (int i = 0; i < count; i++) {
     menu->items[i].text = (char*)malloc(strlen(texts[i]) + 1);
-    strcpy(menu->items[i].text, texts[i]);
+    const uint32_t size = sizeof(menu->items[i].text);
+    strlcpy(menu->items[i].text, texts[i], size);
     menu->items[i].state = menu_item_not_selected;
     menu->items[i].type = i;
   }

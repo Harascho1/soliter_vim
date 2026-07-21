@@ -36,9 +36,9 @@ void* count_down(void* parse_timer) {
   return NULL;
 }
 
-int stop_timer(MY_TIMER* timer) {
+void stop_timer(MY_TIMER* timer) {
   if (timer->start_timer == 0) {
-    return 1;
+    return;
   }
   timer->start_timer = 0;
 #ifdef _WIN32
@@ -47,13 +47,12 @@ int stop_timer(MY_TIMER* timer) {
 #else
   pthread_join(timer->thread_clock, NULL);
 #endif
-  return 1;
 }
 
-int reset_timer(MY_TIMER* timer) {
+void reset_timer(MY_TIMER* timer) {
   timer->time_elapsed = 0;
   if (timer->start_timer == 0) {
-    return 1;
+    return;
   }
   timer->start_timer = 0;
 #ifdef _WIN32
@@ -62,7 +61,6 @@ int reset_timer(MY_TIMER* timer) {
 #else
   pthread_join(timer->thread_clock, NULL);
 #endif
-  return 1;
 }
 
 int start_timer(MY_TIMER* timer) {
