@@ -481,13 +481,16 @@ void save_score(const GAME* game, const char* name) {
   make_new_array_of_strings(saves, i, buff, new_index);
 
   if (!status) {
+    free_resurses(saves);
     SDL_Log("make_new_array_of_string error...\n");
     return;
   }
 
   status = print_in_bin(saves, i);
   if (!status) {
+    free_resurses(saves);
     SDL_Log("print_in_bin error...\n");
+    return;
   }
   free_resurses(saves);
 }

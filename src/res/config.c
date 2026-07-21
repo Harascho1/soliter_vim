@@ -159,7 +159,7 @@ bool load_config() {
     return false;
   }
 
-  config_commands = (int*)SDL_malloc(sizeof(int) * 14);
+  config_commands = SDL_malloc(sizeof(int) * 14);
   int status = (int)fread(config_commands, sizeof(int), 14, config_file);
   if (!status) {
     fclose(config_file);
@@ -170,7 +170,7 @@ bool load_config() {
   for (int i = 0; i < 14; i++) {
     const char* buffer = SDL_GetKeyName(config_commands[i]);
     const uint32_t size_of_buffer = strlen(buffer);
-    commands_keys[i] = (char*)SDL_malloc(sizeof(buffer) * (size_of_buffer + 1));
+    commands_keys[i] = SDL_malloc(sizeof(buffer) * (size_of_buffer + 1));
     strlcpy(commands_keys[i], buffer, size_of_buffer + 1);
   }
 
@@ -178,7 +178,7 @@ bool load_config() {
   if (option_file == NULL) {
     return false;
   }
-  config_options = (uint32_t*)SDL_malloc(sizeof(int) * 3);
+  config_options = SDL_malloc(sizeof(int) * 3);
   status = (int)fread(config_options, sizeof(int), 3, option_file);
   if (!status) {
     return false;

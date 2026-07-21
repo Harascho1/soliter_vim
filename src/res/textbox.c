@@ -6,10 +6,10 @@
 #include <uchar.h>
 
 TEXTBOX* create_textbox(const int n) {
-  TEXTBOX* textbox = (TEXTBOX*)SDL_malloc(sizeof(TEXTBOX));
+  TEXTBOX* textbox = SDL_malloc(sizeof(TEXTBOX));
 
   textbox->max_caracters = n;
-  textbox->string = (char*)SDL_malloc(sizeof(char) * (n + 1));
+  textbox->string = SDL_malloc(sizeof(char) * (n + 1));
   memset(textbox->string, 0, sizeof(char) * (n + 1));
 
   return textbox;

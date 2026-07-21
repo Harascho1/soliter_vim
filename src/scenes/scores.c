@@ -11,7 +11,6 @@ bool scores_lazy_load(const GAME* game) {
     SDL_Log("Unable to open file");
     return true;
   }
-  int status;
 
   char* scores_txt[10];
   int prev_pointer = 0;
@@ -31,15 +30,19 @@ bool scores_lazy_load(const GAME* game) {
     }
     SDL_Log("Size in bytes of score buffer: %d\n", pointer);
     fseek(saves, prev_pointer, SEEK_SET);
-    scores_txt[i] = (char*)SDL_malloc(sizeof(char) * pointer);
-    status = fread(scores_txt[i], sizeof(char), pointer, saves);
+    scores_txt[i] = SDL_malloc(sizeof(char) * pointer);
+    const int status = (int)fread(scores_txt[i], sizeof(char), pointer, saves);
     if (!status) {
+      fclose(saves);
       SDL_Log("fread error\n");
+      return false;
     }
     scores_txt[i][pointer - 1] = '\0';
     SDL_Log("Score buffer is: %s", scores_txt[i]);
-    if (strcpy(scores_txt[i], scores_txt[i]) == NULL) {
+    if (strlcpy(scores_txt[i], scores_txt[i], sizeof(scores_txt[i])) == 0) {
+      fclose(saves);
       SDL_Log("strcpy error...");
+      return false;
     }
     prev_pointer += pointer;
   }

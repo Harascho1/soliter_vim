@@ -1,9 +1,9 @@
 #include "menu.h"
 
 MENU* create_menu(const char* const* texts, const unsigned int count) {
-  MENU* menu = (MENU*)malloc(sizeof(MENU));
+  MENU* menu = SDL_malloc(sizeof(MENU));
 
-  menu->items = (MENU_ITEM*)malloc(sizeof(MENU_ITEM) * count);
+  menu->items = SDL_malloc(sizeof(MENU_ITEM) * count);
   if (menu->items == NULL) {
     free(menu);
     return NULL;
@@ -12,7 +12,10 @@ MENU* create_menu(const char* const* texts, const unsigned int count) {
   menu->selected_item = 0;
 
   for (int i = 0; i < count; i++) {
-    menu->items[i].text = (char*)malloc(strlen(texts[i]) + 1);
+    menu->items[i].text = SDL_malloc(sizeof(texts[i]));
+    if (texts[i] == "Main Menu") {
+      SDL_Log("size of menu item: %lld", (long long int)sizeof(texts[i]));
+    }
     const uint32_t size = sizeof(menu->items[i].text);
     strlcpy(menu->items[i].text, texts[i], size);
     menu->items[i].state = menu_item_not_selected;

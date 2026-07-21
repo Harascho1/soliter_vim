@@ -37,7 +37,7 @@ bool lazy_load_option(const GAME* game) {
 }
 
 bool option_setting_lazy_load(const GAME* game) {
-  tex_opt = (TEX_OPTIONS_SETTINGS*)SDL_malloc(sizeof(TEX_OPTIONS_SETTINGS));
+  tex_opt = SDL_malloc(sizeof(TEX_OPTIONS_SETTINGS));
 
   int size = fonts.title_font;
   tex_opt->tex_title_menu =

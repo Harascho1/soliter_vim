@@ -10,7 +10,7 @@ static const int QUEUE_SOUNDS = 3;
 static const int num_of_sounds = 7;
 
 SOUNDBOARD* create_soundboard(MIX_Mixer* mixer) {
-  SOUNDBOARD* sb = (SOUNDBOARD*)SDL_malloc(sizeof(SOUNDBOARD));
+  SOUNDBOARD* sb = SDL_malloc(sizeof(SOUNDBOARD));
   sb->lenght = num_of_sounds;
   sb->mixer = mixer;
   sb->count = 0;

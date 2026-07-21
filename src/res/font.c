@@ -5,7 +5,7 @@
 #include "SDL3/SDL_render.h"
 
 FONT* create_font(const char* path) {
-  FONT* font = (FONT*)malloc(sizeof(FONT));
+  FONT* font = SDL_malloc(sizeof(FONT));
   if (font == NULL) {
     return NULL;
   }
