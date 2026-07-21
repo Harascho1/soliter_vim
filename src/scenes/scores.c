@@ -39,7 +39,8 @@ bool scores_lazy_load(const GAME* game) {
     }
     scores_txt[i][pointer - 1] = '\0';
     SDL_Log("Score buffer is: %s", scores_txt[i]);
-    if (strlcpy(scores_txt[i], scores_txt[i], sizeof(scores_txt[i])) == 0) {
+    const uint32_t size = SDL_strlen(scores_txt[i]) + 1;
+    if (strlcpy(scores_txt[i], scores_txt[i], size) == 0) {
       fclose(saves);
       SDL_Log("strcpy error...");
       return false;
