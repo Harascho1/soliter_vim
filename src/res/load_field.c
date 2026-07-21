@@ -4,15 +4,20 @@ bool load_field(const int width, const int height, FONT* font) {
   resolution.height = (float)height;
   resolution.width = (float)width;
 
-  const float card_width_height_ratio = 7.0F / 5.0F;
-  card_dimens.width_padding = (float)height / 30;
-  card_dimens.height_padding = (float)height / 35;
-  screen_dimens.padding = resolution.width / 45;
   hero_logo_dimens.margin = (resolution.width - resolution.height) / 2;
-  card_dimens.width =
-    (resolution.width - (6 * card_dimens.width_padding) - (game_dimens.padding_width * 2)) /
-    7;
+
+  const float card_width_height_ratio = 7.0F / 5.0F;
+  card_dimens.width_padding = resolution.width / 30;
+  card_dimens.height_padding = resolution.height / 35;
+
+  screen_dimens.padding = resolution.width / 45;
+
+  card_dimens.width = resolution.height / 9.0F;
   card_dimens.height = card_width_height_ratio * card_dimens.width;
+
+  game_dimens.padding_width =
+    (resolution.width - (7 * card_dimens.width) - (6 * card_dimens.width_padding)) / 2.0F;
+
   cursor_dimens.padding = card_dimens.width_padding / 4;
 
   textbox_dimens.width = resolution.width - (2 * (game_dimens.padding_width));
@@ -22,8 +27,9 @@ bool load_field(const int width, const int height, FONT* font) {
 
   int tmp_text_height;
   int tmp_text_width;
-  bool status =
-    get_text_size(font, texts.titles.sovimter, fonts.title_font, &tmp_text_width, &tmp_text_height);
+  bool status = get_text_size(
+    font, texts.titles.sovimter, fonts.title_font, &tmp_text_width, &tmp_text_height
+  );
   if (!status) {
     SDL_Log("get_text_size error...");
     return false;
@@ -35,8 +41,9 @@ bool load_field(const int width, const int height, FONT* font) {
 
   fonts.item_font = height / 20;
 
-  status =
-    get_text_size(font, texts.titles.sovimter, fonts.item_font, &tmp_text_width, &tmp_text_height);
+  status = get_text_size(
+    font, texts.titles.sovimter, fonts.item_font, &tmp_text_width, &tmp_text_height
+  );
   if (!status) {
     SDL_Log("get_text_size error...\n");
     return false;
@@ -48,8 +55,9 @@ bool load_field(const int width, const int height, FONT* font) {
 
   fonts.item_hover_font = height / 13;
 
-  status =
-    get_text_size(font, texts.titles.sovimter, fonts.item_hover_font, &tmp_text_width, &tmp_text_height);
+  status = get_text_size(
+    font, texts.titles.sovimter, fonts.item_hover_font, &tmp_text_width, &tmp_text_height
+  );
   if (!status) {
     SDL_Log("get_text_size error...\n");
     return false;
@@ -59,8 +67,9 @@ bool load_field(const int width, const int height, FONT* font) {
 
   fonts.text_font = height / 30;
 
-  status =
-    get_text_size(font, texts.titles.sovimter, fonts.text_font, &tmp_text_width, &tmp_text_height);
+  status = get_text_size(
+    font, texts.titles.sovimter, fonts.text_font, &tmp_text_width, &tmp_text_height
+  );
   if (!status) {
     SDL_Log("get_text_size error...\n");
     return false;

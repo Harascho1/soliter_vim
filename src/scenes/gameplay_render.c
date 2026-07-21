@@ -188,29 +188,27 @@ bool render_commands(const GAME* game) {
 }
 
 bool render_cursor(const GAME* game) {
-  int status = 0;
-
   const char* path = paths.images.cursor;
   SDL_Texture* texture = create_texture_from_image(game->renderer, path);
   if (texture == NULL) {
-    return 0;
+    return false;
   }
 
   if (game->cursor->cursor == NULL) {
   }
 
-  status = SDL_RenderTexture(game->renderer, texture, NULL, game->cursor->cursor);
+  const bool status = SDL_RenderTexture(game->renderer, texture, NULL, game->cursor->cursor);
   if (!status) {
     SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   SDL_DestroyTexture(texture);
-  return status;
+  return true;
 }
 
 bool sorted_card_render(const GAME* game) {
-  int status;
+  bool status;
   float padding_width =
     (3.0F * (card_dimens.width + card_dimens.width_padding)) + game_dimens.padding_width;
   for (int suit = 0; suit < 4; suit++) {
@@ -231,7 +229,7 @@ bool sorted_card_render(const GAME* game) {
     } else {
       status = render_card(
         game->renderer, game->deck->sorted_cards[suit],
-        &(SDL_FPoint){.x = padding_width, .y = screen_dimens.padding}
+        &(SDL_FPoint){.x = padding_width, .y = game_dimens.padding_height}
       );
       if (!status) {
         SDL_Log("render_card error...\n");
@@ -514,7 +512,7 @@ bool gameplay_render(GAME* game) {
     }
   }
 
-  status = render_name_textbox(game);
+  status = (bool)render_name_textbox(game);
   if (!status) {
     SDL_Log("render_name_textbox failed");
     return false;
