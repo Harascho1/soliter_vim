@@ -160,44 +160,15 @@ bool render_time(const GAME* game) {
 }
 
 bool game_over_menu_render(GAME* game) {
-  if (game == NULL) {
-    SDL_Log("game is NULL\n");
-    return false;
-  }
-
-  if (game->renderer == NULL) {
-    SDL_Log("game->renderer is NULL\n");
-    return false;
-  }
-
   bool status = SDL_RenderClear(game->renderer);
   if (!status) {
     SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());
     return false;
   }
 
-  status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
-  if (!status) {
-    SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
-    push_user_event(SDL_EVENT_QUIT, 0);
-    return false;
-  }
+  render_background(game);
 
   render_logo(game);
-
-  const SDL_FRect* rect = &(SDL_FRect){
-    .x = 0,
-    .y = 0,
-    .w = resolution.height,
-    .h = resolution.height,
-  };
-
-  status = SDL_RenderTexture(game->renderer, game->menu_texture, NULL, rect);
-  if (!status) {
-    SDL_Log("SDL_RenderTexture failed: %s\n", SDL_GetError());
-    push_user_event(SDL_EVENT_QUIT, 0);
-    return false;
-  }
 
   int text_width, text_height;
   status = render_time(game);

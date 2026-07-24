@@ -160,17 +160,11 @@ bool main_menu_render(GAME* game) {
     return false;
   }
 
-  bool status = render_background(game);
-  if (!status) {
-    return false;
-  }
+  render_background(game);
 
-  status = render_logo(game);
-  if (!status) {
-    return false;
-  }
+  render_logo(game);
 
-  status = render_text(
+  bool status = render_text(
     game->renderer, tex_game_title,
     &(SDL_FPoint){
       .x = (resolution.width - fonts.title_width) / 2,
