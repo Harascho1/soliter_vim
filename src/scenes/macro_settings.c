@@ -18,11 +18,11 @@ static char* text[14] = {"number 0",       "number 1",          "number 2",
 static const char* press_key = "Press key to bind";
 static char title[] = "Macro";
 
-SDL_Texture* tex_hover_items[14];
-SDL_Texture* tex_items[14];
+static SDL_Texture* tex_hover_items[14];
+static SDL_Texture* tex_items[14];
 SDL_Texture* tex_hover_command_keys[14];
 SDL_Texture* tex_command_keys[14];
-SDL_Texture* tex_title_menu;
+static SDL_Texture* tex_title_menu;
 SDL_Texture* tex_pop_out;
 
 bool lazy_load_config(const GAME* game) {

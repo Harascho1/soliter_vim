@@ -73,7 +73,7 @@ bool scores_event_hendler(GAME* game, const SDL_Event* event) {
       break;
     }
   }
-  return 1;
+  return true;
 }
 
 bool scores_update(const GAME* game) {

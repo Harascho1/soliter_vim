@@ -2,7 +2,6 @@
 #include "../game.h"
 #include "../res/config.h"
 #include "../res/res.h"
-#include "../res/texture.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_render.h"
 

@@ -27,7 +27,7 @@ void destroy_cursor(CURSOR* cursor) {
   }
 }
 
-int set_a_flag(CURSOR* cursor, int flag) {
+int set_a_flag(CURSOR* cursor, const int flag) {
   if (flag == 0) {
     cursor->mode = cursor->mode & ~1;
   } else {

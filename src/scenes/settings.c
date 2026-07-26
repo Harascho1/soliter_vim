@@ -20,7 +20,7 @@ static char* universal_rule = "X - move to NORMAL mode\nC - move to FLY mode";
 
 bool setting_event_handler(GAME* game, const SDL_Event* event) {
   if (event->type != SDL_EVENT_KEY_DOWN) {
-    return 1;
+    return true;
   }
   switch (event->key.key) {
   case SDLK_W:
