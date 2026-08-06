@@ -33,14 +33,13 @@ bool gameplay_lazy_load(const GAME* game) {
   textbox = create_textbox(4);
   start_timer(game->timer);
 
-  int size;
-  size = fonts.text_font;
+  int size = fonts.text_font;
   for (int i = 0; i < 4; i++) {
     tex_modes[i] =
       get_texture_from_text(game->font, game->renderer, modes[i], size, &white_color);
     if (tex_modes[i] == NULL) {
       SDL_Log("tex_modes[%d]  cannot be initiazlied...", i);
-      return 0;
+      return false;
     }
   }
 
@@ -51,7 +50,7 @@ bool gameplay_lazy_load(const GAME* game) {
     );
     if (tex_text_name_a_record == NULL) {
       SDL_Log("tex_text_name_a_record cannot be initiazlied...");
-      return 0;
+      return false;
     }
   }
 
@@ -71,7 +70,7 @@ bool gameplay_lazy_load(const GAME* game) {
     SDL_CreateSurface((int)rect_width, (int)rect_height, SDL_PIXELFORMAT_RGBA32);
   if (surface == NULL) {
     SDL_Log("SDL_CreateSurface error: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   const SDL_PixelFormatDetails* format_details =
@@ -79,23 +78,23 @@ bool gameplay_lazy_load(const GAME* game) {
   if (format_details == NULL) {
     SDL_DestroySurface(surface);
     SDL_Log("SDL_GetPixelFormatDetails error: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   const Uint32 color = SDL_MapRGBA(format_details, NULL, 255, 255, 255, 255);
 
-  int status = SDL_FillSurfaceRect(surface, NULL, color);
+  bool status = SDL_FillSurfaceRect(surface, NULL, color);
   if (!status) {
     SDL_DestroySurface(surface);
     SDL_Log("SDL_FillSurfaceRect error: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   tex_text_box = SDL_CreateTextureFromSurface(game->renderer, surface);
   if (tex_text_box == NULL) {
     SDL_DestroySurface(surface);
     SDL_Log("SDL_CreateTextureFromSurface error: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   SDL_DestroySurface(surface);
@@ -103,7 +102,7 @@ bool gameplay_lazy_load(const GAME* game) {
   surface = SDL_CreateSurface((int)rect_width, (int)rect_height, SDL_PIXELFORMAT_RGBA32);
   if (surface == NULL) {
     SDL_Log("SDL_CreateSurface error: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   // const SDL_PixelFormatDetails *format_details =
@@ -119,18 +118,18 @@ bool gameplay_lazy_load(const GAME* game) {
   if (!status) {
     SDL_DestroySurface(surface);
     SDL_Log("SDL_FillSurfaceRect error: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   tex_fly_notaions = SDL_CreateTextureFromSurface(game->renderer, surface);
   if (tex_fly_notaions == NULL) {
     SDL_DestroySurface(surface);
     SDL_Log("SDL_CreateTextureFromSurface error: %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   SDL_DestroySurface(surface);
-  return 1;
+  return true;
 }
 
 void gameplay_lazy_destroy() {
@@ -147,21 +146,21 @@ void gameplay_lazy_destroy() {
 
 bool render_commands(const GAME* game) {
   if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
-    return 1;
+    return true;
   }
 
   if (have_number_hover(game->cursor) == 0) {
-    return 1;
+    return true;
   }
 
   int text_width, text_height;
   if (strlen(buffer) == 0) {
-    return 1;
+    return true;
   }
-  int status =
+  bool status =
     get_text_size(game->font, buffer, fonts.text_font, &text_width, &text_height);
   if (!status) {
-    return 0;
+    return false;
   }
 
   tex_small_buffer = get_texture_from_text(
@@ -169,7 +168,7 @@ bool render_commands(const GAME* game) {
   );
   if (tex_small_buffer == NULL) {
     SDL_Log("tex_small_buffer is NULL\n");
-    return 0;
+    return false;
   }
 
   status = render_text(
@@ -181,10 +180,10 @@ bool render_commands(const GAME* game) {
   );
   if (!status) {
     SDL_Log("render_text error...\n");
-    return 0;
+    return false;
   }
   SDL_DestroyTexture(tex_small_buffer);
-  return 1;
+  return true;
 }
 
 bool render_cursor(const GAME* game) {
@@ -324,7 +323,7 @@ bool render_name_textbox(const GAME* game) {
 
 bool render_fly_notaions(const GAME* game) {
   if (have_a_flag(game->cursor, CURSOR_FLY_MODE) == 0) {
-    return 1;
+    return true;
   }
   const float height_indent = game_dimens.padding_height + card_dimens.height +
                               card_dimens.height_padding + 2 * card_dimens.height_padding;
@@ -338,16 +337,16 @@ bool render_fly_notaions(const GAME* game) {
   };
 
   for (int i = 0; i < 4; i++) {
-    const int status = SDL_RenderTexture(game->renderer, tex_fly_notaions, NULL, &frect);
+    const bool status = SDL_RenderTexture(game->renderer, tex_fly_notaions, NULL, &frect);
     if (!status) {
       SDL_DestroyTexture(tex_fly_notaions);
       SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
-      return 0;
+      return false;
     }
-    frect.y = frect.y + 3 * card_dimens.height_padding;
+    frect.y = frect.y + (3 * card_dimens.height_padding);
   }
 
-  return 1;
+  return true;
 }
 
 bool render_counting_time(const GAME* game) {
@@ -355,7 +354,7 @@ bool render_counting_time(const GAME* game) {
   char timer[20];
   int text_width, text_height;
   snprintf(timer, 20, "seconds: %d", game->timer->time_elapsed);
-  int status =
+  bool status =
     get_text_size(game->font, timer, fonts.item_font, &text_width, &text_height);
   if (!status) {
     SDL_Log("get_text_size error...\n");
@@ -367,7 +366,7 @@ bool render_counting_time(const GAME* game) {
   );
   if (tex_timer_text == NULL) {
     SDL_Log("tex_timer_text is NULL\n");
-    return 0;
+    return false;
   }
 
   status = render_text(

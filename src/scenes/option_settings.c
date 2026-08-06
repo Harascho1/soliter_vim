@@ -216,7 +216,7 @@ bool option_settings_render(GAME* game) {
   const float text_x_pos = screen_dimens.padding;
   const float commands_x_pos = resolution.width - (float)text_width;
   for (int i = 0; i < 3; i++) {
-    int commands_y_pos;
+    float commands_y_pos;
 
     int commands_selected_height;
     if (selected_index == i) {
@@ -228,7 +228,7 @@ bool option_settings_render(GAME* game) {
         SDL_Log("get_text_size error...\n");
         return false;
       }
-      commands_y_pos = y_pos + (text_height - commands_selected_height) / 2;
+      commands_y_pos = y_pos + ((float)(text_height - commands_selected_height) / 2.0F);
     } else {
       status =
         get_text_size(game->font, options_set[i], fonts.item_font, &text_width, NULL);

@@ -9,7 +9,7 @@
 #include "SDL3/SDL_log.h"
 #include "gameplay.h"
 
-int normal_select_mode(GAME* game, const SDL_Event* event) {
+int normal_select_mode(const GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_KEY_DOWN) {
     switch (event->key.key) {
     case SDLK_ESCAPE:
@@ -103,7 +103,7 @@ int normal_select_mode(GAME* game, const SDL_Event* event) {
   return 1;
 }
 
-int convert_controls(unsigned int key) {
+int convert_controls(const unsigned int key) {
   int i = 0;
   while (i < 14) {
     if (key == config_commands[i]) {
@@ -114,11 +114,12 @@ int convert_controls(unsigned int key) {
   return -1;
 }
 
-int fly_mode(GAME* game, const SDL_Event* event) {
-  int status;
+int fly_mode(const GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_KEY_DOWN) {
+    int status;
     int tmp;
     const int key = convert_controls(event->key.key);
+    // TODO: Needs refactoring
     switch (key) {
     case 0:
       tmp = 10;
@@ -339,9 +340,9 @@ int fly_mode(GAME* game, const SDL_Event* event) {
     if (buffer[0] == '\0') {
       sprintf(buffer, "%d", key);
     } else {
-      char tmp[10];
-      sprintf(tmp, "%d", key);
-      strcpy(buffer, tmp);
+      char tmp_str[10];
+      sprintf(tmp_str, "%d", key);
+      strncpy(buffer, tmp_str, 10);
     }
   }
   return 1;
@@ -394,5 +395,5 @@ bool gameplay_event_handler(GAME* game, const SDL_Event* event) {
   } else {
     normal_select_mode(game, event);
   }
-  return 1;
+  return true;
 }

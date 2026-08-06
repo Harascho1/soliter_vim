@@ -2,8 +2,8 @@
 #include "../res/res.h"
 #include "SDL3/SDL_render.h"
 
-SDL_Texture* tex_settings_menu_items[3];
-SDL_Texture* tex_hover_settings_menu_items[3];
+static SDL_Texture* tex_settings_menu_items[3];
+static SDL_Texture* tex_hover_settings_menu_items[3];
 
 // TODO ubaci u assets direktoriju .txt fajl koji uzima sav ovaj tekst
 static char* normal_mode =
@@ -61,20 +61,20 @@ bool setting_event_handler(GAME* game, const SDL_Event* event) {
   default:
     break;
   }
-  return 1;
+  return true;
 }
 
 bool setting_update(const GAME* game) {
-  return 1;
+  return true;
 }
 
 bool render_guide(const GAME* game) {
 
   int text_width, text_height;
-  int status = set_font_size(game->font, fonts.text_font);
+  bool status = set_font_size(game->font, fonts.text_font);
   if (!status) {
     SDL_Log("get_text_size error\n");
-    return 0;
+    return false;
   }
   status = render_wrapped_text(
     game->font, game->renderer, normal_mode, fonts.text_font,
@@ -86,7 +86,7 @@ bool render_guide(const GAME* game) {
   );
   if (!status) {
     SDL_Log("render_wrapped_text error\n");
-    return 0;
+    return false;
   }
 
   status = render_wrapped_text(
@@ -99,7 +99,7 @@ bool render_guide(const GAME* game) {
   );
   if (!status) {
     SDL_Log("render_wrapped_text error\n");
-    return 0;
+    return false;
   }
 
   status = render_wrapped_text(
@@ -112,7 +112,7 @@ bool render_guide(const GAME* game) {
   );
   if (!status) {
     SDL_Log("render_wrapped_text error\n");
-    return 0;
+    return false;
   }
 
   status = get_text_size(
@@ -121,7 +121,7 @@ bool render_guide(const GAME* game) {
   );
   if (!status) {
     SDL_Log("get_text_size error...\n");
-    return 0;
+    return false;
   }
 
   int selected_text_width, selected_text_height;
@@ -131,7 +131,7 @@ bool render_guide(const GAME* game) {
   );
   if (!status) {
     SDL_Log("get_text_size error...\n");
-    return 0;
+    return false;
   }
 
   SDL_Color selected_color = {150, 255, 150, 255};
@@ -170,7 +170,7 @@ bool render_guide(const GAME* game) {
       );
       if (!status) {
         SDL_Log("get_text_size error...\n");
-        return 0;
+        return false;
       }
       status = get_text_size(
         game->font, game->setting_menu->items[i + 1].text, fonts.item_hover_font,
@@ -178,7 +178,7 @@ bool render_guide(const GAME* game) {
       );
       if (!status) {
         SDL_Log("get_text_size error...\n");
-        return 0;
+        return false;
       }
     }
     not_selected_width +=
@@ -196,24 +196,24 @@ bool setting_render(GAME* game) {
 
   if (game->background_texture == NULL) {
     SDL_Log("background is NULL\n");
-    return 0;
+    return false;
   }
-  int status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
+  bool status = SDL_RenderTexture(game->renderer, game->background_texture, NULL, NULL);
   if (!status) {
     SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
-    return status;
+    return false;
   }
 
   status = render_guide(game);
   if (!status) {
     SDL_Log("render_guide error\n");
-    return status;
+    return false;
   }
 
   status = SDL_RenderPresent(game->renderer);
   if (!status) {
     SDL_Log("SDL_RenderPresent error %s\n", SDL_GetError());
-    return 0;
+    return false;
   }
 
   return status;
@@ -227,7 +227,7 @@ bool setting_lazy_load(const GAME* game) {
     );
     if (tex_settings_menu_items[i] == NULL) {
       SDL_Log("menu_items[%d] cannot be initiazlied...", i);
-      return 0;
+      return false;
     }
   }
   size = fonts.item_hover_font;
@@ -237,10 +237,10 @@ bool setting_lazy_load(const GAME* game) {
     );
     if (tex_hover_settings_menu_items[i] == NULL) {
       SDL_Log("menu_items[%d] cannot be initiazlied...", i);
-      return 0;
+      return false;
     }
   }
-  return 1;
+  return true;
 }
 
 void setting_lazy_destroy() {

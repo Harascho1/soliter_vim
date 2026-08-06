@@ -37,6 +37,11 @@ bool set_font_size(FONT* font, const int size) {
   return true;
 }
 
+/*
+ * TODO:
+ * Rewrite this function to return float width and float height
+ * and change that on every call
+ */
 bool get_text_size(
   FONT* font, const char* text, const int size, int* width, int* height
 ) {
