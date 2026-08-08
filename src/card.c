@@ -11,7 +11,7 @@ bool same_card_selected(const CARD* card1, const CARD* card2) {
 
 void deselect_all_cards(DECK* deck) {
   for (int i = 0; i < 52; i++) {
-    deck->cards[i].selected = 0;
+    deck->cards[i].selected = true;
   }
 }
 
@@ -40,24 +40,18 @@ int select_card_below(const CARD* card, const DECK* deck) {
   if (card == NULL) {
     return 0;
   }
-  if (card->visible == not_visible) {
+  if (!card->visible) {
     return 0;
   }
   CARD* tmp_card = find_card(deck, card->pos->col, card->pos->row + 1);
   if (tmp_card == NULL) {
     return 1;
   }
-  tmp_card->selected = 1;
+  tmp_card->selected = true;
   return 1 + select_card_below(tmp_card, deck);
 }
 
-void shuffle_deck(DECK* deck) {
-  if (deck == NULL) {
-    SDL_Log("Deck is NULL and therefore cannot be shuffled");
-    return;
-  }
-
-  srand((unsigned int)time(NULL));
+static void shuffle_deck(DECK* deck) {
   int count = 0;
   for (int i = deck->count - 1; i >= 0; i--) {
     const uint32_t j = rand() % (i + 1);
@@ -71,7 +65,7 @@ void shuffle_deck(DECK* deck) {
 int sort_a_card(CARD* card, DECK* deck) {
   for (int suit = 0; suit < 4; suit++) {
     if (deck->sorted_cards[suit] == NULL && card->value == 1) {
-      card->on_field = 1;
+      card->on_field = true;
       card->pos->col = suit + 4;
       card->pos->row = 0;
       deck->sorted_cards[suit] = card;
@@ -85,7 +79,7 @@ int sort_a_card(CARD* card, DECK* deck) {
       if (deck->sorted_cards[suit]->value + 1 != card->value) {
         return 0;
       }
-      card->on_field = 1;
+      card->on_field = true;
       card->pos->col = 0;
       card->pos->row = 0;
       deck->sorted_cards[suit] = card;
@@ -98,7 +92,7 @@ int sort_a_card(CARD* card, DECK* deck) {
 void pop_all(CARD_STACK* stack) {
   for (int i = 0; i < stack->count; i++) {
     // NOTE: return cards to the deck face down
-    stack->array[i]->visible = not_visible;
+    stack->array[i]->visible = false;
   }
   memset((void*)stack->array, 0, STACK_SIZE);
   stack->count = 0;
@@ -117,7 +111,7 @@ bool push(CARD_STACK* stack, CARD* card) {
     return false;
   }
   stack->array[stack->count++] = card;
-  card->visible = visible;
+  card->visible = true;
   return true;
 }
 
@@ -153,7 +147,7 @@ bool can_card_be_placed(const CARD* card_below, const CARD* card_above) {
   return false;
 }
 
-void create_card_stack(CARD_STACK* stack) {
+static void create_card_stack(CARD_STACK* stack) {
   stack->count = 0;
 }
 
@@ -169,9 +163,9 @@ DECK* create_deck(SDL_Renderer* renderer) {
     for (int value = value_ace; value <= value_king; value++) {
       deck->cards[i].suit = suit;
       deck->cards[i].value = value;
-      deck->cards[i].visible = not_visible;
-      deck->cards[i].selected = 0;
-      deck->cards[i].on_field = 0;
+      deck->cards[i].visible = false;
+      deck->cards[i].selected = false;
+      deck->cards[i].on_field = false;
       deck->cards[i].frame = SDL_malloc(sizeof(SDL_FPoint));
       deck->cards[i].pos = SDL_malloc(sizeof(POSITION));
       i++;
@@ -192,7 +186,7 @@ DECK* create_deck(SDL_Renderer* renderer) {
   return deck;
 }
 
-void destroy_card(const CARD* card) {
+static void destroy_card(const CARD* card) {
   if (card != NULL) {
     SDL_free(card->frame);
     SDL_free(card->pos);
@@ -205,7 +199,7 @@ bool have_more_cards(const DECK* deck) {
   }
   int count = 0;
   for (int i = 28; i < 52; i++) {
-    if (deck->cards[i].on_field == 0) {
+    if (!deck->cards[i].on_field) {
       count++;
     }
   }
@@ -225,11 +219,11 @@ void destroy_deck(DECK* deck) {
   }
 }
 
-char* find_path(const CARD* card) {
+static char* find_path(const CARD* card) {
   char* path = SDL_malloc(sizeof(char) * 100);
 
-  if (card->visible == not_visible) {
-    if (card->selected == selected) {
+  if (!card->visible) {
+    if (card->selected) {
       sprintf(path, "assets/cards/back_red_basic.png");
       return path;
     }
@@ -275,7 +269,7 @@ char* find_path(const CARD* card) {
     break;
   }
 
-  if (card->selected == 1) {
+  if (card->selected) {
     sprintf(path, "assets/cards/%s_%s.png", value, suit);
     return path;
   }

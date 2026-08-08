@@ -194,9 +194,11 @@ bool render_cursor(const GAME* game) {
   }
 
   if (game->cursor->cursor == NULL) {
+    return false;
   }
 
-  const bool status = SDL_RenderTexture(game->renderer, texture, NULL, game->cursor->cursor);
+  const bool status =
+    SDL_RenderTexture(game->renderer, texture, NULL, game->cursor->cursor);
   if (!status) {
     SDL_Log("SDL_RenderTexture error: %s\n", SDL_GetError());
     return false;
@@ -473,10 +475,10 @@ bool gameplay_render(GAME* game) {
   status = render_text(
     game->renderer, tex_modes[mode],
     &(SDL_FPoint){.x = screen_dimens.padding,
-                 .y = resolution.height - (float)text_height - screen_dimens.padding}
+                  .y = resolution.height - (float)text_height - screen_dimens.padding}
   );
   if (!status) {
-    SDL_Log("render_text error...\n" );
+    SDL_Log("render_text error...\n");
     return false;
   }
 

@@ -9,10 +9,11 @@
 #include "SDL3/SDL_log.h"
 #include "gameplay.h"
 
-int normal_select_mode(const GAME* game, const SDL_Event* event) {
+int normal_select_mode(GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_KEY_DOWN) {
     switch (event->key.key) {
     case SDLK_ESCAPE:
+      // TODO: Make pressing 2 times in a row to go to game over scene
       push_user_event(g_change_scene_event_type, game_state_game_over);
       break;
     case SDLK_C:
@@ -103,7 +104,7 @@ int normal_select_mode(const GAME* game, const SDL_Event* event) {
   return 1;
 }
 
-int convert_controls(const unsigned int key) {
+static int convert_controls(const unsigned int key) {
   int i = 0;
   while (i < 14) {
     if (key == config_commands[i]) {

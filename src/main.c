@@ -72,6 +72,7 @@ static void cleanup() {
 
 int main(const int argc, char** argv) {
   log_init(argc, argv);
+  srand((unsigned int)time(NULL));
 
   bool status = sld_init();
   if (!status) {

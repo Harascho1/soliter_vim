@@ -1,9 +1,6 @@
 #include "textbox.h"
-#include "SDL3/SDL_log.h"
 #include "SDL3/SDL_stdinc.h"
-#include <ctype.h>
 #include <string.h>
-#include <uchar.h>
 
 TEXTBOX* create_textbox(const int n) {
   TEXTBOX* textbox = SDL_malloc(sizeof(TEXTBOX));

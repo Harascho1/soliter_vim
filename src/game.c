@@ -33,7 +33,7 @@ bool load_game_field(DECK* deck) {
     g_invisible_card[i].value = 14;
     for (int j = 0; j < i + 1; ++j) {
       if (i == j) {
-        deck->cards[count].visible = visible;
+        deck->cards[count].visible = true;
       }
       deck->cards[count].frame->x = x_coord;
       deck->cards[count].frame->y = y_coord;

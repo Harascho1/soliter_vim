@@ -16,6 +16,10 @@ CURSOR* create_cursor(const int col, const int row) {
   cursor->cursor->h = card_dimens.height + (cursor_dimens.padding * 2);
 
   cursor->mode = 0;
+  SDL_Log(
+    "game cursor location in pixels: [%.1F %.1F]\n", cursor->cursor->x,
+    cursor->cursor->y
+  );
   return cursor;
 }
 

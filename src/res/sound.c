@@ -46,7 +46,7 @@ typedef struct {
   MIX_Audio* sound;
 } packet;
 
-void* play_sound_on_thread(void* args) {
+static void* play_sound_on_thread(void* args) {
   const packet* tmp = (packet*)args;
   MIX_Audio* sound = (MIX_Audio*)tmp->sound;
   if (sound == NULL) {

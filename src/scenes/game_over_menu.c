@@ -15,7 +15,7 @@ static SDL_Texture* tex_time;
 static SDL_Texture* tex_game_over_items[3];
 static SDL_Texture* tex_hover_game_over_items[3];
 
-bool game_over_menu_lazy_load(const GAME* game) {
+static bool game_over_menu_lazy_load(const GAME* game) {
 
   if (game->timer->start_timer == 1) {
     if (g_game_win == 1) {
@@ -73,7 +73,7 @@ bool game_over_menu_lazy_load(const GAME* game) {
   return true;
 }
 
-void game_over_menu_lazy_destroy() {
+static void game_over_menu_lazy_destroy() {
   SDL_DestroyTexture(tex_time);
 
   for (int i = 0; i < 2; i++) {
@@ -86,7 +86,7 @@ void game_over_menu_lazy_destroy() {
   }
 }
 
-bool game_over_menu_event_handler(GAME* game, const SDL_Event* event) {
+static bool game_over_menu_event_handler(GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_KEY_DOWN) {
     switch (event->key.key) {
     case SDLK_UP:
@@ -127,13 +127,12 @@ bool game_over_menu_event_handler(GAME* game, const SDL_Event* event) {
   return true;
 }
 
-bool game_over_menu_update(const GAME* game) {
+static bool game_over_menu_update(const GAME* game) {
   return true;
 }
 
-bool render_time(const GAME* game) {
+static bool render_time(const GAME* game) {
   if (strlen(win_in_seconds) <= 0) {
-    // SDL_Log("win_in_seconds buffer is empty\n");
     return true;
   }
   int text_width, text_height;
@@ -159,7 +158,7 @@ bool render_time(const GAME* game) {
   return true;
 }
 
-bool game_over_menu_render(GAME* game) {
+static bool game_over_menu_render(GAME* game) {
   bool status = SDL_RenderClear(game->renderer);
   if (!status) {
     SDL_Log("SDL_RenderClear failed: %s\n", SDL_GetError());

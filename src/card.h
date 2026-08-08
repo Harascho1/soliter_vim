@@ -3,10 +3,6 @@
 
 #define STACK_SIZE 30
 
-enum { not_visible = 0, visible };
-
-enum { not_selected = 0, selected };
-
 typedef enum { suit_clubs, suit_spades, suit_diamonds, suit_hearts } SUIT;
 
 typedef enum {
@@ -33,11 +29,11 @@ typedef struct {
 typedef struct {
   VALUE value;
   SUIT suit;
-  int visible;
-  int selected;
+  bool visible;
+  bool selected;
   SDL_FPoint* frame;
   POSITION* pos;
-  int on_field;
+  bool on_field;
 } CARD;
 
 typedef struct {
@@ -85,6 +81,7 @@ void deselect_all_cards(DECK* deck);
 CARD* find_card(const DECK* deck, int col, int row);
 bool can_card_be_placed(const CARD* card_below, const CARD* card_above);
 int sort_a_card(CARD* card, DECK* deck);
+// Returns number of selected cards
 int select_card_below(const CARD* card, const DECK* deck);
 bool same_card_selected(const CARD* card1, const CARD* card2);
 bool have_more_cards(const DECK* deck);

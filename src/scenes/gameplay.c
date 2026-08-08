@@ -13,6 +13,14 @@ void change_cursor_frame(const GAME* game) {
   const CARD* card =
     find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
 
+  if (card != NULL) {
+    SDL_Log("Cursor is on top of: %d", card->value);
+    SDL_Log(
+      "game cursor location in rows and cols: [%d %d]", game->cursor->pos->row,
+      game->cursor->pos->col
+    );
+  }
+
   // * deck_card
   if (card == NULL && game->cursor->pos->row == 0) {
     game->cursor->cursor->x = game_dimens.padding_width - cursor_dimens.padding;
@@ -34,6 +42,11 @@ void change_cursor_frame(const GAME* game) {
     game->cursor->cursor->x = card->frame->x - cursor_dimens.padding;
     game->cursor->cursor->y = card->frame->y - cursor_dimens.padding;
   }
+
+  SDL_Log(
+    "game cursor location in pixels: [%.1F %.1F]", game->cursor->cursor->x,
+    game->cursor->cursor->y
+  );
 }
 
 CARD* top_deck_card(DECK* deck) {
@@ -76,7 +89,7 @@ CARD* draw_next_card(DECK* deck) {
   CARD* next_new_card = top_deck_card(deck);
 
   if (next_new_card != NULL) {
-    next_new_card->visible = visible;
+    next_new_card->visible = true;
     push(&deck->drawn_cards, next_new_card);
   }
 
@@ -100,7 +113,7 @@ bool reveal_card_below(const GAME* game) {
     }
     if (last_card_visible == 0) {
       card = find_card(game->deck, i, j);
-      card->visible = visible;
+      card->visible = true;
     }
   }
 
@@ -110,7 +123,7 @@ bool reveal_card_below(const GAME* game) {
 int selected_card(DECK* deck, CARD** selected_cards) {
   int count = 0;
   for (int i = 0; i < 52; i++) {
-    if (deck->cards[i].selected == selected) {
+    if (deck->cards[i].selected == true) {
       selected_cards[count++] = &deck->cards[i];
     }
   }
@@ -170,6 +183,7 @@ bool place_king(CARD** card, const int num, const CURSOR* cursor) {
   return true;
 }
 
+// TODO: needs refactoring
 bool place_a_card(const GAME* game) {
   const CARD* card =
     find_card(game->deck, game->cursor->pos->col, game->cursor->pos->row);
@@ -239,7 +253,7 @@ bool place_a_card(const GAME* game) {
     return false;
   }
 
-  if (card->on_field == 0) {
+  if (!card->on_field) {
     deselect_all_cards(game->deck);
     set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
     return false;
@@ -252,7 +266,6 @@ bool place_a_card(const GAME* game) {
   }
 
   if (find_card(game->deck, card->pos->col, card->pos->row + 1) != NULL) {
-    SDL_Log("komso\n");
     set_a_flag(game->cursor, CURSOR_NORMAL_MODE);
     deselect_all_cards(game->deck);
     return false;
@@ -268,7 +281,7 @@ bool place_a_card(const GAME* game) {
     s_card[i]->pos->row = row_of_cursor + 1;
     s_card[i]->frame->x = x_card_pos;
     s_card[i]->frame->y = y_card_pos + card_dimens.height_padding;
-    s_card[i]->on_field = 1;
+    s_card[i]->on_field = true;
 
     row_of_cursor++;
     y_card_pos += card_dimens.height_padding;
@@ -312,7 +325,7 @@ int select_a_card(const GAME* game) {
     set_a_flag(game->cursor, CURSOR_SELECT_MODE);
     return 1;
   }
-  if (card->visible == not_visible) {
+  if (card->visible == true) {
     return 1;
   }
   card->selected = !card->selected;
@@ -324,7 +337,7 @@ bool auto_sortable(const CARD* card, CARD** sorted_cards) {
   const int card_suit = card->suit;
   if (card->value == 1) {
     return true;
-}
+  }
 
   if (card->value == 2) {
     const CARD* card_same_suit = NULL;
@@ -401,7 +414,7 @@ void auto_solve(const GAME* game) {
         ++j;
         continue;
       }
-      if (card->visible == visible) {
+      if (card->visible) {
         if (auto_sortable(card, deck->sorted_cards)) {
           game_update |= sort_a_card(card, deck);
         }
@@ -435,7 +448,6 @@ int interact(const GAME* game) {
 }
 
 bool gameplay_update(const GAME* game) {
-
   auto_solve(game);
 
   if (game_update == 1) {
