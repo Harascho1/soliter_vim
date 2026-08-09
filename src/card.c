@@ -223,8 +223,10 @@ static const char* find_path(const CARD* card) {
   const CARD_IMAGE_PATH* card_paths = &paths.images.cards;
 
   if (!card->visible) {
-    return (int)card->selected ? card_paths->selected_face_down_card
-                          : card_paths->face_down_card;
+    if (card->selected) {
+      return card_paths->selected_face_down_card;
+    }
+    return card_paths->face_down_card;
   }
 
   if (card->suit < suit_clubs || card->suit > suit_hearts) {
