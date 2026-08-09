@@ -177,7 +177,7 @@ DECK* create_deck(SDL_Renderer* renderer) {
   deck->deck_card = &deck->cards[deck->count];
 
   deck->empty_sorted_card =
-    create_texture_from_image(renderer, "assets/cards/total_blank_front_white.png");
+    create_texture_from_image(renderer, paths.images.cards.empty_field);
   if (deck->empty_sorted_card == NULL) {
     SDL_Log("create_texture_from_image error\n");
     return NULL;
@@ -219,63 +219,29 @@ void destroy_deck(DECK* deck) {
   }
 }
 
-static char* find_path(const CARD* card) {
-  char* path = SDL_malloc(sizeof(char) * 100);
+static const char* find_path(const CARD* card) {
+  const CARD_IMAGE_PATH* card_paths = &paths.images.cards;
 
   if (!card->visible) {
-    if (card->selected) {
-      sprintf(path, "assets/cards/back_red_basic.png");
-      return path;
-    }
-    sprintf(path, "assets/cards/back_red_basic_white.png");
-    return path;
+    return (int)card->selected ? card_paths->selected_face_down_card
+                          : card_paths->face_down_card;
   }
 
-  char suit[10];
-  switch (card->suit) {
-  case suit_clubs:
-    strncpy(suit, "clubs", 6);
-    break;
-  case suit_spades:
-    strncpy(suit, "spades", 7);
-    break;
-  case suit_diamonds:
-    strncpy(suit, "diamonds", 9);
-    break;
-  case suit_hearts:
-    strncpy(suit, "hearts", 7);
-    break;
-  default:
+  if (card->suit < suit_clubs || card->suit > suit_hearts) {
     SDL_Log("Unknown suit");
     return NULL;
   }
 
-  char value[6];
-  switch (card->value) {
-  case 1:
-    strncpy(value, "ace", 4);
-    break;
-  case 11:
-    strncpy(value, "jack", 5);
-    break;
-  case 12:
-    strncpy(value, "queen", 6);
-    break;
-  case 13:
-    strncpy(value, "king", 5);
-    break;
-  default:
-    SDL_itoa(card->value, value, 10);
-    break;
+  if (card->value < value_ace || card->value > value_king) {
+    SDL_Log("Unknown value");
+    return NULL;
   }
 
   if (card->selected) {
-    sprintf(path, "assets/cards/%s_%s.png", value, suit);
-    return path;
+    return card_paths->selected_deck[card->suit][card->value];
   }
 
-  sprintf(path, "assets/cards/%s_%s_white.png", value, suit);
-  return path;
+  return card_paths->deck[card->suit][card->value];
 }
 
 bool render_card(SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* point) {
@@ -284,7 +250,7 @@ bool render_card(SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* poi
     return false;
   }
 
-  char* path = find_path(card);
+  const char* path = find_path(card);
   if (path == NULL) {
     SDL_Log("path is NULL in render_card fun...\n");
     return false;
@@ -307,6 +273,5 @@ bool render_card(SDL_Renderer* renderer, const CARD* card, const SDL_FPoint* poi
   }
 
   SDL_DestroyTexture(texture);
-  SDL_free(path);
   return status;
 }

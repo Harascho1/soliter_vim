@@ -37,15 +37,22 @@ typedef struct {
 } TEXT;
 extern const TEXT texts;
 
+// NOTE: deck/selected_deck are indexed as [SUIT][VALUE]. VALUE starts at
+// value_ace == 1, so index 0 of the second dimension is unused.
 typedef struct {
-  const char* background;
-  const char* logo;
   const char* face_down_card;
   const char* selected_face_down_card;
   const char* empty_field;
+  const char* deck[4][14];
+  const char* selected_deck[4][14];
+} CARD_IMAGE_PATH;
+
+typedef struct {
+  const char* background;
+  const char* logo;
   const char* cursor;
   // TODO: maybe add array of all 52 cards
-  const char* cards;
+  CARD_IMAGE_PATH cards;
 } IMAGE_PATH;
 
 typedef struct {
