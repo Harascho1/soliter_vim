@@ -18,7 +18,7 @@ static SDL_Texture* tex_hover_menu_items[4];
 static SDL_Texture* tex_game_mode[2];
 static SDL_Texture* tex_hover_game_mode[2];
 
-void lazy_destroy_main_menu() {
+static void lazy_destroy_main_menu() {
   SDL_DestroyTexture(tex_game_title);
   for (int i = 0; i < 4; i++) {
     SDL_DestroyTexture(tex_menu_items[i]);
@@ -34,7 +34,7 @@ void action() {
   SDL_Log("Print");
 }
 
-bool lazy_load_main_menu(const GAME* game) {
+static bool lazy_load_main_menu(const GAME* game) {
   tex_game_title = get_texture_from_text(
     game->font, game->renderer, texts.titles.sovimter, fonts.title_font, &colors.title
   );
@@ -86,7 +86,7 @@ bool lazy_load_main_menu(const GAME* game) {
   return true;
 }
 
-bool main_menu_event_handler(GAME* game, const SDL_Event* event) {
+static bool main_menu_event_handler(GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_MOUSE_MOTION) {
   }
   if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
@@ -142,14 +142,14 @@ bool main_menu_event_handler(GAME* game, const SDL_Event* event) {
   return true;
 }
 
-bool main_menu_update(const GAME* game) {
+static bool main_menu_update(const GAME* game) {
   if (game->timer->start_timer == 1) {
     reset_timer(game->timer);
   }
   return true;
 }
 
-bool main_menu_render(GAME* game) {
+static bool main_menu_render(GAME* game) {
   if (game == NULL) {
     SDL_Log("game is NULL\n");
     return false;

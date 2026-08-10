@@ -4,6 +4,8 @@
 #include "SDL3_mixer/SDL_mixer.h"
 #include "game.h"
 #include "log.h"
+#include "res/config.h"
+
 #include <stdbool.h>
 static GAME_STATE g_current_game_state = game_state_main_menu;
 
@@ -14,10 +16,10 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
 }
 #endif
 
-static SCENE* g_game_scenes[] = {&main_menu_scene,      &gameplay_scene,
-                                 &game_over_menu_scene, &setting_scene,
-                                 &scores_scene,         &macro_setting_scene,
-                                 &option_setting_scene};
+static const SCENE* g_game_scenes[] = {&main_menu_scene,      &gameplay_scene,
+                                       &game_over_menu_scene, &setting_scene,
+                                       &scores_scene,         &macro_setting_scene,
+                                       &option_setting_scene};
 
 static int g_scene_fps[] = {30, 30, 30, 30, 30, 30, 30};
 
@@ -63,6 +65,18 @@ static bool sld_init() {
   return status;
 }
 
+static void files_init() {
+  // TODO: make check func and create func for bin folder if deleted
+  if (!does_config_file_exist()) {
+    create_config_file();
+  }
+  if (!does_option_file_exist()) {
+    create_option_file();
+  }
+  load_config();
+  SDL_Log("Config files are successfully loaded");
+}
+
 static void cleanup() {
   SDL_QuitSubSystem(SDL_INIT_EVENTS);
   TTF_Quit();
@@ -72,6 +86,9 @@ static void cleanup() {
 
 int main(const int argc, char** argv) {
   log_init(argc, argv);
+
+  files_init();
+
   srand((unsigned int)time(NULL));
 
   bool status = sld_init();

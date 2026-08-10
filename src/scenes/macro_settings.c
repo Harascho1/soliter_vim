@@ -25,7 +25,7 @@ SDL_Texture* tex_command_keys[14];
 static SDL_Texture* tex_title_menu;
 SDL_Texture* tex_pop_out;
 
-bool lazy_load_config(const GAME* game) {
+static bool lazy_load_config(const GAME* game) {
   for (int i = 0; i < 14; i++) {
     SDL_DestroyTexture(tex_command_keys[i]);
     SDL_DestroyTexture(tex_hover_command_keys[i]);
@@ -52,7 +52,7 @@ bool lazy_load_config(const GAME* game) {
   return true;
 }
 
-bool macro_setting_menu_lazy_load(const GAME* game) {
+static bool macro_setting_menu_lazy_load(const GAME* game) {
 
   int size = fonts.title_font;
   tex_title_menu =
@@ -105,7 +105,7 @@ bool macro_setting_menu_lazy_load(const GAME* game) {
   return true;
 }
 
-void macro_settings_menu_lazy_destroy() {
+static void macro_settings_menu_lazy_destroy() {
   SDL_DestroyTexture(tex_title_menu);
   SDL_DestroyTexture(tex_pop_out);
   for (int i = 0; i < 14; i++) {
@@ -115,7 +115,7 @@ void macro_settings_menu_lazy_destroy() {
     SDL_DestroyTexture(tex_hover_command_keys[i]);
   }
 }
-bool macro_settings_event_handler(GAME* game, const SDL_Event* event) {
+static bool macro_settings_event_handler(GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_KEY_DOWN) {
     if (event_status == 1) {
       const unsigned int key = event->key.key;
@@ -160,7 +160,7 @@ bool macro_settings_event_handler(GAME* game, const SDL_Event* event) {
   return true;
 }
 
-bool render_press_key_popout(const GAME* game) {
+static bool render_press_key_popout(const GAME* game) {
   int text_width, text_height;
   bool status = get_text_size(
     game->font, press_key,
@@ -183,7 +183,7 @@ bool render_press_key_popout(const GAME* game) {
 }
 
 static int flag = 0;
-bool macro_settings_update(const GAME* game) {
+static bool macro_settings_update(const GAME* game) {
   if (event_status == 1) {
     flag = 1;
   }
@@ -197,7 +197,7 @@ bool macro_settings_update(const GAME* game) {
   return true;
 }
 
-bool macro_settings_render(GAME* game) {
+static bool macro_settings_render(GAME* game) {
   if (game == NULL) {
     SDL_Log("game is NULL\n");
     return false;

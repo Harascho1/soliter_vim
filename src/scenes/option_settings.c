@@ -8,7 +8,7 @@
 static int selected_index = 0;
 static char* text[14] = {"fullscreen", "sfx", "volume"};
 
-bool lazy_load_option(const GAME* game) {
+static bool lazy_load_option(const GAME* game) {
   for (int i = 0; i < 3; i++) {
     SDL_DestroyTexture(tex_opt->tex_options_set[i]);
     SDL_DestroyTexture(tex_opt->tex_hover_options_set[i]);
@@ -35,7 +35,7 @@ bool lazy_load_option(const GAME* game) {
   return true;
 }
 
-bool option_setting_lazy_load(const GAME* game) {
+static bool option_setting_lazy_load(const GAME* game) {
   tex_opt = SDL_malloc(sizeof(TEX_OPTIONS_SETTINGS));
 
   int size = fonts.title_font;
@@ -82,7 +82,7 @@ bool option_setting_lazy_load(const GAME* game) {
   return true;
 }
 
-void option_setting_lazy_destroy() {
+static void option_setting_lazy_destroy() {
   SDL_DestroyTexture(tex_opt->tex_title_menu);
   for (int i = 0; i < 3; i++) {
     SDL_DestroyTexture(tex_opt->tex_items[i]);
@@ -95,7 +95,7 @@ void option_setting_lazy_destroy() {
 
 static int event_status = 0;
 
-bool option_settings_event_hendler(GAME* game, const SDL_Event* event) {
+static bool option_settings_event_hendler(GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_KEY_DOWN) {
     switch (event->key.key) {
     case SDLK_ESCAPE:
@@ -158,7 +158,7 @@ bool option_settings_event_hendler(GAME* game, const SDL_Event* event) {
   return true;
 }
 
-bool option_settings_update(const GAME* game) {
+static bool option_settings_update(const GAME* game) {
   if (event_status == 1) {
     const bool status = lazy_load_option(game);
     if (!status) {
@@ -169,7 +169,7 @@ bool option_settings_update(const GAME* game) {
   return true;
 }
 
-bool option_settings_render(GAME* game) {
+static bool option_settings_render(GAME* game) {
   if (game == NULL) {
     SDL_Log("game is NULL\n");
     return false;

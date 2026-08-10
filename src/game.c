@@ -59,7 +59,7 @@ bool load_game_field(DECK* deck) {
   return true;
 }
 
-bool fullscree_mode(const GAME* game) {
+static bool fullscree_mode(const GAME* game) {
   const bool status = SDL_SetWindowFullscreen(game->window, (bool)config_options[0]);
   if (!status) {
     SDL_Log("SDL_SetWindowFullscreen error %s", SDL_GetError());
@@ -100,14 +100,6 @@ bool game_init(GAME* game, const char* title) {
     game_quit(game);
     return false;
   }
-
-  if (does_config_file_exist()) {
-    create_config_file();
-  }
-  if (does_option_file_exist()) {
-    create_option_file();
-  }
-  load_config();
 
   game->window = SDL_CreateWindow(title, (int)resolution.width, (int)resolution.height, 0);
   if (game->window == NULL) {
@@ -311,7 +303,7 @@ bool push_user_event(const Uint32 type, const Sint32 code) {
   return SDL_PushEvent(&event);
 }
 
-void free_resurses(char** array_of_strings) {
+static void free_resurses(char** array_of_strings) {
   if (array_of_strings == NULL) {
     return;
   }
@@ -324,7 +316,7 @@ void free_resurses(char** array_of_strings) {
   SDL_free(array_of_strings);
 }
 
-bool make_string_array(char** array_of_strings, int* i) {
+static bool make_string_array(char** array_of_strings, int* i) {
   FILE* saves_files_bin = fopen(paths.bins.save, "rb");
   if (saves_files_bin == NULL) {
     return true;
@@ -369,7 +361,7 @@ bool make_string_array(char** array_of_strings, int* i) {
   return true;
 }
 
-bool make_array_of_times(char** array_of_strings, int array[], const int i) {
+static bool make_array_of_times(char** array_of_strings, int array[], const int i) {
   const char* seconds = "name:name seconds:";
   const int jmp = (int)strlen(seconds);
   for (int j = 0; j < i; j++) {
@@ -391,7 +383,7 @@ bool make_array_of_times(char** array_of_strings, int array[], const int i) {
   return true;
 }
 
-int get_new_insert_index(const int* array, int* i, const unsigned int num) {
+static int get_new_insert_index(const int* array, int* i, const unsigned int num) {
   int new_insert;
   for (int j = 0; j < 10; j++) {
     SDL_Log("[%d] broj je: [%d]\n", j, array[j]);
@@ -409,7 +401,7 @@ int get_new_insert_index(const int* array, int* i, const unsigned int num) {
   return -1;
 }
 
-void make_new_array_of_strings(
+static void make_new_array_of_strings(
   char** strings_of_array, const int i, const char* new_string, const int new_insert_index
 ) {
   char tmp[255];
@@ -427,7 +419,7 @@ void make_new_array_of_strings(
   }
 }
 
-bool print_in_bin(char** strings_of_array, const int i) {
+static bool print_in_bin(char** strings_of_array, const int i) {
   FILE* bin_eg = fopen(paths.bins.save, "wb+");
   if (bin_eg == NULL) {
     return false;

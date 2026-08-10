@@ -80,6 +80,7 @@ bool does_config_file_exist() {
   FILE* config_file = fopen(paths.bins.config, "rb");
 
   if (config_file == NULL) {
+    SDL_Log("config_file does not exist");
     return false;
   }
 

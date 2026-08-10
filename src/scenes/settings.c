@@ -18,7 +18,7 @@ static char* fly_mode =
   "cards from a deck.\nTAB - JUMP to the drawn card press.";
 static char* universal_rule = "X - move to NORMAL mode\nC - move to FLY mode";
 
-bool setting_event_handler(GAME* game, const SDL_Event* event) {
+static bool setting_event_handler(GAME* game, const SDL_Event* event) {
   if (event->type != SDL_EVENT_KEY_DOWN) {
     return true;
   }
@@ -64,11 +64,11 @@ bool setting_event_handler(GAME* game, const SDL_Event* event) {
   return true;
 }
 
-bool setting_update(const GAME* game) {
+static bool setting_update(const GAME* game) {
   return true;
 }
 
-bool render_guide(const GAME* game) {
+static bool render_guide(const GAME* game) {
 
   int text_width, text_height;
   bool status = set_font_size(game->font, fonts.text_font);
@@ -192,7 +192,7 @@ bool render_guide(const GAME* game) {
   return status;
 }
 
-bool setting_render(GAME* game) {
+static bool setting_render(GAME* game) {
 
   if (game->background_texture == NULL) {
     SDL_Log("background is NULL\n");
@@ -219,7 +219,7 @@ bool setting_render(GAME* game) {
   return status;
 }
 
-bool setting_lazy_load(const GAME* game) {
+static bool setting_lazy_load(const GAME* game) {
   int size = fonts.item_font;
   for (int i = 0; i < 3; i++) {
     tex_settings_menu_items[i] = get_texture_from_text(
@@ -243,7 +243,7 @@ bool setting_lazy_load(const GAME* game) {
   return true;
 }
 
-void setting_lazy_destroy() {
+static void setting_lazy_destroy() {
   for (int i = 0; i < 3; i++) {
     SDL_DestroyTexture(tex_settings_menu_items[i]);
     SDL_DestroyTexture(tex_hover_settings_menu_items[i]);

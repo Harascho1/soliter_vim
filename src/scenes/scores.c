@@ -5,7 +5,7 @@
 
 SDL_Texture* tex_top_10_scores[10];
 
-bool scores_lazy_load(const GAME* game) {
+static bool scores_lazy_load(const GAME* game) {
   FILE* saves = fopen(paths.bins.save, "rb+");
   if (saves == NULL) {
     SDL_Log("Unable to open file");
@@ -57,13 +57,13 @@ bool scores_lazy_load(const GAME* game) {
   return true;
 }
 
-void scores_lazy_destroy() {
+static void scores_lazy_destroy() {
   for (int i = 0; i < 10; i++) {
     SDL_DestroyTexture(tex_top_10_scores[i]);
   }
 }
 
-bool scores_event_hendler(GAME* game, const SDL_Event* event) {
+static bool scores_event_hendler(GAME* game, const SDL_Event* event) {
   if (event->type == SDL_EVENT_KEY_DOWN) {
     switch (event->key.key) {
     case SDLK_ESCAPE:
@@ -76,11 +76,11 @@ bool scores_event_hendler(GAME* game, const SDL_Event* event) {
   return true;
 }
 
-bool scores_update(const GAME* game) {
+static bool scores_update(const GAME* game) {
   return true;
 }
 
-bool scores_render(GAME* game) {
+static bool scores_render(GAME* game) {
   bool status = SDL_RenderClear(game->renderer);
   if (!status) {
     SDL_Log("SDL_RenderClear error: %s", SDL_GetError());
